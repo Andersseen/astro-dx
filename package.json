@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=apps/demo",
     "build": "npm run build:packages && npm run build --workspace=apps/demo",
-    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/events && npm run build --workspace=packages/attributes && npm run build --workspace=packages/elements && npm run build --workspace=packages/all",
+    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/events && npm run build --workspace=packages/attributes && npm run build --workspace=packages/elements && npm run build --workspace=packages/dom && npm run build --workspace=packages/all",
     "test": "npm run test --workspaces --if-present",
     "lint": "biome check .",
     "format": "biome format --write ."

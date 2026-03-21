@@ -1,5 +1,5 @@
-import { atom } from "nanostores";
-import { trackAtomRead } from "./tracking.ts";
+import { atom } from 'nanostores';
+import { trackAtomRead } from './tracking.ts';
 
 export type Signal<T> = {
   (): T;

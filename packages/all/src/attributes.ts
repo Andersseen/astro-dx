@@ -1,1 +1,1 @@
-export * from "@astro-dx/attributes";
+export * from '@astro-dx/attributes';

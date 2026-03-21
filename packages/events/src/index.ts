@@ -1,1 +1,1 @@
-export { on, onHover, onKey, onFocus } from "./events.ts";
+export { on, onHover, onKey, onFocus } from './events.ts';

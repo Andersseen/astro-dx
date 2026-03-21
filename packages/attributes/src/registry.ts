@@ -1,7 +1,6 @@
-import type { Computed, Signal } from "@astro-dx/core";
+import type { Computed, Signal } from '@astro-dx/core';
 
-export type AnyReadable = (Signal<unknown> | Computed<unknown>) &
-  (() => unknown);
+export type AnyReadable = (Signal<unknown> | Computed<unknown>) & (() => unknown);
 
 declare global {
   interface Window {

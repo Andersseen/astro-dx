@@ -1,19 +1,19 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 export class DxIf extends HTMLElement {
   private _cleanup: (() => void) | null = null;
-  private _template = "";
+  private _template = '';
   private _isMounted = false;
 
   connectedCallback(): void {
-    const signalName = this.getAttribute("signal");
+    const signalName = this.getAttribute('signal');
     if (!signalName) {
       console.warn('[dx-if] missing "signal" attribute');
       return;
     }
 
     this._template = this.innerHTML;
-    this.innerHTML = "";
+    this.innerHTML = '';
 
     requestAnimationFrame(() => this._connect(signalName));
   }
@@ -30,7 +30,7 @@ export class DxIf extends HTMLElement {
         this.innerHTML = this._template;
         this._isMounted = true;
       } else if (!value && this._isMounted) {
-        this.innerHTML = "";
+        this.innerHTML = '';
         this._isMounted = false;
       }
     });
@@ -42,4 +42,4 @@ export class DxIf extends HTMLElement {
   }
 }
 
-customElements.define("dx-if", DxIf);
+customElements.define('dx-if', DxIf);

@@ -1,1 +1,1 @@
-export * from "@astro-dx/core";
+export * from '@astro-dx/core';

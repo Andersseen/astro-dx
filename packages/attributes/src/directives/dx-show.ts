@@ -1,7 +1,7 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 export function applyDxShow(el: Element): void {
-  const signalName = el.getAttribute("dx-show");
+  const signalName = el.getAttribute('dx-show');
   if (!signalName) return;
 
   const sig = resolve(signalName);

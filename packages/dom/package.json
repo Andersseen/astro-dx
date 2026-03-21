@@ -1,7 +1,7 @@
 {
-  "name": "@astro-dx/events",
+  "name": "@astro-dx/dom",
   "version": "0.1.0",
-  "description": "Declarative DOM event bindings for Astro - on, onHover, onKey, onFocus",
+  "description": "Enriched element references, DOM bindings and events for Astro",
   "type": "module",
   "exports": {
     ".": {
@@ -9,19 +9,25 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@astro-dx/core": "*"
+    "@astro-dx/core": "*",
+    "@astro-dx/events": "*",
+    "@astro-dx/attributes": "*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
     "happy-dom": "^14.0.0"
   }
 }

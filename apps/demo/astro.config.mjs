@@ -25,6 +25,7 @@ export default defineConfig({
           __dirname,
           "../../packages/elements/src/index.ts",
         ),
+        "@astro-dx/dom": resolve(__dirname, "../../packages/dom/src/index.ts"),
         "astro-dx/core": resolve(__dirname, "../../packages/all/src/core.ts"),
         "astro-dx/events": resolve(
           __dirname,
@@ -38,6 +39,7 @@ export default defineConfig({
           __dirname,
           "../../packages/all/src/elements.ts",
         ),
+        "astro-dx/dom": resolve(__dirname, "../../packages/all/src/dom.ts"),
         "astro-dx": resolve(__dirname, "../../packages/all/src/index.ts"),
       },
     },

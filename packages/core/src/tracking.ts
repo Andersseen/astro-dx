@@ -1,4 +1,4 @@
-import type { atom } from "nanostores";
+import type { atom } from 'nanostores';
 
 export type AtomLike = ReturnType<typeof atom<unknown>>;
 

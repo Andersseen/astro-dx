@@ -1,9 +1,5 @@
 export * from "@astro-dx/core";
-export * from "@astro-dx/events";
-export {
-  register as registerAttributes,
-  bootstrap,
-} from "@astro-dx/attributes";
+export * from "@astro-dx/dom";
 export {
   register as registerElements,
   DxShow,

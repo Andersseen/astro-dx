@@ -1,6 +1,6 @@
-import { computed as nanoComputed } from "nanostores";
-import type { Signal } from "./signal.ts";
-import { startTracking, stopTracking } from "./tracking.ts";
+import { computed as nanoComputed } from 'nanostores';
+import type { Signal } from './signal.ts';
+import { startTracking, stopTracking } from './tracking.ts';
 
 export type Computed<T> = {
   (): T;
@@ -12,15 +12,13 @@ export function trackRead<T>(sig: Signal<T>): T {
 }
 
 export function computed<T>(fn: () => T): Computed<T> {
-  const trackedAtoms = new Set<Signal<unknown>["_atom"]>();
+  const trackedAtoms = new Set<Signal<unknown>['_atom']>();
   startTracking(trackedAtoms);
   fn();
   stopTracking();
   const deps = [...trackedAtoms];
 
-  const store = nanoComputed(deps as Parameters<typeof nanoComputed>[0], () =>
-    fn(),
-  );
+  const store = nanoComputed(deps as Parameters<typeof nanoComputed>[0], () => fn());
 
   const read = () => store.get();
   read.subscribe = (cb: (value: T) => void) => store.subscribe(cb);

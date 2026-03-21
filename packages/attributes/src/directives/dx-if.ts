@@ -1,7 +1,7 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 export function applyDxIf(el: Element): void {
-  const signalName = el.getAttribute("dx-if");
+  const signalName = el.getAttribute('dx-if');
   if (!signalName) return;
 
   const sig = resolve(signalName);

@@ -1,8 +1,8 @@
-import type { Signal } from "./signal.ts";
-import { startTracking, stopTracking } from "./tracking.ts";
+import type { Signal } from './signal.ts';
+import { startTracking, stopTracking } from './tracking.ts';
 
 export function effect(fn: () => void): () => void {
-  const trackedAtoms = new Set<Signal<unknown>["_atom"]>();
+  const trackedAtoms = new Set<Signal<unknown>['_atom']>();
   startTracking(trackedAtoms);
   fn();
   stopTracking();

@@ -1,4 +1,4 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 type Item = Record<string, unknown>;
 
@@ -7,7 +7,7 @@ type SubscribableItems = {
 };
 
 export function applyDxFor(template: Element): void {
-  const signalName = template.getAttribute("dx-for");
+  const signalName = template.getAttribute('dx-for');
   if (!signalName) return;
 
   const sig = resolve(signalName);
@@ -35,7 +35,7 @@ export function applyDxFor(template: Element): void {
 
     for (const item of items ?? []) {
       const clone = template.cloneNode(true) as Element;
-      clone.removeAttribute("dx-for");
+      clone.removeAttribute('dx-for');
       bindItem(clone, item);
       fragment.appendChild(clone);
       renderedNodes.push(clone);
@@ -46,22 +46,22 @@ export function applyDxFor(template: Element): void {
 }
 
 function bindItem(el: Element, item: Item): void {
-  const textField = el.getAttribute("dx-text");
+  const textField = el.getAttribute('dx-text');
   if (textField && textField in item) {
-    el.textContent = String(item[textField] ?? "");
+    el.textContent = String(item[textField] ?? '');
   }
 
-  const attrValue = el.getAttribute("dx-attr");
+  const attrValue = el.getAttribute('dx-attr');
   if (attrValue) {
-    const [attrName, field] = attrValue.split(":");
+    const [attrName, field] = attrValue.split(':');
     if (attrName && field && field in item) {
-      el.setAttribute(attrName, String(item[field] ?? ""));
+      el.setAttribute(attrName, String(item[field] ?? ''));
     }
   }
 
-  const clsValue = el.getAttribute("dx-class");
+  const clsValue = el.getAttribute('dx-class');
   if (clsValue) {
-    const [className, field] = clsValue.split(":");
+    const [className, field] = clsValue.split(':');
     if (className && field && field in item) {
       el.classList.toggle(className, Boolean(item[field]));
     }
