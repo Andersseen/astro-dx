@@ -1,5 +1,4 @@
 ---
-import CodeBlock from '../../components/CodeBlock.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Installation">
@@ -11,54 +10,58 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </div>
 
     <and-alert variant="warning">
-      astro-dx is a community library, not affiliated with the Astro core team.
+      Community library — not affiliated with the Astro core team.
     </and-alert>
 
-    <!-- Option 1: CLI -->
+    <!-- CLI -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 1 — CLI (recommended)</h2>
-      <p and-text="p-sm" class="opacity-70">
-        Interactive installer that asks which packages you need.
-      </p>
-      <CodeBlock lang="bash" code="npx @astro-dx/init" />
+      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm">
+        npx @astro-dx/init
+      </div>
     </div>
 
-    <!-- Option 2: all-in-one -->
+    <!-- All in one -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 2 — All packages</h2>
-      <CodeBlock lang="bash" code="npm install astro-dx" />
-      <CodeBlock lang="typescript" code={`
-import { signal, computed, effect } from 'astro-dx/core';
-import { on, onHover, onKey } from 'astro-dx/events';
-import { register, bootstrap } from 'astro-dx/attributes';
-import { getElement, getElements } from 'astro-dx/dom';
-import 'astro-dx/elements'; // registers dx-if, dx-show, dx-for custom elements
-      `} />
+      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm">
+        npm install astro-dx
+      </div>
     </div>
 
-    <!-- Option 3: granular -->
+    <!-- Granular -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 3 — Only what you need</h2>
-      <CodeBlock lang="bash" code={`npm install @astro-dx/core                    # signals only
-npm install @astro-dx/core @astro-dx/dom      # signals + DOM utilities
-npm install @astro-dx/core @astro-dx/elements # signals + custom elements`} />
+      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm space-y-1">
+        <div><span class="opacity-40"># signals only</span></div>
+        <div>npm install @astro-dx/core</div>
+        <div class="pt-1"><span class="opacity-40"># signals + DOM utilities</span></div>
+        <div>npm install @astro-dx/core @astro-dx/dom</div>
+        <div class="pt-1"><span class="opacity-40"># signals + custom elements</span></div>
+        <div>npm install @astro-dx/core @astro-dx/elements</div>
+      </div>
     </div>
 
     <!-- Package table -->
     <div and-layout="vertical gap:sm">
-      <h2 and-text="h5 weight:bold">Package overview</h2>
+      <h2 and-text="h5 weight:bold">Packages</h2>
       <div and-layout="vertical gap:xs">
         {[
-          { pkg: '@astro-dx/core', desc: 'signal, computed, effect, createService, lifecycle hooks' },
-          { pkg: '@astro-dx/events', desc: 'on, onHover, onKey, onFocus — event bindings' },
-          { pkg: '@astro-dx/attributes', desc: 'dx-if, dx-show, dx-for as HTML attributes + register/bootstrap' },
+          { pkg: '@astro-dx/core', desc: 'signal, computed, effect, createService, lifecycle' },
+          { pkg: '@astro-dx/events', desc: 'on, onHover, onKey, onFocus' },
+          { pkg: '@astro-dx/attributes', desc: 'dx-if, dx-show, dx-for, dx-model + bootstrap()' },
           { pkg: '@astro-dx/elements', desc: 'dx-if, dx-show, dx-for as custom elements' },
-          { pkg: '@astro-dx/dom', desc: 'getElement, getElements — enriched refs. Re-exports events + attributes.' },
+          { pkg: '@astro-dx/dom', desc: 'getElement, getElements — re-exports events + attributes' },
           { pkg: 'astro-dx', desc: 'All of the above in one install' },
-          { pkg: '@astro-dx/init', desc: 'CLI scaffolding tool — npx @astro-dx/init' },
+          { pkg: '@astro-dx/init', desc: 'CLI — npx @astro-dx/init' },
         ].map(row => (
-          <div and-layout="horizontal gap:md align:start" class="py-3 border-b border-white/10">
-            <code class="text-amber-400 text-sm min-w-52 shrink-0">{row.pkg}</code>
+          <div
+            and-layout="horizontal gap:md align:start"
+            class="py-3 border-b border-white/10"
+          >
+            <code class="text-amber-400 text-sm min-w-[200px] shrink-0">
+              {row.pkg}
+            </code>
             <span and-text="p-sm" class="opacity-60">{row.desc}</span>
           </div>
         ))}

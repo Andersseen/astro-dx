@@ -1,34 +1,39 @@
 ---
-// biome-ignore lint/correctness/noUnusedVariables: Astro Props interface is used by the framework
 interface Props {
   title: string;
   description?: string;
 }
-// biome-ignore lint/correctness/noUnusedVariables: used in template below
-const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
+const {
+  title,
+  description = 'Angular-inspired DX for Astro — community library'
+} = Astro.props;
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title} — astro-dx</title>
+    <!-- Global styles -->
     <link rel="stylesheet" href="/styles/global.css" />
   </head>
   <body>
 
     <!-- Navbar -->
     <and-navbar sticky>
-      <span slot="brand" and-text="h6 weight:bold">astro-dx</span>
-      <nav slot="links" and-layout="horizontal gap:md align:center">
-        <a href="/" class="text-sm font-semibold tracking-tight">Home</a>
-        <a href="/libs" class="text-sm font-semibold tracking-tight">Libraries</a>
-        <a href="/about" class="text-sm font-semibold tracking-tight">About</a>
-        <a href="/demo" class="text-sm font-semibold tracking-tight">Demos</a>
-        <a href="/docs" class="text-sm font-semibold tracking-tight">Docs</a>
+      <a slot="brand" href="/" style="text-decoration:none">
+        <span and-text="h6 weight:bold">astro-dx</span>
+      </a>
+      <nav slot="links">
+        <div and-layout="horizontal gap:md align:center">
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+          <a href="/demo">Demos</a>
+          <a href="/docs/installation">Docs</a>
+        </div>
       </nav>
-      <div slot="actions" and-layout="horizontal gap:sm align:center">
+      <div slot="actions">
         <and-button
           variant="ghost"
           href="https://github.com/Andersseen/astro-dx"
@@ -41,29 +46,37 @@ const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
     </and-navbar>
 
     <!-- Page content -->
-    <main class="container">
+    <main>
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer and-layout="vertical gap:sm align:center" class="mt-14 border-t border-border/80 px-4 py-10">
-      <p and-text="p-sm" class="text-center text-muted-foreground">
-        astro-dx — Community library, not affiliated with the Astro core team.
+    <footer class="mt-24 py-10 border-t border-white/10">
+      <div and-layout="vertical gap:xs align:center">
+      <p and-text="p-sm" class="opacity-50 text-center">
+        astro-dx — Community library · Not affiliated with the Astro core team
       </p>
-      <p and-text="p-sm" class="text-center text-muted-foreground/90">
-        MIT License · Built by Andersseen
+      <p and-text="p-sm" class="opacity-30 text-center">
+        MIT License
       </p>
+      </div>
     </footer>
 
-    <!-- Global scripts -->
+    <!--
+      CRITICAL: These three calls must happen in this order.
+      Without them: components render as unknown HTML elements,
+      icons show as empty, animations never trigger.
+    -->
     <script>
-      import { enableAnimations } from '@andersseen/web-components';
       import '@andersseen/web-components/components/all';
       import { registerAllIcons } from '@andersseen/icon';
       import { initMotion } from '@andersseen/motion';
-      enableAnimations();
-      registerAllIcons();
-      initMotion();
+
+      // Must run after components are defined
+      document.addEventListener('DOMContentLoaded', () => {
+        registerAllIcons();
+        initMotion();
+      });
     </script>
 
   </body>
