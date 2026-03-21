@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "astro-dx": ["../../packages/astro-dx/src/index.ts"],
-      "astro-dx/dom": ["../../packages/astro-dx/src/dom/index.ts"]
+      "astro-dx/dom": ["../../packages/astro-dx/src/dom/index.ts"],
+      "astro-dx-elements": ["../../packages/astro-dx-elements/src/index.ts"]
     }
   }
 }

@@ -15,6 +15,10 @@ export default defineConfig({
           "../../packages/astro-dx/src/dom/index.ts",
         ),
         "astro-dx": resolve(__dirname, "../../packages/astro-dx/src/index.ts"),
+        "astro-dx-elements": resolve(
+          __dirname,
+          "../../packages/astro-dx-elements/src/index.ts",
+        ),
       },
     },
   },
