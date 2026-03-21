@@ -1,0 +1,18 @@
+---
+// apps/demo/src/pages/index.astro
+import Counter from '../components/Counter.astro';
+import CounterStats from '../components/CounterStats.astro';
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>astro-dx demo</title>
+  </head>
+  <body>
+    <h1>astro-dx</h1>
+
+    <!-- Two islands, zero prop drilling, shared service -->
+    <Counter client:load />
+    <CounterStats client:load />
+  </body>
+</html>

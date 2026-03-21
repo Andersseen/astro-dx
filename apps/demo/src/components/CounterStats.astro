@@ -1,0 +1,14 @@
+---
+// apps/demo/src/components/CounterStats.astro
+// Separate island - reads the same service, no props passed
+---
+<div id="stats">
+  Double: <span id="double-value">0</span>
+</div>
+
+<script>
+  import { CounterService } from '../services/counter.service';
+  import { text } from 'astro-dx/dom';
+
+  text('#double-value', CounterService.double);
+</script>

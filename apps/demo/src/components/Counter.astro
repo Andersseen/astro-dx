@@ -1,0 +1,19 @@
+---
+// apps/demo/src/components/Counter.astro
+---
+<div id="counter">
+  <button id="btn-dec">-</button>
+  <span id="count-value">0</span>
+  <button id="btn-inc">+</button>
+  <button id="btn-reset">Reset</button>
+</div>
+
+<script>
+  import { CounterService } from '../services/counter.service';
+  import { text, on } from 'astro-dx/dom';
+
+  text('#count-value', CounterService.count);
+  on('#btn-inc', 'click', () => CounterService.increment());
+  on('#btn-dec', 'click', () => CounterService.decrement());
+  on('#btn-reset', 'click', () => CounterService.reset());
+</script>
