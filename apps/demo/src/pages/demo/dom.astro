@@ -1,0 +1,125 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="DOM demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/dom</and-badge>
+      <h1 and-text="h2 weight:bold">DOM bindings</h1>
+      <p and-text="p" class="opacity-70">
+        getElement() and getElements() — typed, chainable, auto-cleaned references.
+      </p>
+    </div>
+
+    <!-- Modal demo -->
+    <DemoCard title="Modal — getElement + effect">
+      <div and-layout="vertical gap:md" class="p-6">
+        <and-button variant="default" id="btn-open-modal">Open modal</and-button>
+
+        <dialog id="demo-modal" class="rounded-xl border border-white/10 bg-slate-900 p-6 backdrop:bg-black/50 w-full max-w-sm">
+          <div and-layout="vertical gap:md">
+            <h2 id="modal-title" and-text="h5 weight:bold">Default title</h2>
+            <p and-text="p-sm" class="opacity-70">This title is driven by a signal.</p>
+            <and-button variant="outline" id="btn-close-modal">Close</and-button>
+          </div>
+        </dialog>
+      </div>
+    </DemoCard>
+
+    <!-- Product list demo -->
+    <DemoCard title="Product list — getElements + onHover + on">
+      <div and-layout="vertical gap:md" class="p-6">
+        <ul id="product-list" and-layout="vertical gap:xs">
+          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="1">Product A</li>
+          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="2">Product B</li>
+          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="3">Product C</li>
+        </ul>
+        <p and-text="p-sm" class="opacity-60">
+          Last clicked: <span id="last-clicked" class="text-amber-400">none</span>
+        </p>
+      </div>
+    </DemoCard>
+
+    <!-- Code example -->
+    <CodeBlock lang="typescript" code={`
+import { signal } from '@astro-dx/core';
+import { getElement, getElements } from '@astro-dx/dom';
+
+const isOpen = signal(false);
+const modalTitle = signal('Hello from astro-dx');
+const lastClicked = signal('none');
+
+const modal    = getElement<HTMLDialogElement>('#modal');
+const btnOpen  = getElement<HTMLButtonElement>('#btn-open');
+const btnClose = getElement<HTMLButtonElement>('#btn-close');
+
+getElement('#modal-title').text(modalTitle);
+getElement('#last-clicked').text(lastClicked);
+
+btnOpen.on('click', () => isOpen.set(true));
+btnClose.on('click', () => isOpen.set(false));
+
+modal.effect(() => {
+  if (isOpen()) modal.el.showModal();
+  else if (modal.el.open) modal.el.close();
+});
+
+const items = getElements<HTMLLIElement>('.product-item');
+for (const item of items) {
+  item
+    .onHover({
+      enter: () => item.el.style.setProperty('opacity', '0.6'),
+      leave: () => item.el.style.removeProperty('opacity'),
+    })
+    .on('click', () => lastClicked.set(item.el.dataset.id ?? ''));
+}
+    `} />
+
+  </section>
+
+  <script>
+    import { signal, onPageLoad, onBeforeSwap } from '@astro-dx/core';
+    import { getElement, getElements, destroyAll } from '@astro-dx/dom';
+
+    onPageLoad(() => {
+      const isOpen = signal(false);
+      const modalTitle = signal('Hello from astro-dx');
+      const lastClicked = signal('none');
+
+      const modal    = getElement<HTMLDialogElement>('#demo-modal');
+      const btnOpen  = getElement<HTMLButtonElement>('#btn-open-modal');
+      const btnClose = getElement<HTMLButtonElement>('#btn-close-modal');
+
+      getElement('#modal-title').text(modalTitle);
+      getElement('#last-clicked').text(lastClicked);
+
+      btnOpen.on('click', () => isOpen.set(true));
+      btnClose.on('click', () => isOpen.set(false));
+      modal.on('close', () => isOpen.set(false));
+
+      modal.effect(() => {
+        if (isOpen()) {
+          if (!modal.el.open) modal.el.showModal();
+        } else if (modal.el.open) {
+          modal.el.close();
+        }
+      });
+
+      const items = getElements<HTMLLIElement>('.demo-product');
+      for (const item of items) {
+        item
+          .onHover({
+            enter: () => item.el.style.setProperty('opacity', '0.6'),
+            leave: () => item.el.style.removeProperty('opacity'),
+          })
+          .on('click', () => lastClicked.set(item.el.dataset.id ?? 'unknown'));
+      }
+    });
+
+    onBeforeSwap(() => destroyAll());
+  </script>
+
+</BaseLayout>

@@ -1,0 +1,69 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Installation">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs</and-badge>
+      <h1 and-text="h2 weight:bold">Installation</h1>
+    </div>
+
+    <and-alert variant="warning">
+      astro-dx is a community library, not affiliated with the Astro core team.
+    </and-alert>
+
+    <!-- Option 1: CLI -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 1 — CLI (recommended)</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Interactive installer that asks which packages you need.
+      </p>
+      <CodeBlock lang="bash" code="npx @astro-dx/init" />
+    </div>
+
+    <!-- Option 2: all-in-one -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 2 — All packages</h2>
+      <CodeBlock lang="bash" code="npm install astro-dx" />
+      <CodeBlock lang="typescript" code={`
+import { signal, computed, effect } from 'astro-dx/core';
+import { on, onHover, onKey } from 'astro-dx/events';
+import { register, bootstrap } from 'astro-dx/attributes';
+import { getElement, getElements } from 'astro-dx/dom';
+import 'astro-dx/elements'; // registers dx-if, dx-show, dx-for custom elements
+      `} />
+    </div>
+
+    <!-- Option 3: granular -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 3 — Only what you need</h2>
+      <CodeBlock lang="bash" code={`npm install @astro-dx/core                    # signals only
+npm install @astro-dx/core @astro-dx/dom      # signals + DOM utilities
+npm install @astro-dx/core @astro-dx/elements # signals + custom elements`} />
+    </div>
+
+    <!-- Package table -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Package overview</h2>
+      <div and-layout="vertical gap:xs">
+        {[
+          { pkg: '@astro-dx/core', desc: 'signal, computed, effect, createService, lifecycle hooks' },
+          { pkg: '@astro-dx/events', desc: 'on, onHover, onKey, onFocus — event bindings' },
+          { pkg: '@astro-dx/attributes', desc: 'dx-if, dx-show, dx-for as HTML attributes + register/bootstrap' },
+          { pkg: '@astro-dx/elements', desc: 'dx-if, dx-show, dx-for as custom elements' },
+          { pkg: '@astro-dx/dom', desc: 'getElement, getElements — enriched refs. Re-exports events + attributes.' },
+          { pkg: 'astro-dx', desc: 'All of the above in one install' },
+          { pkg: '@astro-dx/init', desc: 'CLI scaffolding tool — npx @astro-dx/init' },
+        ].map(row => (
+          <div and-layout="horizontal gap:md align:start" class="py-3 border-b border-white/10">
+            <code class="text-amber-400 text-sm min-w-52 shrink-0">{row.pkg}</code>
+            <span and-text="p-sm" class="opacity-60">{row.desc}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </section>
+</BaseLayout>

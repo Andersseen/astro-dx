@@ -1,1 +1,1 @@
-export * from "@astro-dx/dom";
+export * from '@astro-dx/dom';

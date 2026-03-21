@@ -8,15 +8,15 @@ export function onPageLoad(callback: LifecycleCallback): void {
     callback();
   };
 
-  document.addEventListener("astro:page-load", handler);
+  document.addEventListener('astro:page-load', handler);
 
-  if (document.readyState === "loading") {
+  if (document.readyState === 'loading') {
     document.addEventListener(
-      "DOMContentLoaded",
+      'DOMContentLoaded',
       () => {
         if (!fired) callback();
       },
-      { once: true },
+      { once: true }
     );
   } else if (!fired) {
     callback();
@@ -25,10 +25,10 @@ export function onPageLoad(callback: LifecycleCallback): void {
 
 export function onBeforeSwap(callback: LifecycleCallback): void {
   document.addEventListener(
-    "astro:before-swap",
+    'astro:before-swap',
     () => {
       callback();
     },
-    { once: true },
+    { once: true }
   );
 }

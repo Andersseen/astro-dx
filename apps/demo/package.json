@@ -10,10 +10,20 @@
   },
   "dependencies": {
     "astro": "^5.0.0",
-    "astro-dx": "*"
+    "@astro-dx/core": "*",
+    "@astro-dx/events": "*",
+    "@astro-dx/attributes": "*",
+    "@astro-dx/elements": "*",
+    "@astro-dx/dom": "*",
+    "@andersseen/web-components": "latest",
+    "@andersseen/layout": "latest",
+    "@andersseen/motion": "latest",
+    "@andersseen/icon": "latest"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "tailwindcss": "^4.0.0",
     "typescript": "^5.5.0"
   }
 }

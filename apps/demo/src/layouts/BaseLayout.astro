@@ -1,0 +1,67 @@
+---
+// biome-ignore lint/correctness/noUnusedVariables: Astro Props interface is used by the framework
+interface Props {
+  title: string;
+  description?: string;
+}
+// biome-ignore lint/correctness/noUnusedVariables: used in template below
+const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} — astro-dx</title>
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+
+    <!-- Navbar -->
+    <and-navbar sticky>
+      <span slot="brand" and-text="h6 weight:bold">astro-dx</span>
+      <nav slot="links" and-layout="horizontal gap:md align:center">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/demo">Demos</a>
+        <a href="/docs">Docs</a>
+      </nav>
+      <div slot="actions" and-layout="horizontal gap:sm align:center">
+        <and-button
+          variant="ghost"
+          href="https://github.com/Andersseen/astro-dx"
+          target="_blank"
+        >
+          <and-icon name="github" size="18"></and-icon>
+          GitHub
+        </and-button>
+      </div>
+    </and-navbar>
+
+    <!-- Page content -->
+    <main>
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer and-layout="vertical gap:sm align:center" class="py-12 mt-24 border-t border-white/10">
+      <p and-text="p-sm" class="text-center opacity-60">
+        astro-dx — Community library, not affiliated with the Astro core team.
+      </p>
+      <p and-text="p-sm" class="text-center opacity-40">
+        MIT License · Built by Andersseen
+      </p>
+    </footer>
+
+    <!-- Global scripts -->
+    <script>
+      import '@andersseen/web-components/components/all';
+      import { registerAllIcons } from '@andersseen/icon';
+      import { initMotion } from '@andersseen/motion';
+      registerAllIcons();
+      initMotion();
+    </script>
+
+  </body>
+</html>

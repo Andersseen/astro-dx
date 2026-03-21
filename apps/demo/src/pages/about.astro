@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About" description="What is astro-dx and why it exists">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">About</and-badge>
+      <h1 and-text="h2 weight:bold">What is astro-dx?</h1>
+    </div>
+
+    <and-alert variant="info">
+      <strong>Community library</strong> — astro-dx is not affiliated with,
+      endorsed by, or part of the official Astro project.
+    </and-alert>
+
+    <div and-layout="vertical gap:md">
+      <p and-text="p" class="opacity-80">
+        Astro is great for building content-focused sites with zero JS by default.
+        But when you need client-side interactivity across islands,
+        the DX gets rough fast — raw nanostores, manual querySelector,
+        no cleanup, no structure.
+      </p>
+      <p and-text="p" class="opacity-80">
+        astro-dx brings the patterns Angular developers love — signals, computed values,
+        singleton services, declarative DOM bindings — to Astro's client scripts.
+        No compiler, no framework, no Shadow DOM. Just ergonomic TypeScript on top of nanostores.
+      </p>
+    </div>
+
+    <and-accordion>
+      {[
+        {
+          title: 'Why not just use Preact/Vue islands?',
+          content: 'You can — and sometimes you should. astro-dx fills the gap for components that need interactivity but not a full framework. Less JS, more native.'
+        },
+        {
+          title: 'Why not Alpine.js?',
+          content: 'Alpine is great but uses string expressions in HTML attributes with eval() under the hood. astro-dx keeps all logic in TypeScript where you have type safety and autocompletion.'
+        },
+        {
+          title: 'Does it work with Cloudflare Pages?',
+          content: 'Yes. astro-dx is fully static — no server runtime needed. It was built specifically with Cloudflare + Astro in mind.'
+        },
+        {
+          title: 'Does it support ViewTransitions?',
+          content: 'Yes. Use onPageLoad() and onBeforeSwap() from @astro-dx/core to safely initialize and clean up across navigations.'
+        },
+      ].map(item => (
+        <and-accordion-item>
+          <span slot="header">{item.title}</span>
+          <p slot="content" and-text="p-sm" class="opacity-70">{item.content}</p>
+        </and-accordion-item>
+      ))}
+    </and-accordion>
+
+  </section>
+</BaseLayout>

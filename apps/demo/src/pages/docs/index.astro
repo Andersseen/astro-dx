@@ -1,0 +1,80 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Docs" description="astro-dx documentation — quick start">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs</and-badge>
+      <h1 and-text="h2 weight:bold">Quick start</h1>
+      <p and-text="p" class="opacity-70">
+        Get up and running with astro-dx in minutes.
+      </p>
+    </div>
+
+    <and-alert variant="warning">
+      astro-dx is a community library, not affiliated with the Astro core team.
+    </and-alert>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">1. Install</h2>
+      <CodeBlock lang="bash" code="npx @astro-dx/init" />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">2. Create a signal</h2>
+      <CodeBlock lang="typescript" code={`
+// In any .astro file <script> tag
+import { signal, computed } from '@astro-dx/core';
+import { getElement } from '@astro-dx/dom';
+
+const count = signal(0);
+const double = computed(() => count() * 2);
+
+getElement('#count').text(count);
+getElement('#btn').on('click', () => count.update(v => v + 1));
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">3. Share state via a service</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal, computed } from '@astro-dx/core';
+
+class CartServiceClass {
+  private _items = signal<string[]>([]);
+  readonly total = computed(() => this._items().length);
+
+  add(item: string) { this._items.update(p => [...p, item]); }
+  clear() { this._items.set([]); }
+}
+
+// ESM singleton — same instance across all islands
+export const CartService = new CartServiceClass();
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Explore the docs</h2>
+      <div and-layout="vertical gap:xs">
+        {[
+          { href: '/docs/installation', label: 'Installation', desc: 'All install options — CLI, all-in-one, granular' },
+          { href: '/docs/core', label: '@astro-dx/core', desc: 'signal, computed, effect, lifecycle hooks' },
+          { href: '/docs/events', label: '@astro-dx/events', desc: 'on, onHover, onKey, onFocus' },
+          { href: '/docs/attributes', label: '@astro-dx/attributes', desc: 'dx-if, dx-show, dx-for as attributes' },
+          { href: '/docs/elements', label: '@astro-dx/elements', desc: 'dx-if, dx-show, dx-for as custom elements' },
+          { href: '/docs/dom', label: '@astro-dx/dom', desc: 'getElement, getElements, enriched refs' },
+        ].map(item => (
+          <a href={item.href} class="no-underline">
+            <div and-layout="horizontal gap:md align:center" class="py-3 px-4 rounded-xl border border-white/10 hover:border-amber-400/50 transition-colors">
+              <code class="text-amber-400 text-sm min-w-48 shrink-0">{item.label}</code>
+              <span and-text="p-sm" class="opacity-60">{item.desc}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+
+  </section>
+</BaseLayout>

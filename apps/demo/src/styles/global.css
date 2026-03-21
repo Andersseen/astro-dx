@@ -1,0 +1,17 @@
+/* Style theme */
+@import "@andersseen/web-components/themes/styles/playful";
+
+/* Color palette */
+@import "@andersseen/web-components/themes/colors/slate-amber";
+
+/* Web components base styles */
+@import "@andersseen/web-components/dist/web-components/web-components.css";
+
+/* Motion */
+@import "@andersseen/motion/style.css";
+
+/* Layout */
+@import "@andersseen/layout/dist/layout.css";
+
+/* Tailwind 4 */
+@import "tailwindcss";

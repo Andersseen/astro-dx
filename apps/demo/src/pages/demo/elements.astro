@@ -1,0 +1,79 @@
+---
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Elements demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/elements</and-badge>
+      <h1 and-text="h2 weight:bold">Custom elements</h1>
+      <p and-text="p" class="opacity-70">
+        dx-if, dx-show, dx-for as custom elements — explicit, self-documenting markup.
+      </p>
+    </div>
+
+    <DemoCard title="dx-show, dx-if, dx-for — ShopService">
+      <div and-layout="vertical gap:md" class="p-6">
+
+        <!-- dx-show: stays in DOM, toggled with hidden attribute -->
+        <dx-show signal="hasItems">
+          <and-alert variant="success">You have items in your cart</and-alert>
+        </dx-show>
+
+        <!-- dx-if: node created/destroyed -->
+        <dx-if signal="isModalOpen">
+          <div and-layout="vertical gap:sm" class="p-4 rounded-xl border border-white/10 bg-white/5">
+            <p and-text="p-sm">Modal is open</p>
+            <and-button variant="ghost" size="sm" id="btn-close-modal">Close</and-button>
+          </div>
+        </dx-if>
+
+        <!-- dx-for: reactive list -->
+        <ul and-layout="vertical gap:xs">
+          <dx-for signal="cartItems">
+            <li and-layout="horizontal gap:sm justify:between" class="py-2 px-3 rounded-lg bg-white/5 text-sm">
+              <span dx-text="name"></span>
+              <span dx-text="price" class="text-amber-400 font-mono"></span>
+            </li>
+          </dx-for>
+        </ul>
+
+        <div and-layout="horizontal gap:sm">
+          <and-button variant="default" id="btn-add-product">
+            <and-icon name="plus" size="14"></and-icon>
+            Add product
+          </and-button>
+          <and-button variant="outline" id="btn-open-modal">Open modal</and-button>
+          <and-button variant="ghost" id="btn-clear-cart">Clear</and-button>
+        </div>
+
+      </div>
+    </DemoCard>
+
+  </section>
+
+  <script>
+    import { register } from '@astro-dx/elements';
+    import '@astro-dx/elements';
+    import { on } from '@astro-dx/events';
+    import { ShopService } from '../../services/shop.service';
+
+    register({
+      hasItems: ShopService.hasItems,
+      isModalOpen: ShopService.isModalOpen,
+      cartItems: ShopService.cartItems,
+    });
+
+    let i = 0;
+    on('#btn-add-product', 'click', () => {
+      i++;
+      ShopService.addToCart({ id: `p${i}`, name: `Product ${i}`, price: i * 10 });
+    });
+
+    on('#btn-open-modal', 'click', () => ShopService.openModal());
+    on('#btn-close-modal', 'click', () => ShopService.closeModal());
+    on('#btn-clear-cart', 'click', () => ShopService.clearCart());
+  </script>
+
+</BaseLayout>

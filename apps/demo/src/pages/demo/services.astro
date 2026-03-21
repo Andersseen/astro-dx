@@ -1,0 +1,92 @@
+---
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Services demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/core · Services</and-badge>
+      <h1 and-text="h2 weight:bold">Services</h1>
+      <p and-text="p" class="opacity-70">
+        Singleton classes. Share reactive state across any island — no prop drilling, no parent needed.
+      </p>
+    </div>
+
+    <and-alert variant="info">
+      The two cards below are completely independent Astro islands.
+      They share state via CartService — no props passed between them.
+    </and-alert>
+
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+
+      <!-- Island A: add products -->
+      <DemoCard title="Island A — Add to cart">
+        <div and-layout="vertical gap:sm" class="p-4">
+          {['Keyboard', 'Mouse', 'Monitor', 'Headphones'].map(name => (
+            <and-button
+              variant="outline"
+              class="product-btn w-full"
+              data-name={name}
+            >
+              <and-icon name="plus" size="14"></and-icon>
+              {name}
+            </and-button>
+          ))}
+        </div>
+      </DemoCard>
+
+      <!-- Island B: cart summary -->
+      <DemoCard title="Island B — Cart summary">
+        <div and-layout="vertical gap:md" class="p-4">
+          <div and-layout="horizontal gap:sm align:center justify:between">
+            <span and-text="p-sm" class="opacity-60">Total items</span>
+            <and-badge id="cart-total" variant="default">0</and-badge>
+          </div>
+          <ul id="cart-list" and-layout="vertical gap:xs" class="min-h-16">
+          </ul>
+          <and-button variant="ghost" size="sm" id="btn-clear" class="w-full">
+            Clear cart
+          </and-button>
+        </div>
+      </DemoCard>
+
+    </div>
+
+  </section>
+
+  <script>
+    import { signal, computed } from '@astro-dx/core';
+    import { getElement, getElements } from '@astro-dx/dom';
+
+    // Service — defined once, shared across both islands via module singleton
+    class CartServiceClass {
+      private _items = signal<{ name: string }[]>([]);
+      readonly items = this._items;
+      readonly total = computed(() => this._items().length);
+
+      add(name: string) { this._items.update(p => [...p, { name }]); }
+      clear() { this._items.set([]); }
+    }
+    const CartService = new CartServiceClass();
+
+    // Island A — product buttons
+    const productBtns = getElements<HTMLButtonElement>('.product-btn');
+    for (const btn of productBtns) {
+      btn.on('click', () => CartService.add(btn.el.dataset.name!));
+    }
+
+    // Island B — reactive summary
+    getElement('#cart-total').text(CartService.total);
+
+    const cartList = document.querySelector('#cart-list')!;
+    CartService.items.subscribe(items => {
+      cartList.innerHTML = items
+        .map(item => `<li class="text-sm opacity-70 py-1 border-b border-white/10">${item.name}</li>`)
+        .join('');
+    });
+
+    getElement('#btn-clear').on('click', () => CartService.clear());
+  </script>
+
+</BaseLayout>

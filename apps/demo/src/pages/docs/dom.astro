@@ -1,0 +1,86 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="@astro-dx/dom">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs · @astro-dx/dom</and-badge>
+      <h1 and-text="h2 weight:bold">@astro-dx/dom</h1>
+      <p and-text="p" class="opacity-70">
+        Typed, chainable element references. Also re-exports everything from
+        @astro-dx/events and @astro-dx/attributes.
+      </p>
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">getElement()</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Returns an <code>ElementRef</code> for a single element.
+        Returns a no-op ref (not null) if not found — no null checks needed.
+      </p>
+      <CodeBlock lang="typescript" code={`
+import { getElement } from '@astro-dx/dom';
+
+const btn = getElement<HTMLButtonElement>('#btn');
+
+btn.text(label);                     // reactive textContent
+btn.attr('disabled', isLoading);     // reactive attribute
+btn.cls('active', isActive);         // reactive class toggle
+btn.on('click', () => { ... });      // event listener
+btn.onHover({ enter, leave });       // mouseenter + mouseleave
+btn.onKey('Enter', fn);              // keydown with key filter
+btn.onFocus({ focus, blur });        // focus + blur
+btn.effect(() => { ... });           // reactive effect
+btn.destroy();                       // remove all listeners + subscriptions
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">getElements()</h2>
+      <p and-text="p-sm" class="opacity-70">Returns an array of ElementRefs for all matching elements.</p>
+      <CodeBlock lang="typescript" code={`
+import { getElements } from '@astro-dx/dom';
+
+const items = getElements<HTMLLIElement>('.item');
+for (const item of items) {
+  item.on('click', () => select(item.el.dataset.id!));
+}
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">destroyAll()</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Destroys all ElementRef instances created since last cleanup.
+        Call in <code>onBeforeSwap</code> to prevent listener stacking across navigations.
+      </p>
+      <CodeBlock lang="typescript" code={`
+import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
+import { getElement, destroyAll } from '@astro-dx/dom';
+
+onPageLoad(() => {
+  getElement('#btn').on('click', doSomething);
+});
+
+onBeforeSwap(() => {
+  destroyAll(); // cleans everything set up in onPageLoad
+});
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Chaining</h2>
+      <p and-text="p-sm" class="opacity-70">All methods return <code>this</code>.</p>
+      <CodeBlock lang="typescript" code={`
+getElement('#btn')
+  .text(label)
+  .attr('disabled', isLoading)
+  .cls('active', isActive)
+  .on('click', handleClick);
+      `} />
+    </div>
+
+  </section>
+</BaseLayout>

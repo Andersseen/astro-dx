@@ -1,0 +1,113 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Signals demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/core</and-badge>
+      <h1 and-text="h2 weight:bold">Signals</h1>
+      <p and-text="p" class="opacity-70">
+        signal(), computed(), effect() — same API as Angular 20+
+      </p>
+    </div>
+
+    <!-- Live demo -->
+    <DemoCard title="Counter — signal + computed">
+      <div and-layout="vertical gap:lg align:center" class="py-8">
+        <div and-layout="horizontal gap:lg align:center">
+          <and-button variant="outline" id="btn-dec" size="lg">−</and-button>
+          <div and-layout="vertical gap:xs align:center">
+            <span id="count-display" class="text-6xl font-bold text-amber-400">0</span>
+            <span and-text="p-sm" class="opacity-50">count</span>
+          </div>
+          <and-button variant="outline" id="btn-inc" size="lg">+</and-button>
+        </div>
+        <div and-layout="horizontal gap:xl">
+          <div and-layout="vertical gap:xs align:center">
+            <span id="double-display" class="text-2xl font-mono text-amber-300">0</span>
+            <span and-text="p-sm" class="opacity-50">double</span>
+          </div>
+          <div and-layout="vertical gap:xs align:center">
+            <span id="sign-display" class="text-2xl font-mono">neutral</span>
+            <span and-text="p-sm" class="opacity-50">sign</span>
+          </div>
+        </div>
+        <and-button variant="ghost" size="sm" id="btn-reset">Reset</and-button>
+      </div>
+    </DemoCard>
+
+    <!-- Code comparison tabs -->
+    <and-tabs>
+      <and-tab slot="tabs" value="with">With astro-dx</and-tab>
+      <and-tab slot="tabs" value="without">Without</and-tab>
+
+      <div slot="panel-with">
+        <CodeBlock lang="typescript" code={`
+import { signal, computed } from '@astro-dx/core';
+import { getElement } from '@astro-dx/dom';
+
+const count  = signal(0);
+const double = computed(() => count() * 2);
+const sign   = computed(() => count() > 0 ? 'positive' : count() < 0 ? 'negative' : 'neutral');
+
+getElement('#count-display').text(count);
+getElement('#double-display').text(double);
+getElement('#sign-display').text(sign);
+
+getElement('#btn-inc').on('click', () => count.update(v => v + 1));
+getElement('#btn-dec').on('click', () => count.update(v => v - 1));
+getElement('#btn-reset').on('click', () => count.set(0));
+        `} />
+      </div>
+
+      <div slot="panel-without">
+        <CodeBlock lang="typescript" code={`
+import { atom, computed } from 'nanostores';
+
+const $count  = atom(0);
+const $double = computed($count, c => c * 2);
+const $sign   = computed($count, c => c > 0 ? 'positive' : c < 0 ? 'negative' : 'neutral');
+
+$count.subscribe(v => {
+  document.querySelector('#count-display').textContent = String(v);
+});
+$double.subscribe(v => {
+  document.querySelector('#double-display').textContent = String(v);
+});
+$sign.subscribe(v => {
+  document.querySelector('#sign-display').textContent = v;
+});
+
+document.querySelector('#btn-inc')
+  ?.addEventListener('click', () => $count.set($count.get() + 1));
+document.querySelector('#btn-dec')
+  ?.addEventListener('click', () => $count.set($count.get() - 1));
+document.querySelector('#btn-reset')
+  ?.addEventListener('click', () => $count.set(0));
+        `} />
+      </div>
+    </and-tabs>
+
+  </section>
+
+  <script>
+    import { signal, computed } from '@astro-dx/core';
+    import { getElement } from '@astro-dx/dom';
+
+    const count  = signal(0);
+    const double = computed(() => count() * 2);
+    const sign   = computed(() => count() > 0 ? 'positive' : count() < 0 ? 'negative' : 'neutral');
+
+    getElement('#count-display').text(count);
+    getElement('#double-display').text(double);
+    getElement('#sign-display').text(sign);
+
+    getElement('#btn-inc').on('click', () => count.update(v => v + 1));
+    getElement('#btn-dec').on('click', () => count.update(v => v - 1));
+    getElement('#btn-reset').on('click', () => count.set(0));
+  </script>
+
+</BaseLayout>

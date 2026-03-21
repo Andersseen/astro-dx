@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Demos">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Demos</and-badge>
+      <h1 and-text="h2 weight:bold">Live demos</h1>
+      <p and-text="p" class="opacity-70">
+        Every demo is a real working example. No mocks.
+      </p>
+    </div>
+
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+      {[
+        { href: '/demo/signals', title: 'Signals', desc: 'signal(), computed(), effect()', icon: 'zap', badge: '@astro-dx/core' },
+        { href: '/demo/services', title: 'Services', desc: 'Singleton services. Cross-island state.', icon: 'layers', badge: '@astro-dx/core' },
+        { href: '/demo/dom', title: 'DOM bindings', desc: 'getElement(), getElements()', icon: 'mouse-pointer', badge: '@astro-dx/dom' },
+        { href: '/demo/attributes', title: 'Attributes', desc: 'dx-if, dx-show, dx-for', icon: 'code', badge: '@astro-dx/attributes' },
+        { href: '/demo/elements', title: 'Elements', desc: 'Custom elements approach', icon: 'component', badge: '@astro-dx/elements' },
+      ].map(d => (
+        <a href={d.href} class="no-underline" and-motion="slide-in-up" and-motion-trigger="enter">
+          <and-card class="h-full hover:border-amber-400/50 transition-colors cursor-pointer">
+            <div and-layout="vertical gap:sm" class="p-6">
+              <div and-layout="horizontal gap:sm align:center justify:between">
+                <and-icon name={d.icon} size="20" class="text-amber-400"></and-icon>
+                <and-badge variant="outline" size="sm">{d.badge}</and-badge>
+              </div>
+              <h3 and-text="h6 weight:bold">{d.title}</h3>
+              <p and-text="p-sm" class="opacity-60">{d.desc}</p>
+            </div>
+          </and-card>
+        </a>
+      ))}
+    </div>
+
+  </section>
+</BaseLayout>

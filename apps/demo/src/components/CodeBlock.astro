@@ -1,0 +1,16 @@
+---
+// Uses Astro's built-in syntax highlighting
+// biome-ignore lint/correctness/noUnusedVariables: Astro Props interface is used by the framework
+interface Props {
+  code: string;
+  lang?: string;
+}
+// biome-ignore lint/correctness/noUnusedVariables: used in template below
+const { code, lang = 'typescript' } = Astro.props;
+---
+<div class="rounded-xl overflow-hidden border border-white/10 text-sm">
+  <div class="px-4 py-2 bg-white/5 border-b border-white/10">
+    <span and-text="p-sm" class="opacity-40 font-mono">{lang}</span>
+  </div>
+  <pre class="p-4 overflow-x-auto"><code set:html={code.trim()} /></pre>
+</div>

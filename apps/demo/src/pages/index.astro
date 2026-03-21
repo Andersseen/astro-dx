@@ -1,28 +1,88 @@
 ---
-// apps/demo/src/pages/index.astro
-import Counter from '../components/Counter.astro';
-import CounterStats from '../components/CounterStats.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>astro-dx demo</title>
-  </head>
-  <body>
-    <h1>astro-dx</h1>
+<BaseLayout title="Home">
 
-    <nav>
-      <ul>
-        <li><a href="/">Counter service</a></li>
-        <li><a href="/approaches">Attributes + Elements approaches</a></li>
-        <li><a href="/elements-demo">Elements demo (ShopService)</a></li>
-        <li><a href="/dom-demo">DOM demo (getElement)</a></li>
-      </ul>
-    </nav>
+  <!-- Hero -->
+  <section and-layout="vertical gap:xl align:center" class="min-h-screen px-6 py-32 text-center">
 
-    <h2>Counter service</h2>
-    <!-- Two islands, zero prop drilling, shared service -->
-    <Counter />
-    <CounterStats />
-  </body>
-</html>
+    <div
+      and-layout="vertical gap:md align:center"
+      and-motion="fade-in"
+      and-motion-trigger="enter"
+    >
+      <and-badge variant="outline">Community library · Not official Astro</and-badge>
+
+      <h1 and-text="h1 weight:bold" class="max-w-3xl">
+        Angular-inspired DX for <span class="text-amber-400">Astro</span>
+      </h1>
+
+      <p and-text="p-lg" class="max-w-xl opacity-70">
+        Signals, services, DOM bindings and reactive templates —
+        without leaving Astro. Built on nanostores.
+      </p>
+    </div>
+
+    <!-- Install command -->
+    <div
+      and-layout="horizontal gap:sm align:center"
+      class="px-6 py-3 rounded-xl border border-white/10 bg-white/5 font-mono text-sm"
+      and-motion="slide-in-up"
+      and-motion-trigger="enter"
+      and-motion-delay="200ms"
+    >
+      <and-icon name="terminal" size="16" class="opacity-50"></and-icon>
+      <span class="opacity-50">$</span>
+      <span>npx @astro-dx/init</span>
+      <and-button variant="ghost" size="sm" id="btn-copy">
+        <and-icon name="copy" size="14"></and-icon>
+      </and-button>
+    </div>
+
+    <!-- CTAs -->
+    <div
+      and-layout="horizontal gap:md align:center"
+      and-motion="slide-in-up"
+      and-motion-trigger="enter"
+      and-motion-delay="300ms"
+    >
+      <and-button variant="default" href="/docs">Get started</and-button>
+      <and-button variant="outline" href="/demo">See demos</and-button>
+    </div>
+
+    <!-- Feature grid -->
+    <div
+      and-layout="grid cols:1 cols@md:2 cols@lg:4 gap:md"
+      class="w-full max-w-5xl mt-16"
+      and-motion="fade-in"
+      and-motion-trigger="enter"
+      and-motion-delay="400ms"
+    >
+      {[
+        { icon: 'zap', title: 'Signals', desc: 'signal(), computed(), effect() — Angular 20+ API' },
+        { icon: 'layers', title: 'Services', desc: 'Singleton classes. Share state across any island.' },
+        { icon: 'code', title: 'DOM bindings', desc: 'text(), attr(), cls() — no querySelector' },
+        { icon: 'component', title: 'Reactive templates', desc: 'dx-if, dx-show, dx-for — as attributes or elements' },
+      ].map(f => (
+        <and-card>
+          <div and-layout="vertical gap:sm" class="p-5">
+            <and-icon name={f.icon} size="24" class="text-amber-400"></and-icon>
+            <h3 and-text="h6 weight:bold">{f.title}</h3>
+            <p and-text="p-sm" class="opacity-60">{f.desc}</p>
+          </div>
+        </and-card>
+      ))}
+    </div>
+
+  </section>
+
+  <script>
+    import { getElement } from '@astro-dx/dom';
+
+    const btnCopy = getElement<HTMLButtonElement>('#btn-copy');
+    btnCopy.on('click', () => {
+      navigator.clipboard.writeText('npx @astro-dx/init');
+    });
+  </script>
+
+</BaseLayout>

@@ -1,0 +1,85 @@
+---
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Attributes demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/attributes</and-badge>
+      <h1 and-text="h2 weight:bold">Attribute directives</h1>
+      <p and-text="p" class="opacity-70">
+        dx-if, dx-show, dx-for — decorate existing elements directly. No wrapper needed.
+      </p>
+    </div>
+
+    <!-- dx-show vs dx-if comparison -->
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+
+      <DemoCard title="dx-show — toggle visibility">
+        <div and-layout="vertical gap:md" class="p-4">
+          <and-button variant="outline" id="btn-toggle-show">Toggle</and-button>
+          <and-alert dx-show="isVisible" variant="success">
+            Visible! Node stays in DOM.
+          </and-alert>
+        </div>
+      </DemoCard>
+
+      <DemoCard title="dx-if — create / destroy">
+        <div and-layout="vertical gap:md" class="p-4">
+          <and-button variant="outline" id="btn-toggle-if">Toggle</and-button>
+          <and-alert dx-if="isMounted" variant="info">
+            Mounted! Node created and destroyed.
+          </and-alert>
+        </div>
+      </DemoCard>
+
+    </div>
+
+    <!-- dx-for list -->
+    <DemoCard title="dx-for — reactive list">
+      <div and-layout="vertical gap:md" class="p-4">
+        <div and-layout="horizontal gap:sm">
+          <and-input id="input-item" placeholder="Add item..." class="flex-1"></and-input>
+          <and-button variant="default" id="btn-add-item">Add</and-button>
+        </div>
+        <ul and-layout="vertical gap:xs">
+          <li
+            dx-for="listItems"
+            dx-text="label"
+            class="py-2 px-3 rounded-lg bg-white/5 text-sm"
+          ></li>
+        </ul>
+      </div>
+    </DemoCard>
+
+  </section>
+
+  <script>
+    import { signal } from '@astro-dx/core';
+    import { register, bootstrap } from '@astro-dx/attributes';
+    import { getElement } from '@astro-dx/dom';
+
+    const isVisible = signal(true);
+    const isMounted = signal(true);
+    const listItems = signal<{ label: string }[]>([]);
+
+    register({ isVisible, isMounted, listItems });
+    bootstrap();
+
+    getElement('#btn-toggle-show').on('click', () => isVisible.update(v => !v));
+    getElement('#btn-toggle-if').on('click', () => isMounted.update(v => !v));
+
+    const input = getElement<HTMLInputElement>('#input-item');
+    const addItem = () => {
+      const val = (input.el as any).value?.trim();
+      if (!val) return;
+      listItems.update(p => [...p, { label: val }]);
+      (input.el as any).value = '';
+    };
+
+    getElement('#btn-add-item').on('click', addItem);
+    input.onKey('Enter', addItem);
+  </script>
+
+</BaseLayout>
