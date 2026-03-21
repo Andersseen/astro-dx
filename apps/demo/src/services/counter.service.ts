@@ -1,5 +1,5 @@
 // apps/demo/src/services/counter.service.ts
-import { computed, signal } from "astro-dx";
+import { computed, signal } from "@astro-dx/core";
 
 class CounterServiceClass {
   private _count = signal(0);

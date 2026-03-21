@@ -3,9 +3,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "astro-dx": ["../../packages/astro-dx/src/index.ts"],
-      "astro-dx/dom": ["../../packages/astro-dx/src/dom/index.ts"],
-      "astro-dx-elements": ["../../packages/astro-dx-elements/src/index.ts"]
+      "@astro-dx/core": ["../../packages/core/src/index.ts"],
+      "@astro-dx/events": ["../../packages/events/src/index.ts"],
+      "@astro-dx/attributes": ["../../packages/attributes/src/index.ts"],
+      "@astro-dx/elements": ["../../packages/elements/src/index.ts"],
+      "astro-dx": ["../../packages/all/src/index.ts"],
+      "astro-dx/core": ["../../packages/all/src/core.ts"],
+      "astro-dx/events": ["../../packages/all/src/events.ts"],
+      "astro-dx/attributes": ["../../packages/all/src/attributes.ts"],
+      "astro-dx/elements": ["../../packages/all/src/elements.ts"]
     }
   }
 }

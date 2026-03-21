@@ -17,24 +17,20 @@
 
     <!-- dx-if: node is created/destroyed -->
     <dx-if signal="isModalOpen">
-      <template>
-        <div class="modal">
-          <p>Modal content</p>
-          <button id="btn-close">Close</button>
-        </div>
-      </template>
+      <div class="modal">
+        <p>Modal content</p>
+        <button id="btn-close">Close</button>
+      </div>
     </dx-if>
 
     <!-- dx-for: renders a list reactively -->
     <ul>
       <dx-for signal="cartItems">
-        <template>
-          <li>
-            <span dx-text="name"></span>
-            &mdash;
-            <span dx-text="price"></span>
-          </li>
-        </template>
+        <li>
+          <span dx-text="name"></span>
+          &mdash;
+          <span dx-text="price"></span>
+        </li>
       </dx-for>
     </ul>
 
@@ -43,8 +39,9 @@
     <button id="btn-clear">Clear cart</button>
 
     <script>
-      import { register } from 'astro-dx-elements';
-      import { on } from 'astro-dx/dom';
+      import { register } from '@astro-dx/elements';
+      import '@astro-dx/elements';
+      import { on } from '@astro-dx/events';
       import { ShopService } from '../services/shop.service';
 
       register({
@@ -60,7 +57,13 @@
       });
 
       on('#btn-open', 'click', () => ShopService.openModal());
-      on('#btn-close', 'click', () => ShopService.closeModal());
+      on(document, 'click', (event) => {
+        if (event instanceof Event && event.target instanceof HTMLElement) {
+          if (event.target.id === 'btn-close') {
+            ShopService.closeModal();
+          }
+        }
+      });
       on('#btn-clear', 'click', () => ShopService.clearCart());
     </script>
 

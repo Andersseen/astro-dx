@@ -1,16 +1,18 @@
 {
   "name": "astro-dx-root",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "devDependencies": {
     "@biomejs/biome": "^1.9.0"
   },
   "scripts": {
-    "dev": "pnpm --filter astro-dx-demo dev",
-    "build": "pnpm --filter astro-dx build && pnpm --filter astro-dx-elements build && pnpm --filter astro-dx-demo build",
-    "build:lib": "pnpm --filter astro-dx build",
-    "build:elements": "pnpm --filter astro-dx build && pnpm --filter astro-dx-elements build",
-    "test": "pnpm --filter astro-dx test && pnpm --filter astro-dx-elements test",
-    "test:e2e": "pnpm --filter astro-dx-demo test:e2e",
+    "dev": "npm run dev --workspace=apps/demo",
+    "build": "npm run build:packages && npm run build --workspace=apps/demo",
+    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/events && npm run build --workspace=packages/attributes && npm run build --workspace=packages/elements && npm run build --workspace=packages/all",
+    "test": "npm run test --workspaces --if-present",
     "lint": "biome check .",
     "format": "biome format --write ."
   }

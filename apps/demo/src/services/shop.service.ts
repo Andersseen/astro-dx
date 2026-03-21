@@ -1,5 +1,5 @@
 // apps/demo/src/services/shop.service.ts
-import { signal, computed } from "astro-dx";
+import { computed, signal } from "@astro-dx/core";
 
 type Product = { id: string; name: string; price: number };
 

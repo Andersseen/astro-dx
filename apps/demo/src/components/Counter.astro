@@ -10,9 +10,15 @@
 
 <script>
   import { CounterService } from '../services/counter.service';
-  import { text, on } from 'astro-dx/dom';
+  import { effect } from '@astro-dx/core';
+  import { on } from '@astro-dx/events';
 
-  text('#count-value', CounterService.count);
+  const countEl = document.querySelector('#count-value');
+  if (countEl) {
+    effect(() => {
+      countEl.textContent = String(CounterService.count());
+    });
+  }
   on('#btn-inc', 'click', () => CounterService.increment());
   on('#btn-dec', 'click', () => CounterService.decrement());
   on('#btn-reset', 'click', () => CounterService.reset());

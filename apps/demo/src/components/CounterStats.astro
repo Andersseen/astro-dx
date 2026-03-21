@@ -8,7 +8,12 @@
 
 <script>
   import { CounterService } from '../services/counter.service';
-  import { text } from 'astro-dx/dom';
+  import { effect } from '@astro-dx/core';
 
-  text('#double-value', CounterService.double);
+  const doubleEl = document.querySelector('#double-value');
+  if (doubleEl) {
+    effect(() => {
+      doubleEl.textContent = String(CounterService.double());
+    });
+  }
 </script>

@@ -1,7 +1,6 @@
-// apps/demo/astro.config.mjs
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
-import { fileURLToPath } from "url";
-import { resolve } from "path";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -10,15 +9,36 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        "astro-dx/dom": resolve(
+        "@astro-dx/core": resolve(
           __dirname,
-          "../../packages/astro-dx/src/dom/index.ts",
+          "../../packages/core/src/index.ts",
         ),
-        "astro-dx": resolve(__dirname, "../../packages/astro-dx/src/index.ts"),
-        "astro-dx-elements": resolve(
+        "@astro-dx/events": resolve(
           __dirname,
-          "../../packages/astro-dx-elements/src/index.ts",
+          "../../packages/events/src/index.ts",
         ),
+        "@astro-dx/attributes": resolve(
+          __dirname,
+          "../../packages/attributes/src/index.ts",
+        ),
+        "@astro-dx/elements": resolve(
+          __dirname,
+          "../../packages/elements/src/index.ts",
+        ),
+        "astro-dx/core": resolve(__dirname, "../../packages/all/src/core.ts"),
+        "astro-dx/events": resolve(
+          __dirname,
+          "../../packages/all/src/events.ts",
+        ),
+        "astro-dx/attributes": resolve(
+          __dirname,
+          "../../packages/all/src/attributes.ts",
+        ),
+        "astro-dx/elements": resolve(
+          __dirname,
+          "../../packages/all/src/elements.ts",
+        ),
+        "astro-dx": resolve(__dirname, "../../packages/all/src/index.ts"),
       },
     },
   },
