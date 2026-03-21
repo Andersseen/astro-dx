@@ -2,51 +2,43 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Home">
-  <section class="min-h-[90vh] px-6 py-32">
-    <div and-layout="vertical gap:xl align:center" class="max-w-4xl mx-auto text-center">
 
-      <and-badge
-        variant="outline"
-        and-motion="fade-in"
-        and-motion-trigger="enter"
-      >
+  <!-- Hero -->
+  <section class="section flex min-h-[88vh] items-center">
+    <div class="container flex flex-col items-center gap-8 text-center">
+
+      <!-- Disclaimer -->
+      <span class="rounded-full border border-white/15 px-3 py-1 text-xs opacity-50">
         Community library · Not official Astro
-      </and-badge>
+      </span>
 
-      <div
-        and-layout="vertical gap:md align:center"
-        and-motion="slide-in-up"
-        and-motion-trigger="enter"
-        and-motion-delay="100ms"
-      >
-        <h1 and-text="h1 weight:bold">
-          Angular-inspired DX<br/>for <span class="text-amber-400">Astro</span>
+      <!-- Headline -->
+      <div class="flex max-w-[700px] flex-col gap-4">
+        <h1 class="m-0 font-sans text-[clamp(2.5rem,6vw,4rem)] font-extrabold leading-[1.1]">
+          Angular-inspired DX<br/>
+          for <span class="text-orange-400">Astro</span>
         </h1>
-        <p and-text="p-lg" class="max-w-2xl opacity-70">
+        <p class="mx-auto m-0 max-w-[560px] text-lg leading-[1.7] opacity-60">
           Signals, services, DOM bindings and reactive templates —
           without leaving Astro. Built on nanostores.
         </p>
       </div>
 
-      <div
-        and-motion="slide-in-up"
-        and-motion-trigger="enter"
-        and-motion-delay="200ms"
-        class="flex items-center gap-3 px-5 py-3 rounded-xl border border-white/10 bg-white/5 font-mono text-sm"
-      >
-        <span class="opacity-40">$</span>
-        <span>npx @astro-dx/init</span>
-        <and-button variant="ghost" size="sm" id="btn-copy" class="ml-2 opacity-50 hover:opacity-100 transition-opacity">
+      <!-- Install command -->
+      <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5">
+        <span class="font-mono text-sm opacity-40">$</span>
+        <span class="font-mono text-sm">npx @astro-dx/init</span>
+        <button
+          id="btn-copy"
+          title="Copy"
+          class="flex items-center p-1 text-inherit opacity-40 transition-opacity hover:opacity-100"
+        >
           <and-icon name="copy" size="14"></and-icon>
-        </and-button>
+        </button>
       </div>
 
-      <div
-        and-layout="horizontal gap:md align:center"
-        and-motion="slide-in-up"
-        and-motion-trigger="enter"
-        and-motion-delay="300ms"
-      >
+      <!-- CTA buttons -->
+      <div class="flex flex-wrap justify-center gap-3">
         <and-button variant="default" href="/docs/installation">
           Get started
         </and-button>
@@ -55,49 +47,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </and-button>
       </div>
 
-      <div
-        and-layout="grid cols:1 cols@md:2 cols@lg:4 gap:md"
-        class="w-full mt-8"
-        and-motion="fade-in"
-        and-motion-trigger="enter"
-        and-motion-delay="400ms"
-      >
-        <and-card>
-          <div and-layout="vertical gap:sm" class="p-5">
-            <and-icon name="zap" size="22" class="text-amber-400"></and-icon>
-            <h3 and-text="h6 weight:bold">Signals</h3>
-            <p and-text="p-sm" class="opacity-60">
-              signal(), computed(), effect() — Angular 20+ API
-            </p>
-          </div>
-        </and-card>
-        <and-card>
-          <div and-layout="vertical gap:sm" class="p-5">
-            <and-icon name="layers" size="22" class="text-amber-400"></and-icon>
-            <h3 and-text="h6 weight:bold">Services</h3>
-            <p and-text="p-sm" class="opacity-60">
-              Singleton classes. Share state across any island.
-            </p>
-          </div>
-        </and-card>
-        <and-card>
-          <div and-layout="vertical gap:sm" class="p-5">
-            <and-icon name="mouse-pointer" size="22" class="text-amber-400"></and-icon>
-            <h3 and-text="h6 weight:bold">DOM bindings</h3>
-            <p and-text="p-sm" class="opacity-60">
-              getElement(), text(), attr() — no querySelector
-            </p>
-          </div>
-        </and-card>
-        <and-card>
-          <div and-layout="vertical gap:sm" class="p-5">
-            <and-icon name="code" size="22" class="text-amber-400"></and-icon>
-            <h3 and-text="h6 weight:bold">Templates</h3>
-            <p and-text="p-sm" class="opacity-60">
-              dx-if, dx-show, dx-for as attributes or elements
-            </p>
-          </div>
-        </and-card>
+      <!-- Feature grid -->
+      <div class="mt-8 grid w-full max-w-[900px] grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+
+        <div class="flex flex-col gap-2.5 rounded-xl border border-white/10 bg-white/5 p-5 text-left">
+          <and-icon name="zap" size="20" class="text-orange-400"></and-icon>
+          <strong class="text-[0.9rem]">Signals</strong>
+          <span class="text-xs leading-6 opacity-55">signal(), computed(), effect() — Angular 20+ API</span>
+        </div>
+
+        <div class="flex flex-col gap-2.5 rounded-xl border border-white/10 bg-white/5 p-5 text-left">
+          <and-icon name="layers" size="20" class="text-orange-400"></and-icon>
+          <strong class="text-[0.9rem]">Services</strong>
+          <span class="text-xs leading-6 opacity-55">Singleton classes. Share state across islands.</span>
+        </div>
+
+        <div class="flex flex-col gap-2.5 rounded-xl border border-white/10 bg-white/5 p-5 text-left">
+          <and-icon name="mouse-pointer" size="20" class="text-orange-400"></and-icon>
+          <strong class="text-[0.9rem]">DOM bindings</strong>
+          <span class="text-xs leading-6 opacity-55">getElement(), text(), attr() — no querySelector</span>
+        </div>
+
+        <div class="flex flex-col gap-2.5 rounded-xl border border-white/10 bg-white/5 p-5 text-left">
+          <and-icon name="code" size="20" class="text-orange-400"></and-icon>
+          <strong class="text-[0.9rem]">Templates</strong>
+          <span class="text-xs leading-6 opacity-55">dx-if, dx-show, dx-for — attributes or elements</span>
+        </div>
+
       </div>
 
     </div>
@@ -106,7 +82,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <script>
     import { getElement } from '@astro-dx/dom';
 
-    getElement('#btn-copy').on('click', () => {
+    getElement<HTMLButtonElement>('#btn-copy').on('click', () => {
       navigator.clipboard.writeText('npx @astro-dx/init');
     });
   </script>

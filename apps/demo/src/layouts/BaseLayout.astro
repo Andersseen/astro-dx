@@ -1,11 +1,13 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description?: string;
 }
 const {
   title,
-  description = 'Angular-inspired DX for Astro — community library'
+  description = 'Angular-inspired DX for Astro — community library',
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -15,64 +17,58 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title} — astro-dx</title>
-    <!-- Global styles -->
-    <link rel="stylesheet" href="/styles/global.css" />
   </head>
   <body>
 
-    <!-- Navbar -->
-    <and-navbar sticky>
-      <a slot="brand" href="/" style="text-decoration:none">
-        <span and-text="h6 weight:bold">astro-dx</span>
-      </a>
-      <nav slot="links">
-        <div and-layout="horizontal gap:md align:center">
-          <a href="/">Home</a>
-          <a href="/about">About</a>
-          <a href="/demo">Demos</a>
-          <a href="/docs/installation">Docs</a>
-        </div>
-      </nav>
-      <div slot="actions">
-        <and-button
-          variant="ghost"
+    <header class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-xl">
+      <div class="container flex h-14 items-center justify-between gap-4 text-slate-200">
+
+        <!-- Brand -->
+        <a href="/" class="inline-flex items-center gap-2 no-underline">
+          <span class="font-sans text-base font-bold text-orange-400">
+            astro-dx
+          </span>
+        </a>
+
+        <!-- Nav links -->
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="/" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Home</a>
+          <a href="/about" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">About</a>
+          <a href="/demo" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Demos</a>
+          <a href="/docs/installation" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Docs</a>
+        </nav>
+
+        <!-- GitHub -->
+        <a
           href="https://github.com/Andersseen/astro-dx"
           target="_blank"
+          rel="noopener"
+          class="rounded-md border border-white/15 px-3 py-1.5 text-xs text-slate-200 no-underline opacity-85 transition hover:opacity-100"
         >
-          <and-icon name="github" size="18"></and-icon>
           GitHub
-        </and-button>
-      </div>
-    </and-navbar>
+        </a>
 
-    <!-- Page content -->
+      </div>
+    </header>
+
     <main>
       <slot />
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-24 py-10 border-t border-white/10">
-      <div and-layout="vertical gap:xs align:center">
-      <p and-text="p-sm" class="opacity-50 text-center">
-        astro-dx — Community library · Not affiliated with the Astro core team
-      </p>
-      <p and-text="p-sm" class="opacity-30 text-center">
-        MIT License
-      </p>
+    <footer class="mt-24 border-t border-white/10 py-10">
+      <div class="container flex flex-col items-center gap-2">
+        <p class="m-0 text-center text-xs opacity-45">
+          astro-dx — Community library · Not affiliated with the Astro core team
+        </p>
+        <p class="m-0 text-center text-[11px] opacity-30">MIT License</p>
       </div>
     </footer>
 
-    <!--
-      CRITICAL: These three calls must happen in this order.
-      Without them: components render as unknown HTML elements,
-      icons show as empty, animations never trigger.
-    -->
     <script>
       import '@andersseen/web-components/components/all';
       import { registerAllIcons } from '@andersseen/icon';
       import { initMotion } from '@andersseen/motion';
 
-      // Must run after components are defined
       document.addEventListener('DOMContentLoaded', () => {
         registerAllIcons();
         initMotion();

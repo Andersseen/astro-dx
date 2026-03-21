@@ -9,21 +9,21 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "astro": "^5.0.0",
-    "@astro-dx/core": "workspace:*",
-    "@astro-dx/events": "workspace:*",
-    "@astro-dx/attributes": "workspace:*",
-    "@astro-dx/elements": "workspace:*",
-    "@astro-dx/dom": "workspace:*",
-    "@andersseen/web-components": "latest",
+    "@andersseen/icon": "latest",
     "@andersseen/layout": "latest",
     "@andersseen/motion": "latest",
-    "@andersseen/icon": "latest"
+    "@andersseen/web-components": "latest",
+    "@astro-dx/attributes": "workspace:*",
+    "@astro-dx/core": "workspace:*",
+    "@astro-dx/dom": "workspace:*",
+    "@astro-dx/elements": "workspace:*",
+    "@astro-dx/events": "workspace:*",
+    "astro": "^5.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.0",
-    "@tailwindcss/vite": "^4.0.0",
-    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.5.0"
   }
 }

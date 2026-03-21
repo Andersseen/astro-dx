@@ -1,59 +1,120 @@
-/* Style theme */
-@import "@andersseen/web-components/themes/styles/playful";
+/* ============================================
+   IMPORTS — must be at top level, never nested
+   ============================================ */
 
-/* Color palette */
-@import "@andersseen/web-components/themes/colors/slate-amber";
-
-/* Web components base styles */
-@import "@andersseen/web-components/dist/web-components/web-components.css";
-
-/* Motion */
-@import "@andersseen/motion/style.css";
-
-/* Layout */
-@import "@andersseen/layout/dist/layout.css";
-
-/* Tailwind 4 */
-@import "tailwindcss";
-
+/* 7. Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap");
 
+/* 6. Tailwind 4 */
+@import "tailwindcss";
+/* 1. Andersseen web components base styles */
+@import "@andersseen/web-components/dist/web-components/web-components.css";
+
+/* 2. Style theme */
+/* Not available in @andersseen/web-components@0.0.2 exports */
+
+/* 3. Color palette */
+/* Not available in @andersseen/web-components@0.0.2 exports */
+
+/* 4. Motion */
+@import "@andersseen/motion/style.css";
+
+/* 5. Layout system */
+@import "@andersseen/layout/dist/layout.css";
+
+/* ============================================
+   BASE RESETS
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Sora", sans-serif;
+  color: #e5e7eb;
+  background:
+    radial-gradient(
+      circle at 20% -10%,
+      rgba(251, 146, 60, 0.18),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(59, 130, 246, 0.12),
+      transparent 35%
+    ),
+    #080b12;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+}
+
+/* Prevent flash of unstyled custom elements */
+:not(:defined) {
+  visibility: hidden;
+}
+
+/* ============================================
+   DESIGN TOKENS — override defaults
+   ============================================ */
+
 :root {
-  /* 1. Web components styles — must come first */
-  @import "@andersseen/web-components/dist/web-components/web-components.css";
-
-  /* 2. Style theme — playful */
-  @import "@andersseen/web-components/themes/styles/playful";
-
-  /* 3. Color palette — slate-amber */
-  @import "@andersseen/web-components/themes/colors/slate-amber";
-  --ring: 23 92% 53%;
-  /* 4. Motion animations */
   --primary: 24 95% 53%;
   --primary-foreground: 24 100% 98%;
-  /* 5. Layout system */
   --primary-200: 34 100% 90%;
   --primary-300: 32 98% 80%;
-  /* 6. Tailwind 4 — last, so it can override if needed */
   --primary-500: 24 95% 53%;
   --primary-600: 21 90% 48%;
-  /* 7. Base resets */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
+  --ring: 24 95% 53%;
+  --font-sans: "Sora", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
 
-  html {
-    scroll-behavior: smooth;
-  }
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-  }
+.container {
+  width: 100%;
+  max-width: 1024px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
 
-  /* Hide undefined custom elements during load to avoid FOUC */
-  :not(:defined) {
-    visibility: hidden;
-  --card: 223 28% 14%;
+.container-sm {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Code blocks */
+.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  overflow-x: auto;
+}
+
+/* Section spacing */
+.section {
+  padding-block: 5rem;
+}
+
+.section-sm {
+  padding-block: 3rem;
+}
