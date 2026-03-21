@@ -1,4 +1,5 @@
 ---
+import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
@@ -50,6 +51,25 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
       </div>
     </DemoCard>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code example</h2>
+      <CodeBlock lang="typescript" code={`
+import { register } from '@astro-dx/elements';
+import '@astro-dx/elements';
+
+register({
+  hasItems: ShopService.hasItems,
+  isModalOpen: ShopService.isModalOpen,
+  cartItems: ShopService.cartItems,
+});
+
+// In template:
+// <dx-show signal="hasItems">...</dx-show>
+// <dx-if signal="isModalOpen">...</dx-if>
+// <dx-for signal="cartItems">...</dx-for>
+      `} />
+    </div>
 
   </section>
 

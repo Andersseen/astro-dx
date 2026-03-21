@@ -1,4 +1,5 @@
 ---
+import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
@@ -51,6 +52,30 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
       </DemoCard>
 
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code example</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal, computed } from '@astro-dx/core';
+
+class CartServiceClass {
+  private _items = signal<{ name: string }[]>([]);
+  readonly items = this._items;
+  readonly total = computed(() => this._items().length);
+
+  add(name: string) {
+    this._items.update(prev => [...prev, { name }]);
+  }
+
+  clear() {
+    this._items.set([]);
+  }
+}
+
+// Shared singleton between islands
+export const CartService = new CartServiceClass();
+      `} />
     </div>
 
   </section>
