@@ -8,7 +8,7 @@ interface Props {
 const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
 ---
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,10 +22,11 @@ const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
     <and-navbar sticky>
       <span slot="brand" and-text="h6 weight:bold">astro-dx</span>
       <nav slot="links" and-layout="horizontal gap:md align:center">
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/demo">Demos</a>
-        <a href="/docs">Docs</a>
+        <a href="/" class="text-sm font-semibold tracking-tight">Home</a>
+        <a href="/libs" class="text-sm font-semibold tracking-tight">Libraries</a>
+        <a href="/about" class="text-sm font-semibold tracking-tight">About</a>
+        <a href="/demo" class="text-sm font-semibold tracking-tight">Demos</a>
+        <a href="/docs" class="text-sm font-semibold tracking-tight">Docs</a>
       </nav>
       <div slot="actions" and-layout="horizontal gap:sm align:center">
         <and-button
@@ -40,25 +41,27 @@ const { title, description = 'Angular-inspired DX for Astro' } = Astro.props;
     </and-navbar>
 
     <!-- Page content -->
-    <main>
+    <main class="container">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer and-layout="vertical gap:sm align:center" class="py-12 mt-24 border-t border-white/10">
-      <p and-text="p-sm" class="text-center opacity-60">
+    <footer and-layout="vertical gap:sm align:center" class="mt-14 border-t border-border/80 px-4 py-10">
+      <p and-text="p-sm" class="text-center text-muted-foreground">
         astro-dx — Community library, not affiliated with the Astro core team.
       </p>
-      <p and-text="p-sm" class="text-center opacity-40">
+      <p and-text="p-sm" class="text-center text-muted-foreground/90">
         MIT License · Built by Andersseen
       </p>
     </footer>
 
     <!-- Global scripts -->
     <script>
+      import { enableAnimations } from '@andersseen/web-components';
       import '@andersseen/web-components/components/all';
       import { registerAllIcons } from '@andersseen/icon';
       import { initMotion } from '@andersseen/motion';
+      enableAnimations();
       registerAllIcons();
       initMotion();
     </script>

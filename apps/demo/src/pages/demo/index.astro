@@ -2,38 +2,40 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Demos">
-  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+  <section class="py-14 md:py-20">
+    <header class="mb-7 grid gap-3">
+      <span class="text-primary text-xs font-extrabold uppercase tracking-[0.2em]">Demos</span>
+      <h1 class="text-balance">Live demos</h1>
+      <p class="max-w-2xl text-base text-muted-foreground md:text-lg">Examples reales, pensados para entender la API rapido y sin mocks.</p>
+    </header>
 
-    <div and-layout="vertical gap:sm">
-      <and-badge variant="outline" class="w-fit">Demos</and-badge>
-      <h1 and-text="h2 weight:bold">Live demos</h1>
-      <p and-text="p" class="opacity-70">
-        Every demo is a real working example. No mocks.
-      </p>
-    </div>
-
-    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {[
-        { href: '/demo/signals', title: 'Signals', desc: 'signal(), computed(), effect()', icon: 'zap', badge: '@astro-dx/core' },
-        { href: '/demo/services', title: 'Services', desc: 'Singleton services. Cross-island state.', icon: 'layers', badge: '@astro-dx/core' },
-        { href: '/demo/dom', title: 'DOM bindings', desc: 'getElement(), getElements()', icon: 'mouse-pointer', badge: '@astro-dx/dom' },
-        { href: '/demo/attributes', title: 'Attributes', desc: 'dx-if, dx-show, dx-for', icon: 'code', badge: '@astro-dx/attributes' },
-        { href: '/demo/elements', title: 'Elements', desc: 'Custom elements approach', icon: 'component', badge: '@astro-dx/elements' },
-      ].map(d => (
-        <a href={d.href} class="no-underline" and-motion="slide-in-up" and-motion-trigger="enter">
-          <and-card class="h-full hover:border-amber-400/50 transition-colors cursor-pointer">
-            <div and-layout="vertical gap:sm" class="p-6">
-              <div and-layout="horizontal gap:sm align:center justify:between">
-                <and-icon name={d.icon} size="20" class="text-amber-400"></and-icon>
-                <and-badge variant="outline" size="sm">{d.badge}</and-badge>
+        { href: '/demo/signals', title: 'Signals', desc: 'signal(), computed() y effect() en flujo reactivo basico.', icon: 'zap', badge: '@astro-dx/core' },
+        { href: '/demo/services', title: 'Services', desc: 'Estado singleton compartido entre islands.', icon: 'layers', badge: '@astro-dx/core' },
+        { href: '/demo/dom', title: 'DOM bindings', desc: 'getElement() y getElements() para manipulacion declarativa.', icon: 'mouse-pointer', badge: '@astro-dx/dom' },
+        { href: '/demo/attributes', title: 'Attributes', desc: 'dx-if, dx-show y dx-for como directivas de atributo.', icon: 'code', badge: '@astro-dx/attributes' },
+        { href: '/demo/elements', title: 'Elements', desc: 'dx-if, dx-show y dx-for como custom elements.', icon: 'component', badge: '@astro-dx/elements' },
+      ].map((d, index) => (
+        <a
+          href={d.href}
+          class="group h-full"
+          and-motion="slide-in-up"
+          and-motion-trigger="enter"
+          and-motion-delay={`${80 + index * 60}ms`}
+        >
+          <article class="h-full rounded-xl border border-border bg-card shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-primary-300">
+            <div class="grid gap-3 p-5">
+              <div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+                <and-icon name={d.icon} size="20" class="text-primary-600"></and-icon>
+                <span class="rounded-full border border-primary-200 bg-primary-100 px-2.5 py-1 font-mono text-xs text-primary-600">{d.badge}</span>
               </div>
-              <h3 and-text="h6 weight:bold">{d.title}</h3>
-              <p and-text="p-sm" class="opacity-60">{d.desc}</p>
+              <h3 class="text-lg font-semibold tracking-tight text-card-foreground">{d.title}</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">{d.desc}</p>
             </div>
-          </and-card>
+          </article>
         </a>
       ))}
     </div>
-
   </section>
 </BaseLayout>

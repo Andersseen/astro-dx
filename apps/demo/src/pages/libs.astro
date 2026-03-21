@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const libraries = [
+  {
+    name: '@astro-dx/core',
+    desc: 'Signals, computed values, effects and lifecycle helpers.',
+    docs: '/docs/core',
+    demo: '/demo/signals',
+  },
+  {
+    name: '@astro-dx/dom',
+    desc: 'DOM refs with typed bindings and event helpers.',
+    docs: '/docs/dom',
+    demo: '/demo/dom',
+  },
+  {
+    name: '@astro-dx/events',
+    desc: 'High-level event utilities for keyboard, hover and focus.',
+    docs: '/docs/events',
+    demo: '/docs/events',
+  },
+  {
+    name: '@astro-dx/attributes',
+    desc: 'dx-if, dx-show and dx-for as attribute directives.',
+    docs: '/docs/attributes',
+    demo: '/demo/attributes',
+  },
+  {
+    name: '@astro-dx/elements',
+    desc: 'dx-if, dx-show and dx-for as custom elements.',
+    docs: '/docs/elements',
+    demo: '/demo/elements',
+  },
+  {
+    name: '@astro-dx/all',
+    desc: 'All-in-one package for quick project setup.',
+    docs: '/docs/installation',
+    demo: '/docs',
+  },
+];
+---
+<BaseLayout title="Libraries" description="Library pages for each astro-dx package">
+  <section class="py-14 md:py-20">
+    <header class="mb-7 grid gap-3">
+      <span class="text-primary text-xs font-extrabold uppercase tracking-[0.2em]">Libraries</span>
+      <h1 class="text-balance">One page per package</h1>
+      <p class="max-w-2xl text-base text-muted-foreground md:text-lg">
+        Browse each package with direct access to docs and working demos.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {libraries.map((lib, index) => (
+        <article
+          class="rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300"
+          and-motion="slide-in-up"
+          and-motion-trigger="enter"
+          and-motion-delay={`${80 + index * 60}ms`}
+        >
+          <div class="grid gap-3">
+            <h2 class="text-lg font-semibold text-card-foreground">{lib.name}</h2>
+            <p class="text-sm leading-relaxed text-muted-foreground">{lib.desc}</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <a href={lib.docs} class="inline-flex rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:border-primary-300 hover:text-primary-600">
+                Docs
+              </a>
+              <a href={lib.demo} class="inline-flex rounded-md border border-primary-200 bg-primary-100 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-200">
+                Demo
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

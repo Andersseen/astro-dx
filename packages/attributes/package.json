@@ -9,14 +9,16 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@astro-dx/core": "*"
+    "@astro-dx/core": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

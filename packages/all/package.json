@@ -29,16 +29,18 @@
       "types": "./dist/dom.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup"
   },
   "dependencies": {
-    "@astro-dx/core": "*",
-    "@astro-dx/events": "*",
-    "@astro-dx/attributes": "*",
-    "@astro-dx/elements": "*",
-    "@astro-dx/dom": "*"
+    "@astro-dx/core": "workspace:*",
+    "@astro-dx/events": "workspace:*",
+    "@astro-dx/attributes": "workspace:*",
+    "@astro-dx/elements": "workspace:*",
+    "@astro-dx/dom": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
