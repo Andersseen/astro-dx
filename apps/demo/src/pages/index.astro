@@ -11,6 +11,16 @@ import CounterStats from '../components/CounterStats.astro';
   <body>
     <h1>astro-dx</h1>
 
+    <nav>
+      <ul>
+        <li><a href="/">Counter service</a></li>
+        <li><a href="/approaches">Attributes + Elements approaches</a></li>
+        <li><a href="/elements-demo">Elements demo (ShopService)</a></li>
+        <li><a href="/dom-demo">DOM demo (getElement)</a></li>
+      </ul>
+    </nav>
+
+    <h2>Counter service</h2>
     <!-- Two islands, zero prop drilling, shared service -->
     <Counter />
     <CounterStats />
