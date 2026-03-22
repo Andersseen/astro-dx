@@ -90,6 +90,8 @@ const { id, files, height = 360 } = Astro.props;
   import { oneDark } from '@codemirror/theme-one-dark';
   import { EditorState } from '@codemirror/state';
   import { buildSrcdoc } from '../../snippets/playground/template';
+  import { getElement, getElements } from '@astro-dx/dom';
+  import { on } from '@astro-dx/events';
 
 
 
@@ -98,16 +100,16 @@ const { id, files, height = 360 } = Astro.props;
     const id = container.id.replace('playground-', '');
     const height = Number(container.dataset.height) || 360;
 
-    const jsCode = JSON.parse(document.getElementById(`data-js-${id}`)!.textContent!);
-    const htmlCode = JSON.parse(document.getElementById(`data-html-${id}`)!.textContent!);
+    const jsCode = JSON.parse(getElement<HTMLElement>(`#data-js-${id}`).el.textContent!);
+    const htmlCode = JSON.parse(getElement<HTMLElement>(`#data-html-${id}`).el.textContent!);
 
     const editors = new Map<string, EditorView>();
 
     function getOrCreateEditor(elId: string, type: 'js' | 'html', code: string): EditorView {
       if (editors.has(elId)) return editors.get(elId)!;
 
-      const el = document.getElementById(elId);
-      if (!el) return null as any;
+      const el = getElement<HTMLElement>(`#${elId}`).el;
+      if (!el.id) return null as any;
 
       const view = new EditorView({
         state: EditorState.create({
@@ -147,41 +149,46 @@ const { id, files, height = 360 } = Astro.props;
       const srcdoc = buildSrcdoc(code.js, code.html);
 
       // Update all iframes
-      const desktopIframe = document.getElementById(`iframe-${id}`) as HTMLIFrameElement | null;
-      const mobileIframe = document.getElementById(`iframe-mobile-${id}`) as HTMLIFrameElement | null;
-      if (desktopIframe) desktopIframe.srcdoc = srcdoc;
-      if (mobileIframe) mobileIframe.srcdoc = srcdoc;
+      const desktopIframe = getElement<HTMLIFrameElement>(`#iframe-${id}`).el;
+      const mobileIframe = getElement<HTMLIFrameElement>(`#iframe-mobile-${id}`).el;
+      if (desktopIframe.id) desktopIframe.srcdoc = srcdoc;
+      if (mobileIframe.id) mobileIframe.srcdoc = srcdoc;
     }
 
     // ─── Desktop: code tab switching ───
-    const codeTabs = container.querySelectorAll<HTMLButtonElement>(`.playground-code-tab[data-for="${id}"]`);
-    const codePanels = container.querySelectorAll<HTMLElement>(`.playground-code-panel[data-owner="${id}"]`);
+    const codeTabs = getElements<HTMLButtonElement>(`.playground-code-tab[data-for="${id}"]`);
+    const codePanels = getElements<HTMLElement>(`.playground-code-panel[data-owner="${id}"]`);
 
-    codeTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
+    codeTabs.forEach(tabRef => {
+      on(tabRef.el, 'click', () => {
+        const tab = tabRef.el;
         const target = tab.dataset.codetab!;
-        codeTabs.forEach(t => t.classList.remove('active'));
-        codePanels.forEach(p => p.classList.remove('active'));
+        codeTabs.forEach(t => t.el.classList.remove('active'));
+        codePanels.forEach(p => p.el.classList.remove('active'));
         tab.classList.add('active');
-        container.querySelector(`.playground-code-panel[data-codepanel="${target}"][data-owner="${id}"]`)?.classList.add('active');
+        const targetPanel = getElement(`.playground-code-panel[data-codepanel="${target}"][data-owner="${id}"]`).el;
+        if (targetPanel.className) targetPanel.classList.add('active');
         getOrCreateEditor(`editor-${target}-${id}`, target as 'js' | 'html', target === 'js' ? jsCode : htmlCode);
       });
     });
 
     // Desktop run button
-    container.querySelector(`[data-run-desktop="${id}"]`)?.addEventListener('click', runCode);
+    const desktopRunBtn = getElement(`[data-run-desktop="${id}"]`).el;
+    if (desktopRunBtn.className) on(desktopRunBtn, 'click', runCode);
 
     // ─── Mobile: tab switching ───
-    const mobileTabs = container.querySelectorAll<HTMLButtonElement>(`.playground-tab[data-for="${id}"]`);
-    const mobilePanels = container.querySelectorAll<HTMLElement>(`.playground-panel[data-owner="${id}"]`);
+    const mobileTabs = getElements<HTMLButtonElement>(`.playground-tab[data-for="${id}"]`);
+    const mobilePanels = getElements<HTMLElement>(`.playground-panel[data-owner="${id}"]`);
 
-    mobileTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
+    mobileTabs.forEach(tabRef => {
+      on(tabRef.el, 'click', () => {
+        const tab = tabRef.el;
         const target = tab.dataset.tab!;
-        mobileTabs.forEach(t => t.classList.remove('active'));
-        mobilePanels.forEach(p => p.classList.remove('active'));
+        mobileTabs.forEach(t => t.el.classList.remove('active'));
+        mobilePanels.forEach(p => p.el.classList.remove('active'));
         tab.classList.add('active');
-        container.querySelector(`.playground-panel[data-panel="${target}"][data-owner="${id}"]`)?.classList.add('active');
+        const targetPanel = getElement(`.playground-panel[data-panel="${target}"][data-owner="${id}"]`).el;
+        if (targetPanel.className) targetPanel.classList.add('active');
         if (target === 'js' || target === 'html') {
           getOrCreateEditor(`editor-${target}-mobile-${id}`, target, target === 'js' ? jsCode : htmlCode);
         }
@@ -189,14 +196,15 @@ const { id, files, height = 360 } = Astro.props;
     });
 
     // Mobile run button
-    container.querySelector(`[data-run="${id}"]`)?.addEventListener('click', runCode);
+    const mobileRunBtn = getElement(`[data-run="${id}"]`).el;
+    if (mobileRunBtn.className) on(mobileRunBtn, 'click', runCode);
 
     // ─── Initial run + init desktop JS editor ───
     getOrCreateEditor(`editor-js-${id}`, 'js', jsCode);
     runCode();
   }
 
-  document.querySelectorAll<HTMLElement>('.playground').forEach(initPlayground);
+  getElements<HTMLElement>('.playground').forEach(ref => initPlayground(ref.el));
 </script>
 
 <style>
