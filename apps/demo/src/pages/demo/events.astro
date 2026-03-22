@@ -1,0 +1,108 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import eventsCode from '../../snippets/demo/events.example.ts?raw';
+---
+<BaseLayout title="Events demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/events</and-badge>
+      <h1 and-text="h2 weight:bold">Event shortcuts</h1>
+      <p and-text="p" class="opacity-70">
+        onInput, onSubmit, onHover, onFocus, onKey and onResize with clean setup + cleanup.
+      </p>
+    </div>
+
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+      <DemoCard title="Input + submit + key">
+        <form id="search-form" and-layout="vertical gap:sm" class="p-4">
+          <and-input id="search-input" placeholder="Type and press Enter"></and-input>
+          <and-button type="submit" variant="default">Submit</and-button>
+          <p and-text="p-sm" class="opacity-70">Query: <span id="query-state">-</span></p>
+          <p and-text="p-sm" class="opacity-70">Status: <span id="status-state">idle</span></p>
+        </form>
+      </DemoCard>
+
+      <DemoCard title="Hover + focus">
+        <div and-layout="vertical gap:sm" class="p-4">
+          <div
+            id="hover-zone"
+            class="rounded-lg border border-white/10 bg-white/5 p-4 text-sm select-none"
+          >
+            Hover this area
+          </div>
+          <and-input id="focus-input" placeholder="Focus and blur this input"></and-input>
+          <p and-text="p-sm" class="opacity-70">Hover: <span id="hover-state">outside</span></p>
+          <p and-text="p-sm" class="opacity-70">Focus: <span id="focus-state">blurred</span></p>
+        </div>
+      </DemoCard>
+    </div>
+
+    <DemoCard title="ResizeObserver utility">
+      <div and-layout="vertical gap:sm" class="p-4">
+        <div
+          id="resizable-box"
+          class="min-h-24 min-w-40 resize overflow-auto rounded-lg border border-dashed border-white/20 bg-white/5 p-3"
+          style="width: 220px; height: 120px"
+        >
+          Drag the bottom-right corner to resize.
+        </div>
+        <p and-text="p-sm" class="opacity-70">Size: <span id="size-state">waiting resize...</span></p>
+      </div>
+    </DemoCard>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code example</h2>
+      <CodeBlock lang="typescript" code={eventsCode} />
+    </div>
+
+  </section>
+
+  <script>
+    import { signal } from '@astro-dx/core';
+    import { getElement } from '@astro-dx/dom';
+    import {
+      onInput,
+      onSubmit,
+      onHover,
+      onFocus,
+      onKey,
+      onResize,
+    } from '@astro-dx/events';
+
+    const query = signal('');
+    const status = signal('idle');
+    const hoverState = signal('outside');
+    const focusState = signal('blurred');
+    const boxSize = signal('waiting resize...');
+
+    getElement('#query-state').text(query);
+    getElement('#status-state').text(status);
+    getElement('#hover-state').text(hoverState);
+    getElement('#focus-state').text(focusState);
+    getElement('#size-state').text(boxSize);
+
+    onInput('#search-input', (value) => query.set(value));
+    onSubmit('#search-form', () => status.set(`submit:${query()}`));
+    onKey('#search-input', 'Enter', () => status.set(`enter:${query()}`));
+
+    onHover('#hover-zone', {
+      enter: () => hoverState.set('inside'),
+      leave: () => hoverState.set('outside'),
+    });
+
+    onFocus('#focus-input', {
+      focus: () => focusState.set('focused'),
+      blur: () => focusState.set('blurred'),
+    });
+
+    onResize('#resizable-box', (entry) => {
+      const width = Math.round(entry.contentRect.width);
+      const height = Math.round(entry.contentRect.height);
+      boxSize.set(`${width} x ${height}`);
+    });
+  </script>
+
+</BaseLayout>

@@ -41,6 +41,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             icon: 'code',
             badge: '@astro-dx/attributes'
           },
+          {
+            href: '/demo/elements',
+            title: 'Elements',
+            desc: 'dx-show, dx-if, dx-for as custom elements',
+            icon: 'box',
+            badge: '@astro-dx/elements'
+          },
+          {
+            href: '/demo/events',
+            title: 'Events',
+            desc: 'onInput, onSubmit, onHover, onFocus, onResize',
+            icon: 'mouse-pointer',
+            badge: '@astro-dx/events'
+          },
         ] as const).map(d => (
           <a
             href={d.href}

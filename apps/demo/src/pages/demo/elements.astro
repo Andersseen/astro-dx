@@ -2,6 +2,7 @@
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import elementsCode from '../../snippets/demo/elements.example.ts?raw';
 ---
 <BaseLayout title="Elements demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -54,21 +55,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
-      <CodeBlock lang="typescript" code={`
-import { register } from '@astro-dx/elements';
-import '@astro-dx/elements';
-
-register({
-  hasItems: ShopService.hasItems,
-  isModalOpen: ShopService.isModalOpen,
-  cartItems: ShopService.cartItems,
-});
-
-// In template:
-// <dx-show signal="hasItems">...</dx-show>
-// <dx-if signal="isModalOpen">...</dx-if>
-// <dx-for signal="cartItems">...</dx-for>
-      `} />
+      <CodeBlock lang="typescript" code={elementsCode} />
     </div>
 
   </section>

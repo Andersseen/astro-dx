@@ -2,6 +2,9 @@
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import signalsCode from '../../snippets/demo/signals.example.ts?raw';
+import signalsWithCode from '../../snippets/demo/signals.with-astro-dx.ts?raw';
+import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?raw';
 ---
 <BaseLayout title="Signals demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -41,19 +44,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal, computed } from '@astro-dx/core';
-import { getElement } from '@astro-dx/dom';
-
-const count = signal(0);
-const double = computed(() => count() * 2);
-
-getElement('#count-display').text(count);
-getElement('#double-display').text(double);
-
-getElement('#btn-inc').on('click', () => count.update(v => v + 1));
-getElement('#btn-dec').on('click', () => count.update(v => v - 1));
-      `} />
+      <CodeBlock lang="typescript" code={signalsCode} />
     </div>
 
     <!-- Code comparison tabs -->
@@ -62,49 +53,11 @@ getElement('#btn-dec').on('click', () => count.update(v => v - 1));
       <and-tab slot="tabs" value="without">Without</and-tab>
 
       <div slot="panel-with">
-        <CodeBlock lang="typescript" code={`
-import { signal, computed } from '@astro-dx/core';
-import { getElement } from '@astro-dx/dom';
-
-const count  = signal(0);
-const double = computed(() => count() * 2);
-const sign   = computed(() => count() > 0 ? 'positive' : count() < 0 ? 'negative' : 'neutral');
-
-getElement('#count-display').text(count);
-getElement('#double-display').text(double);
-getElement('#sign-display').text(sign);
-
-getElement('#btn-inc').on('click', () => count.update(v => v + 1));
-getElement('#btn-dec').on('click', () => count.update(v => v - 1));
-getElement('#btn-reset').on('click', () => count.set(0));
-        `} />
+        <CodeBlock lang="typescript" code={signalsWithCode} />
       </div>
 
       <div slot="panel-without">
-        <CodeBlock lang="typescript" code={`
-import { atom, computed } from 'nanostores';
-
-const $count  = atom(0);
-const $double = computed($count, c => c * 2);
-const $sign   = computed($count, c => c > 0 ? 'positive' : c < 0 ? 'negative' : 'neutral');
-
-$count.subscribe(v => {
-  document.querySelector('#count-display').textContent = String(v);
-});
-$double.subscribe(v => {
-  document.querySelector('#double-display').textContent = String(v);
-});
-$sign.subscribe(v => {
-  document.querySelector('#sign-display').textContent = v;
-});
-
-document.querySelector('#btn-inc')
-  ?.addEventListener('click', () => $count.set($count.get() + 1));
-document.querySelector('#btn-dec')
-  ?.addEventListener('click', () => $count.set($count.get() - 1));
-document.querySelector('#btn-reset')
-  ?.addEventListener('click', () => $count.set(0));
-        `} />
+        <CodeBlock lang="typescript" code={signalsWithoutCode} />
       </div>
     </and-tabs>
 

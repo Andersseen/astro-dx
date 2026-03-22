@@ -2,6 +2,7 @@
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import servicesCode from '../../snippets/demo/services.example.ts?raw';
 ---
 <BaseLayout title="Services demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -56,26 +57,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal, computed } from '@astro-dx/core';
-
-class CartServiceClass {
-  private _items = signal<{ name: string }[]>([]);
-  readonly items = this._items;
-  readonly total = computed(() => this._items().length);
-
-  add(name: string) {
-    this._items.update(prev => [...prev, { name }]);
-  }
-
-  clear() {
-    this._items.set([]);
-  }
-}
-
-// Shared singleton between islands
-export const CartService = new CartServiceClass();
-      `} />
+      <CodeBlock lang="typescript" code={servicesCode} />
     </div>
 
   </section>

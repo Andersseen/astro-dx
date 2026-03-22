@@ -2,6 +2,7 @@
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
 ---
 <BaseLayout title="Attributes demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -56,20 +57,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal } from '@astro-dx/core';
-import { register, bootstrap } from '@astro-dx/attributes';
-
-const isVisible = signal(true);
-const listItems = signal([{ label: 'First item' }]);
-
-register({ isVisible, listItems });
-bootstrap();
-
-// In template:
-// <and-alert dx-show="isVisible">Visible</and-alert>
-// <li dx-for="listItems" dx-text="label"></li>
-      `} />
+      <CodeBlock lang="typescript" code={attributesCode} />
     </div>
 
   </section>
