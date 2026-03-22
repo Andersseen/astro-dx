@@ -40,7 +40,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Sora", sans-serif;
-  color: #e5e7eb;
+  color: hsl(var(--foreground));
   background:
     radial-gradient(
       circle at 20% -10%,
@@ -106,6 +106,13 @@ a {
    ============================================ */
 
 :root {
+  --background: 222 36% 6%;
+  --foreground: 218 30% 90%;
+  --muted-foreground: 216 20% 72%;
+  --subtle-foreground: 215 14% 58%;
+  --surface: 223 26% 12%;
+  --surface-2: 223 22% 16%;
+  --border: 220 20% 26%;
   --primary: 24 95% 53%;
   --primary-foreground: 24 100% 98%;
   --primary-200: 34 100% 90%;
@@ -162,4 +169,53 @@ a {
 
 .section-sm {
   padding-block: 3rem;
+}
+
+.text-theme-strong {
+  color: hsl(var(--foreground));
+}
+
+.text-theme-muted {
+  color: hsl(var(--muted-foreground));
+}
+
+.text-theme-subtle {
+  color: hsl(var(--subtle-foreground));
+}
+
+.text-theme-accent {
+  color: hsl(var(--primary));
+}
+
+.text-theme-accent-soft {
+  color: hsl(var(--primary-300));
+}
+
+.surface-theme {
+  background-color: hsl(var(--surface) / 0.58);
+}
+
+.surface-theme-soft {
+  background-color: hsl(var(--surface-2) / 0.5);
+}
+
+.border-theme {
+  border-color: hsl(var(--border) / 0.62);
+}
+
+.border-theme-soft {
+  border-color: hsl(var(--border) / 0.48);
+}
+
+.chip-link {
+  border: 1px solid hsl(var(--border) / 0.56);
+  color: hsl(var(--muted-foreground));
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.chip-link:hover {
+  border-color: hsl(var(--primary) / 0.65);
+  color: hsl(var(--foreground));
 }

@@ -25,14 +25,14 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
         <div and-layout="horizontal gap:lg align:center">
           <and-button variant="outline" id="btn-dec" size="lg">−</and-button>
           <div and-layout="vertical gap:xs align:center">
-            <span id="count-display" class="text-6xl font-bold text-amber-400">0</span>
+            <span id="count-display" class="text-theme-accent text-6xl font-bold">0</span>
             <span and-text="p-sm" class="opacity-50">count</span>
           </div>
           <and-button variant="outline" id="btn-inc" size="lg">+</and-button>
         </div>
         <div and-layout="horizontal gap:xl">
           <div and-layout="vertical gap:xs align:center">
-            <span id="double-display" class="text-2xl font-mono text-amber-300">0</span>
+            <span id="double-display" class="text-theme-accent-soft text-2xl font-mono">0</span>
             <span and-text="p-sm" class="opacity-50">double</span>
           </div>
           <div and-layout="vertical gap:xs align:center">
@@ -64,23 +64,23 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
         </div>
 
         <div and-layout="grid cols:2 cols@md:5 gap:sm" class="text-sm">
-          <div class="rounded-lg bg-white/5 px-3 py-2">
+          <div class="surface-theme rounded-lg px-3 py-2">
             <span class="opacity-60">Branch</span>
             <div id="branch-display" class="font-mono">A</div>
           </div>
-          <div class="rounded-lg bg-white/5 px-3 py-2">
+          <div class="surface-theme rounded-lg px-3 py-2">
             <span class="opacity-60">Selected value</span>
             <div id="selected-display" class="font-mono">0</div>
           </div>
-          <div class="rounded-lg bg-white/5 px-3 py-2">
+          <div class="surface-theme rounded-lg px-3 py-2">
             <span class="opacity-60">Effect runs</span>
             <div id="runs-display" class="font-mono">0</div>
           </div>
-          <div class="rounded-lg bg-white/5 px-3 py-2">
+          <div class="surface-theme rounded-lg px-3 py-2">
             <span class="opacity-60">A source</span>
             <div id="source-a-display" class="font-mono">1</div>
           </div>
-          <div class="rounded-lg bg-white/5 px-3 py-2">
+          <div class="surface-theme rounded-lg px-3 py-2">
             <span class="opacity-60">B source</span>
             <div id="source-b-display" class="font-mono">100</div>
           </div>

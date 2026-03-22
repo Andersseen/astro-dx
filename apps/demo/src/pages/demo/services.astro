@@ -124,7 +124,7 @@ import serviceReceiverCode from '../../snippets/demo/services.receiver-component
     const cartList = getElement<HTMLUListElement>('#cart-list');
     cart.cartItems.subscribe(items => {
       cartList.el.innerHTML = items
-        .map(item => `<li class="text-sm opacity-70 py-1 border-b border-white/10">${item.name}</li>`)
+        .map(item => `<li class="text-sm opacity-70 py-1 border-b border-theme">${item.name}</li>`)
         .join('');
     });
 

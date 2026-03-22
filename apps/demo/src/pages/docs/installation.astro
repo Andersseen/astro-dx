@@ -16,7 +16,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <!-- CLI -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 1 — CLI (recommended)</h2>
-      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm">
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm">
         npx @astro-dx/init
       </div>
     </div>
@@ -24,7 +24,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <!-- All in one -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 2 — All packages</h2>
-      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm">
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm">
         npm install astro-dx
       </div>
     </div>
@@ -32,7 +32,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <!-- Granular -->
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Option 3 — Only what you need</h2>
-      <div class="px-4 py-3 rounded-lg border border-white/10 bg-white/5 font-mono text-sm space-y-1">
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm space-y-1">
         <div><span class="opacity-40"># signals only</span></div>
         <div>npm install @astro-dx/core</div>
         <div class="pt-1"><span class="opacity-40"># signals + DOM utilities</span></div>
@@ -57,9 +57,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         ].map(row => (
           <div
             and-layout="horizontal gap:md align:start"
-            class="py-3 border-b border-white/10"
+            class="py-3 border-b border-theme"
           >
-            <code class="text-amber-400 text-sm min-w-[200px] shrink-0">
+            <code class="text-theme-accent text-sm min-w-[200px] shrink-0">
               {row.pkg}
             </code>
             <span and-text="p-sm" class="opacity-60">{row.desc}</span>

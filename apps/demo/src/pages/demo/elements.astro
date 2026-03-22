@@ -25,7 +25,7 @@ import elementsCode from '../../snippets/demo/elements.example.ts?raw';
 
         <!-- dx-if: node created/destroyed -->
         <dx-if signal="isModalOpen">
-          <div and-layout="vertical gap:sm" class="p-4 rounded-xl border border-white/10 bg-white/5">
+          <div and-layout="vertical gap:sm" class="surface-theme border-theme p-4 rounded-xl border">
             <p and-text="p-sm">Modal is open</p>
             <and-button variant="ghost" size="sm" id="btn-close-modal">Close</and-button>
           </div>
@@ -34,9 +34,9 @@ import elementsCode from '../../snippets/demo/elements.example.ts?raw';
         <!-- dx-for: reactive list -->
         <ul and-layout="vertical gap:xs">
           <dx-for signal="cartItems">
-            <li and-layout="horizontal gap:sm justify:between" class="py-2 px-3 rounded-lg bg-white/5 text-sm">
+            <li and-layout="horizontal gap:sm justify:between" class="surface-theme py-2 px-3 rounded-lg text-sm">
               <span dx-text="name"></span>
-              <span dx-text="price" class="text-amber-400 font-mono"></span>
+              <span dx-text="price" class="text-theme-accent font-mono"></span>
             </li>
           </dx-for>
         </ul>

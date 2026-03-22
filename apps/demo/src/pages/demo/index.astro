@@ -10,11 +10,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         <h1 and-text="h2 weight:bold">Live demos</h1>
         <p and-text="p" class="opacity-70">Every demo is real. No mocks.</p>
         <div class="flex flex-wrap gap-2 pt-2">
-          <a href="/demo/signals" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 no-underline hover:border-white/25 hover:text-white">Core</a>
-          <a href="/demo/dom" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 no-underline hover:border-white/25 hover:text-white">DOM</a>
-          <a href="/demo/events" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 no-underline hover:border-white/25 hover:text-white">Events</a>
-          <a href="/demo/attributes" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 no-underline hover:border-white/25 hover:text-white">Attributes</a>
-          <a href="/demo/elements" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300 no-underline hover:border-white/25 hover:text-white">Elements</a>
+          <a href="/demo/signals" class="chip-link rounded-full px-3 py-1 text-xs no-underline">Core</a>
+          <a href="/demo/dom" class="chip-link rounded-full px-3 py-1 text-xs no-underline">DOM</a>
+          <a href="/demo/events" class="chip-link rounded-full px-3 py-1 text-xs no-underline">Events</a>
+          <a href="/demo/attributes" class="chip-link rounded-full px-3 py-1 text-xs no-underline">Attributes</a>
+          <a href="/demo/elements" class="chip-link rounded-full px-3 py-1 text-xs no-underline">Elements</a>
         </div>
       </div>
 
@@ -72,12 +72,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <and-card class="h-full cursor-pointer">
               <div and-layout="vertical gap:sm" class="p-6">
                 <div and-layout="horizontal gap:sm align:center justify:between">
-                  <and-icon name={d.icon} size="20" class="text-amber-400"></and-icon>
+                  <and-icon name={d.icon} size="20" class="text-theme-accent"></and-icon>
                   <and-badge variant="outline">{d.badge}</and-badge>
                 </div>
                 <h3 and-text="h6 weight:bold">{d.title}</h3>
                 <p and-text="p-sm" class="opacity-60">{d.desc}</p>
-                <span class="text-xs uppercase tracking-[0.16em] text-slate-500">Open demo</span>
+                <span class="text-theme-subtle text-xs uppercase tracking-[0.16em]">Open demo</span>
               </div>
             </and-card>
           </a>

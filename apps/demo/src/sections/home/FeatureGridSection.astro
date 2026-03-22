@@ -28,9 +28,9 @@ const features = [
       {features.map((feature) => (
         <and-card variant="outline" padded>
           <div class="flex flex-col gap-2.5 text-left">
-            <and-icon name={feature.icon} size="20" class="text-orange-400"></and-icon>
-            <strong class="text-[0.9rem] text-slate-100">{feature.title}</strong>
-            <span class="text-xs leading-6 text-slate-300/65">{feature.description}</span>
+            <and-icon name={feature.icon} size="20" class="text-theme-accent"></and-icon>
+            <strong class="text-theme-strong text-[0.9rem]">{feature.title}</strong>
+            <span class="text-theme-muted text-xs leading-6">{feature.description}</span>
           </div>
         </and-card>
       ))}

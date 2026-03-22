@@ -20,7 +20,7 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
       <div and-layout="vertical gap:md" class="p-6">
         <and-button variant="default" id="btn-open-modal">Open modal</and-button>
 
-        <dialog id="demo-modal" class="rounded-xl border border-white/10 bg-slate-900 p-6 backdrop:bg-black/50 w-full max-w-sm">
+        <dialog id="demo-modal" class="border-theme surface-theme-soft rounded-xl border p-6 backdrop:bg-[hsl(var(--background)/0.82)] w-full max-w-sm">
           <div and-layout="vertical gap:md">
             <h2 id="modal-title" and-text="h5 weight:bold">Default title</h2>
             <p and-text="p-sm" class="opacity-70">This title is driven by a signal.</p>
@@ -34,12 +34,12 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
     <DemoCard title="Product list — getElements + onHover + onClick">
       <div and-layout="vertical gap:md" class="p-6">
         <ul id="product-list" and-layout="vertical gap:xs">
-          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="1">Product A</li>
-          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="2">Product B</li>
-          <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="3">Product C</li>
+          <li class="demo-product surface-theme py-2 px-3 rounded-lg cursor-pointer transition-opacity" data-id="1">Product A</li>
+          <li class="demo-product surface-theme py-2 px-3 rounded-lg cursor-pointer transition-opacity" data-id="2">Product B</li>
+          <li class="demo-product surface-theme py-2 px-3 rounded-lg cursor-pointer transition-opacity" data-id="3">Product C</li>
         </ul>
         <p and-text="p-sm" class="opacity-60">
-          Last clicked: <span id="last-clicked" class="text-amber-400">none</span>
+          Last clicked: <span id="last-clicked" class="text-theme-accent">none</span>
         </p>
       </div>
     </DemoCard>
