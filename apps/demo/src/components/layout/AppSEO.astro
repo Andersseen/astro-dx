@@ -15,7 +15,9 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
 const socialImageURL = new URL(image, Astro.url);
-const siteTitle = `${title} — astro-dx`;
+const siteTitle = title === 'Home' 
+  ? 'Astro-DX | Developer Experience Utilities'
+  : `${title} | Astro-DX`;
 ---
 
 <!-- Global Metadata -->
@@ -24,7 +26,8 @@ const siteTitle = `${title} — astro-dx`;
 <meta name="generator" content={Astro.generator} />
 
 <!-- Favicons -->
-<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" href="/favicon.png" sizes="any" />
 <link rel="apple-touch-icon" href="/favicon.png" />
 
 <!-- Canonical URL -->

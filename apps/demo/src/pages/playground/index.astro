@@ -55,6 +55,9 @@ const entries = Object.entries(playgrounds);
 </BaseLayout>
 
 <script>
+  import { getElement, getElements } from '@astro-dx/dom';
+  import { on } from '@astro-dx/events';
+
   const SIDEBAR_ITEMS = [
     { id: 'signals',    label: 'Signals',    icon: 'zap' },
     { id: 'services',   label: 'Services',   icon: 'layers' },
@@ -63,21 +66,22 @@ const entries = Object.entries(playgrounds);
     { id: 'attributes', label: 'Directives', icon: 'code' },
   ];
 
-  const sidebar = document.getElementById('playground-sidebar') as any;
+  const sidebar = getElement<any>('#playground-sidebar').el;
   sidebar.items = SIDEBAR_ITEMS;
   sidebar.activeItem = 'signals';
 
-  const sections = document.querySelectorAll<HTMLElement>('.playground-section');
+  const sectionRefs = getElements<HTMLElement>('.playground-section');
 
   function showSection(id: string) {
-    sections.forEach(s => {
-      s.classList.toggle('active', s.dataset.section === id);
+    sectionRefs.forEach(ref => {
+      ref.el.classList.toggle('active', ref.el.dataset.section === id);
     });
   }
 
-  sidebar.addEventListener('andSidebarItemClick', (e: CustomEvent<string>) => {
-    sidebar.activeItem = e.detail;
-    showSection(e.detail);
+  on(sidebar, 'andSidebarItemClick', (e: any) => {
+    const custom = e as CustomEvent<string>;
+    sidebar.activeItem = custom.detail;
+    showSection(custom.detail);
   });
 </script>
 

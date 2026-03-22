@@ -2,6 +2,8 @@ import "@andersseen/web-components/components/all";
 import { enableAnimations } from "@andersseen/web-components";
 import { registerAllIcons } from "@andersseen/icon";
 import { initMotion } from "@andersseen/motion";
+import { getElements } from "@astro-dx/dom";
+import { on } from "@astro-dx/events";
 import "../services/index.ts";
 
 enableAnimations();
@@ -34,9 +36,7 @@ const readNavbarItems = (navbar: Element): NavbarItem[] => {
 };
 
 const syncNavbarState = () => {
-  const navbars = document.querySelectorAll<HTMLElement>(
-    "and-navbar[data-app-navbar]",
-  );
+  const navbars = getElements<HTMLElement>("and-navbar[data-app-navbar]").map(ref => ref.el);
   for (const navbar of navbars) {
     const items = readNavbarItems(navbar);
     const active = resolveActiveItem(window.location.pathname, items);
@@ -55,14 +55,14 @@ const syncNavbarState = () => {
       toggleIcon.name = isOpen ? "x" : "menu";
 
       if (!navbar.dataset.toggleIconBound) {
-        const onMenuChange = (event: Event) => {
+        const onMenuChange = (event: any) => {
           const custom = event as CustomEvent<boolean>;
           const opened = custom.detail === true;
           toggleIcon.name = opened ? "x" : "menu";
         };
 
-        navbar.addEventListener("mobileMenuChange", onMenuChange);
-        navbar.addEventListener("mobile-menu-change", onMenuChange);
+        on(navbar, "mobileMenuChange", onMenuChange);
+        on(navbar, "mobile-menu-change", onMenuChange);
         navbar.dataset.toggleIconBound = "true";
       }
     }
@@ -76,14 +76,14 @@ const initClientUi = () => {
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initClientUi, { once: true });
+  on(document, "DOMContentLoaded", initClientUi);
 } else {
   initClientUi();
 }
 
-document.addEventListener("astro:page-load", () => {
+on(document, "astro:page-load", () => {
   initMotion();
   syncNavbarState();
 });
 
-window.addEventListener("popstate", syncNavbarState);
+on(window, "popstate", syncNavbarState);
