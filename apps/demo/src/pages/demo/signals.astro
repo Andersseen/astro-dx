@@ -1,12 +1,14 @@
 ---
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
+import Playground from '../../components/playground/Playground.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import signalsCode from '../../snippets/demo/signals.example.ts?raw';
 import signalsWithCode from '../../snippets/demo/signals.with-astro-dx.ts?raw';
 import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?raw';
 import signalsConditionalCode from '../../snippets/demo/signals.conditional-effect.ts?raw';
 import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?raw';
+import { signalsPlayground } from '../../snippets/playground/signals.ts';
 ---
 <BaseLayout title="Signals demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -100,6 +102,15 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">peek() best practices</h2>
       <CodeBlock lang="typescript" code={signalsPeekCode} />
+    </div>
+
+    <!-- Interactive Playground -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Playground</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Edit the code and hit Run to see it live. The preview uses a shimmed version of the astro-dx API.
+      </p>
+      <Playground id="signals" files={signalsPlayground} height={320} />
     </div>
 
     <!-- Code comparison tabs -->

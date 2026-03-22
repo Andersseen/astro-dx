@@ -3,10 +3,12 @@ import CodeBlock from '../../components/CodeBlock.astro';
 import Counter from '../../components/Counter.astro';
 import CounterStats from '../../components/CounterStats.astro';
 import DemoCard from '../../components/DemoCard.astro';
+import Playground from '../../components/playground/Playground.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import servicesCode from '../../snippets/demo/services.example.ts?raw';
 import serviceManagerCode from '../../snippets/demo/services.manager-component.example.ts?raw';
 import serviceReceiverCode from '../../snippets/demo/services.receiver-component.example.ts?raw';
+import { servicesPlayground } from '../../snippets/playground/services.ts';
 ---
 <BaseLayout title="Services demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -93,6 +95,15 @@ import serviceReceiverCode from '../../snippets/demo/services.receiver-component
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
       <CodeBlock lang="typescript" code={servicesCode} />
+    </div>
+
+    <!-- Interactive Playground -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Playground</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Two independent islands sharing reactive state. Edit the code and hit Run.
+      </p>
+      <Playground id="services" files={servicesPlayground} height={320} />
     </div>
 
   </section>

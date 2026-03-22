@@ -2,24 +2,24 @@
 import '../styles/global.css';
 import AppFooter from '../components/layout/AppFooter.astro';
 import AppNavbar from '../components/layout/AppNavbar.astro';
+import AppSEO from '../components/layout/AppSEO.astro';
 
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 const {
   title,
   description = 'Angular-inspired DX for Astro — community library',
+  image,
 } = Astro.props;
 const pathname = Astro.url.pathname;
 ---
 <!DOCTYPE html>
 <html lang="en" class="dark">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <title>{title} — astro-dx</title>
+    <AppSEO {title} {description} {image} />
   </head>
   <body class="app-shell">
     <div class="ambient-glow ambient-glow-a"></div>

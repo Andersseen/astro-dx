@@ -1,0 +1,349 @@
+---
+interface Props {
+  /** Unique id for this playground instance */
+  id: string;
+  /** The code files to display */
+  files: { js: string; html: string };
+  /** Height of the preview iframe in px */
+  height?: number;
+}
+
+const { id, files, height = 360 } = Astro.props;
+---
+
+<div class="playground" id={`playground-${id}`} data-height={height}>
+  <!-- Mobile: tab bar (hidden on desktop) -->
+  <div class="playground-header playground-mobile-only">
+    <div class="playground-tabs">
+      <button class="playground-tab active" data-tab="preview" data-for={id}>Preview</button>
+      <button class="playground-tab" data-tab="js" data-for={id}>TS</button>
+      <button class="playground-tab" data-tab="html" data-for={id}>HTML</button>
+    </div>
+    <button class="playground-run" data-run={id} title="Run code">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21"/></svg>
+      Run
+    </button>
+  </div>
+
+  <!-- Desktop: split layout -->
+  <div class="playground-split">
+    <!-- Left: Code editors -->
+    <div class="playground-code-pane">
+      <div class="playground-code-header">
+        <div class="playground-code-tabs">
+          <button class="playground-code-tab active" data-codetab="js" data-for={id}>TS</button>
+          <button class="playground-code-tab" data-codetab="html" data-for={id}>HTML</button>
+        </div>
+        <button class="playground-run-desktop" data-run-desktop={id} title="Run code">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21"/></svg>
+          Run
+        </button>
+      </div>
+      <div class="playground-code-panel active" data-codepanel="js" data-owner={id}>
+        <div class="playground-editor" id={`editor-js-${id}`}></div>
+      </div>
+      <div class="playground-code-panel" data-codepanel="html" data-owner={id}>
+        <div class="playground-editor" id={`editor-html-${id}`}></div>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="playground-preview-pane">
+      <iframe
+        id={`iframe-${id}`}
+        class="playground-iframe"
+        sandbox="allow-scripts"
+        style={`height:${height}px`}
+        title={`${id} preview`}
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- Mobile: panels (hidden on desktop) -->
+  <div class="playground-mobile-only">
+    <div class="playground-panel active" data-panel="preview" data-owner={id}>
+      <iframe
+        id={`iframe-mobile-${id}`}
+        class="playground-iframe"
+        sandbox="allow-scripts"
+        style={`height:${height}px`}
+        title={`${id} mobile preview`}
+      ></iframe>
+    </div>
+    <div class="playground-panel" data-panel="js" data-owner={id}>
+      <div class="playground-editor" id={`editor-js-mobile-${id}`}></div>
+    </div>
+    <div class="playground-panel" data-panel="html" data-owner={id}>
+      <div class="playground-editor" id={`editor-html-mobile-${id}`}></div>
+    </div>
+  </div>
+
+  <!-- Hidden data carriers -->
+  <script type="application/json" id={`data-js-${id}`} set:html={JSON.stringify(files.js)} />
+  <script type="application/json" id={`data-html-${id}`} set:html={JSON.stringify(files.html)} />
+</div>
+
+<script>
+  import { EditorView, basicSetup } from 'codemirror';
+  import { javascript } from '@codemirror/lang-javascript';
+  import { html } from '@codemirror/lang-html';
+  import { oneDark } from '@codemirror/theme-one-dark';
+  import { EditorState } from '@codemirror/state';
+  import { buildSrcdoc } from '../../snippets/playground/template';
+
+
+
+
+  function initPlayground(container: HTMLElement) {
+    const id = container.id.replace('playground-', '');
+    const height = Number(container.dataset.height) || 360;
+
+    const jsCode = JSON.parse(document.getElementById(`data-js-${id}`)!.textContent!);
+    const htmlCode = JSON.parse(document.getElementById(`data-html-${id}`)!.textContent!);
+
+    const editors = new Map<string, EditorView>();
+
+    function getOrCreateEditor(elId: string, type: 'js' | 'html', code: string): EditorView {
+      if (editors.has(elId)) return editors.get(elId)!;
+
+      const el = document.getElementById(elId);
+      if (!el) return null as any;
+
+      const view = new EditorView({
+        state: EditorState.create({
+          doc: code,
+          extensions: [
+            basicSetup,
+            oneDark,
+            EditorView.theme({
+              '&': { height: `${height}px`, fontSize: '13px' },
+              '.cm-scroller': { overflow: 'auto' },
+            }),
+            type === 'js' ? javascript({ typescript: true }) : html(),
+          ],
+        }),
+        parent: el,
+      });
+
+      editors.set(elId, view);
+      return view;
+    }
+
+    function getCurrentCode(): { js: string; html: string } {
+      // Try desktop editors first, then mobile
+      const jsEditorDesktop = editors.get(`editor-js-${id}`);
+      const jsEditorMobile = editors.get(`editor-js-mobile-${id}`);
+      const htmlEditorDesktop = editors.get(`editor-html-${id}`);
+      const htmlEditorMobile = editors.get(`editor-html-mobile-${id}`);
+
+      return {
+        js: jsEditorDesktop?.state.doc.toString() ?? jsEditorMobile?.state.doc.toString() ?? jsCode,
+        html: htmlEditorDesktop?.state.doc.toString() ?? htmlEditorMobile?.state.doc.toString() ?? htmlCode,
+      };
+    }
+
+    function runCode() {
+      const code = getCurrentCode();
+      const srcdoc = buildSrcdoc(code.js, code.html);
+
+      // Update all iframes
+      const desktopIframe = document.getElementById(`iframe-${id}`) as HTMLIFrameElement | null;
+      const mobileIframe = document.getElementById(`iframe-mobile-${id}`) as HTMLIFrameElement | null;
+      if (desktopIframe) desktopIframe.srcdoc = srcdoc;
+      if (mobileIframe) mobileIframe.srcdoc = srcdoc;
+    }
+
+    // ─── Desktop: code tab switching ───
+    const codeTabs = container.querySelectorAll<HTMLButtonElement>(`.playground-code-tab[data-for="${id}"]`);
+    const codePanels = container.querySelectorAll<HTMLElement>(`.playground-code-panel[data-owner="${id}"]`);
+
+    codeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.codetab!;
+        codeTabs.forEach(t => t.classList.remove('active'));
+        codePanels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        container.querySelector(`.playground-code-panel[data-codepanel="${target}"][data-owner="${id}"]`)?.classList.add('active');
+        getOrCreateEditor(`editor-${target}-${id}`, target as 'js' | 'html', target === 'js' ? jsCode : htmlCode);
+      });
+    });
+
+    // Desktop run button
+    container.querySelector(`[data-run-desktop="${id}"]`)?.addEventListener('click', runCode);
+
+    // ─── Mobile: tab switching ───
+    const mobileTabs = container.querySelectorAll<HTMLButtonElement>(`.playground-tab[data-for="${id}"]`);
+    const mobilePanels = container.querySelectorAll<HTMLElement>(`.playground-panel[data-owner="${id}"]`);
+
+    mobileTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab!;
+        mobileTabs.forEach(t => t.classList.remove('active'));
+        mobilePanels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        container.querySelector(`.playground-panel[data-panel="${target}"][data-owner="${id}"]`)?.classList.add('active');
+        if (target === 'js' || target === 'html') {
+          getOrCreateEditor(`editor-${target}-mobile-${id}`, target, target === 'js' ? jsCode : htmlCode);
+        }
+      });
+    });
+
+    // Mobile run button
+    container.querySelector(`[data-run="${id}"]`)?.addEventListener('click', runCode);
+
+    // ─── Initial run + init desktop JS editor ───
+    getOrCreateEditor(`editor-js-${id}`, 'js', jsCode);
+    runCode();
+  }
+
+  document.querySelectorAll<HTMLElement>('.playground').forEach(initPlayground);
+</script>
+
+<style>
+  .playground {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: hsl(240 6% 10%);
+  }
+
+  /* ─── Desktop split layout ─── */
+  .playground-split {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .playground-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .playground-mobile-only {
+      display: none !important;
+    }
+  }
+
+  .playground-code-pane {
+    border-right: 1px solid hsl(var(--border));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .playground-code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(240 6% 8%);
+  }
+
+  .playground-code-tabs {
+    display: flex;
+  }
+
+  .playground-code-tab {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .playground-code-tab:hover { color: hsl(var(--foreground)); }
+  .playground-code-tab.active {
+    color: hsl(var(--foreground));
+    border-bottom-color: hsl(var(--primary));
+  }
+
+  .playground-code-panel { display: none; }
+  .playground-code-panel.active { display: block; }
+
+  .playground-preview-pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .playground-run-desktop {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    margin-right: 0.375rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 5px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .playground-run-desktop:hover { opacity: 0.85; }
+
+  /* ─── Mobile tab layout ─── */
+  .playground-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(240 6% 8%);
+  }
+
+  .playground-tabs { display: flex; }
+
+  .playground-tab {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .playground-tab:hover { color: hsl(var(--foreground)); }
+  .playground-tab.active {
+    color: hsl(var(--foreground));
+    border-bottom-color: hsl(var(--primary));
+  }
+
+  .playground-run {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    margin-right: 0.375rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 5px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .playground-run:hover { opacity: 0.85; }
+
+  .playground-panel { display: none; }
+  .playground-panel.active { display: block; }
+
+  /* ─── Shared ─── */
+  .playground-iframe {
+    width: 100%;
+    border: none;
+    display: block;
+    background: hsl(240 6% 10%);
+  }
+
+  .playground-editor { overflow: auto; }
+
+  .playground-editor :global(.cm-editor) { border-radius: 0; }
+  .playground-editor :global(.cm-gutters) { border-right: 1px solid hsl(var(--border)); }
+</style>

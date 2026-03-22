@@ -8,6 +8,7 @@ const { currentPath } = Astro.props;
 const navItems = [
   { id: 'home', label: 'Home', href: '/' },
   { id: 'demos', label: 'Demos', href: '/demo' },
+  { id: 'playground', label: 'Playground', href: '/playground' },
   { id: 'docs', label: 'Docs', href: '/docs' },
   { id: 'libraries', label: 'Libraries', href: '/libs' },
   { id: 'about', label: 'About', href: '/about' },
@@ -42,21 +43,13 @@ const activeItem =
         <and-icon name="rocket" size="16"></and-icon>
         <span class="font-semibold tracking-[0.02em]">astro-dx</span>
       </a>
-
-      <div slot="actions" class="hidden items-center gap-2 md:flex">
-        <and-button variant="ghost" size="sm" href="/docs/installation">Start</and-button>
-
-        <and-button
-          variant="link"
-          size="sm"
-          href="https://github.com/Andersseen/astro-dx"
-          target="_blank"
-          rel="noopener"
-        >
-          <and-icon slot="start" name="github" size="14"></and-icon>
-          GitHub
-        </and-button>
-      </div>
+  <div slot="actions">
+  
+    <and-button size="sm" variant="link" href="https://github.com/Andersseen/astro-dx" target="_blank">
+      <and-icon name="github" size="16"></and-icon>
+      GitHub
+    </and-button>
+ 
 
   </and-navbar>
 
