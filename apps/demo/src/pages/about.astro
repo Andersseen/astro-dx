@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { systemPrompt, astroDxContext, coreContext, domContext, eventsContext, attributesContext } from '../snippets/prompts';
 ---
 <BaseLayout title="About">
   <section class="section">
@@ -65,6 +66,96 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </and-accordion>
       </div>
 
+      <!-- Agent Prompts -->
+      <div class="flex flex-col gap-4 mt-8">
+        <h2 class="m-0 font-sans text-2xl font-extrabold">AI Agent Prompts</h2>
+        <p class="m-0 text-[0.9375rem] leading-7 opacity-75">
+          These libraries are new and not yet covered in standard LLM training data.
+          Copy these context prompts into your AI agent (Claude, ChatGPT, Cursor, etc.)
+          so it knows exactly how to use astro-dx.
+        </p>
+
+        <and-tabs default-value="system">
+          <and-tabs-list>
+            <and-tabs-trigger value="system">Agent</and-tabs-trigger>
+            <and-tabs-trigger value="overview">Overview</and-tabs-trigger>
+            <and-tabs-trigger value="core">Core</and-tabs-trigger>
+            <and-tabs-trigger value="dom">DOM</and-tabs-trigger>
+            <and-tabs-trigger value="events">Events</and-tabs-trigger>
+            <and-tabs-trigger value="attributes">Directives</and-tabs-trigger>
+          </and-tabs-list>
+
+          <and-tabs-content value="system">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{systemPrompt}</code></pre>
+            </div>
+          </and-tabs-content>
+
+          <and-tabs-content value="overview">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{astroDxContext}</code></pre>
+            </div>
+          </and-tabs-content>
+
+          <and-tabs-content value="core">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{coreContext}</code></pre>
+            </div>
+          </and-tabs-content>
+
+          <and-tabs-content value="dom">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{domContext}</code></pre>
+            </div>
+          </and-tabs-content>
+
+          <and-tabs-content value="events">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{eventsContext}</code></pre>
+            </div>
+          </and-tabs-content>
+
+          <and-tabs-content value="attributes">
+            <div class="prompt-panel">
+              <pre class="prompt-code"><code>{attributesContext}</code></pre>
+            </div>
+          </and-tabs-content>
+        </and-tabs>
+      </div>
+
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .prompt-panel {
+    height: 520px;
+    overflow-y: auto;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid hsl(var(--border));
+    background: hsl(240 10% 4%);
+  }
+
+  .prompt-code {
+    margin: 0;
+    padding: 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: hsl(0 0% 90%);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Scrollbar styling */
+  .prompt-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+  .prompt-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .prompt-panel::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+</style>
