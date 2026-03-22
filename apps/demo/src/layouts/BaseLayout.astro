@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import AppFooter from '../components/layout/AppFooter.astro';
+import AppNavbar from '../components/layout/AppNavbar.astro';
 
 interface Props {
   title: string;
@@ -9,6 +11,7 @@ const {
   title,
   description = 'Angular-inspired DX for Astro — community library',
 } = Astro.props;
+const pathname = Astro.url.pathname;
 ---
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -18,62 +21,20 @@ const {
     <meta name="description" content={description} />
     <title>{title} — astro-dx</title>
   </head>
-  <body>
+  <body class="app-shell">
+    <div class="ambient-glow ambient-glow-a"></div>
+    <div class="ambient-glow ambient-glow-b"></div>
 
-    <header class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-xl">
-      <div class="container flex h-14 items-center justify-between gap-4 text-slate-200">
+    <AppNavbar currentPath={pathname} />
 
-        <!-- Brand -->
-        <a href="/" class="inline-flex items-center gap-2 no-underline">
-          <span class="font-sans text-base font-bold text-orange-400">
-            astro-dx
-          </span>
-        </a>
-
-        <!-- Nav links -->
-        <nav class="hidden items-center gap-6 md:flex">
-          <a href="/" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Home</a>
-          <a href="/about" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">About</a>
-          <a href="/demo" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Demos</a>
-          <a href="/docs/installation" class="text-sm text-slate-300/80 no-underline transition-colors hover:text-white">Docs</a>
-        </nav>
-
-        <!-- GitHub -->
-        <a
-          href="https://github.com/Andersseen/astro-dx"
-          target="_blank"
-          rel="noopener"
-          class="rounded-md border border-white/15 px-3 py-1.5 text-xs text-slate-200 no-underline opacity-85 transition hover:opacity-100"
-        >
-          GitHub
-        </a>
-
-      </div>
-    </header>
-
-    <main>
+    <main class="relative z-10">
       <slot />
     </main>
 
-    <footer class="mt-24 border-t border-white/10 py-10">
-      <div class="container flex flex-col items-center gap-2">
-        <p class="m-0 text-center text-xs opacity-45">
-          astro-dx — Community library · Not affiliated with the Astro core team
-        </p>
-        <p class="m-0 text-center text-[11px] opacity-30">MIT License</p>
-      </div>
-    </footer>
+    <AppFooter />
 
     <script>
-      import '@andersseen/web-components/components/all';
-      import { registerAllIcons } from '@andersseen/icon';
-      import { initMotion } from '@andersseen/motion';
-      import '../services/index.ts';
-
-      document.addEventListener('DOMContentLoaded', () => {
-        registerAllIcons();
-        initMotion();
-      });
+      import '../scripts/bootstrap.ts';
     </script>
 
   </body>

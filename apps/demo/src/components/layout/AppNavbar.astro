@@ -1,0 +1,54 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const navItems = [
+  { id: 'home', label: 'Home', href: '/' },
+  { id: 'demos', label: 'Demos', href: '/demo' },
+  { id: 'docs', label: 'Docs', href: '/docs' },
+  { id: 'libraries', label: 'Libraries', href: '/libs' },
+  { id: 'about', label: 'About', href: '/about' },
+] as const;
+
+const activeItem =
+  navItems.find((item) =>
+    item.href === '/'
+      ? currentPath === '/'
+      : currentPath === item.href || currentPath.startsWith(`${item.href}/`),
+  )?.id ?? 'home';
+---
+<header class="sticky top-0 z-50 border-b border-white/10 backdrop-blur-xl">
+ 
+    <and-navbar
+      variant="default"
+      position="static"
+      item-variant="underline"
+      items={JSON.stringify(navItems)}
+      active-item={activeItem}
+      aria-nav-label="Main navigation"
+      custom-class="w-full"
+    >
+      <a slot="brand" href="/" class="inline-flex items-center gap-2 no-underline">
+        <and-icon name="rocket" size="16"></and-icon>
+        <span class="font-semibold tracking-[0.02em]">astro-dx</span>
+      </a>
+
+      <div slot="actions" class="hidden items-center gap-2 md:flex">
+        <and-button variant="ghost" size="sm" href="/docs/installation">Start</and-button>
+        <and-button
+          variant="link"
+          size="sm"
+          href="https://github.com/Andersseen/astro-dx"
+          target="_blank"
+          rel="noopener"
+        >
+          <and-icon slot="start" name="github" size="14"></and-icon>
+          GitHub
+        </and-button>
+      </div>
+    </and-navbar>
+
+</header>

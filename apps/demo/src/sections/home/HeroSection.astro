@@ -1,0 +1,52 @@
+<section class="section flex min-h-[72vh] items-center">
+  <div class="container flex flex-col items-center gap-8 text-center">
+    <p class="m-0 text-xs uppercase tracking-[0.24em] text-slate-400">
+      Angular-inspired DX for Astro
+    </p>
+
+    <div class="flex max-w-[760px] flex-col gap-4">
+      <h1 class="m-0 font-sans text-[clamp(2.5rem,6vw,4rem)] font-extrabold leading-[1.05] text-slate-100">
+        Build Astro apps with
+        <span class="text-orange-400">reactive primitives</span>
+        and explicit architecture.
+      </h1>
+      <p class="mx-auto m-0 max-w-[620px] text-lg leading-[1.7] text-slate-300/70">
+        Signals, services, events, DOM bindings and template directives designed
+        for teams that want fast iteration with clear patterns.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5">
+      <span class="font-mono text-sm opacity-40">$</span>
+      <span class="font-mono text-sm">npx @astro-dx/init</span>
+      <button
+        id="btn-copy"
+        title="Copy"
+        class="flex items-center p-1 text-inherit opacity-40 transition-opacity hover:opacity-100"
+      >
+        <and-icon name="copy" size="14"></and-icon>
+      </button>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3">
+      <and-button variant="default" href="/docs/installation">Get started</and-button>
+      <and-button variant="outline" href="/demo">See demos</and-button>
+      <and-button variant="ghost" href="/libs">Browse libraries</and-button>
+    </div>
+
+    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+      <a href="/demo/signals" class="rounded-full border border-white/10 px-3 py-1 text-xs no-underline text-slate-300 hover:border-white/25 hover:text-white">Signals demo</a>
+      <a href="/demo/services" class="rounded-full border border-white/10 px-3 py-1 text-xs no-underline text-slate-300 hover:border-white/25 hover:text-white">Services demo</a>
+      <a href="/demo/events" class="rounded-full border border-white/10 px-3 py-1 text-xs no-underline text-slate-300 hover:border-white/25 hover:text-white">Events demo</a>
+      <a href="/docs/core" class="rounded-full border border-white/10 px-3 py-1 text-xs no-underline text-slate-300 hover:border-white/25 hover:text-white">Core docs</a>
+    </div>
+  </div>
+
+  <script>
+    import { onClick } from '@astro-dx/events';
+
+    onClick('#btn-copy', () => {
+      navigator.clipboard.writeText('npx @astro-dx/init');
+    });
+  </script>
+</section>

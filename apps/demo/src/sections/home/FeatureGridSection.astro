@@ -1,0 +1,39 @@
+---
+const features = [
+  {
+    icon: 'zap',
+    title: 'Signals',
+    description: 'signal(), computed(), effect() with dynamic dependency tracking.',
+  },
+  {
+    icon: 'layers',
+    title: 'Services',
+    description: 'register()/inject() architecture for explicit shared state.',
+  },
+  {
+    icon: 'mouse-pointer',
+    title: 'DOM bindings',
+    description: 'getElement(), text(), model() wrappers for cleaner islands.',
+  },
+  {
+    icon: 'code',
+    title: 'Templates',
+    description: 'dx-if, dx-show, dx-for with attribute and custom-element APIs.',
+  },
+] as const;
+---
+<section class="section-sm">
+  <div class="container">
+    <div class="grid w-full grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+      {features.map((feature) => (
+        <and-card variant="outline" padded>
+          <div class="flex flex-col gap-2.5 text-left">
+            <and-icon name={feature.icon} size="20" class="text-orange-400"></and-icon>
+            <strong class="text-[0.9rem] text-slate-100">{feature.title}</strong>
+            <span class="text-xs leading-6 text-slate-300/65">{feature.description}</span>
+          </div>
+        </and-card>
+      ))}
+    </div>
+  </div>
+</section>

@@ -56,6 +56,42 @@ body {
   line-height: 1.6;
 }
 
+.app-shell {
+  position: relative;
+  overflow-x: clip;
+}
+
+.ambient-glow {
+  position: fixed;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-a {
+  top: -10rem;
+  left: -8rem;
+  background: radial-gradient(
+    circle,
+    rgba(251, 146, 60, 0.85),
+    transparent 68%
+  );
+}
+
+.ambient-glow-b {
+  top: 10rem;
+  right: -12rem;
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.75),
+    transparent 68%
+  );
+}
+
 a {
   color: inherit;
 }
@@ -97,6 +133,15 @@ a {
   max-width: 720px;
   margin-inline: auto;
   padding-inline: 1.5rem;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Code blocks */
