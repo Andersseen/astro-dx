@@ -1,15 +1,16 @@
-import { resolve } from '../registry.ts';
+import { resolve } from "../registry.ts";
 
 export class DxShow extends HTMLElement {
   private _cleanup: (() => void) | null = null;
 
   connectedCallback(): void {
-    const signalName = this.getAttribute('signal');
+    const signalName = this.getAttribute("signal");
     if (!signalName) {
       console.warn('[dx-show] missing "signal" attribute');
       return;
     }
-    requestAnimationFrame(() => this._connect(signalName));
+
+    this._connect(signalName);
   }
 
   private _connect(signalName: string): void {
@@ -18,6 +19,9 @@ export class DxShow extends HTMLElement {
       console.warn(`[dx-show] signal "${signalName}" not found in registry`);
       return;
     }
+
+    this.hidden = !Boolean(sig());
+
     this._cleanup = sig.subscribe((value) => {
       this.hidden = !value;
     });
@@ -29,4 +33,4 @@ export class DxShow extends HTMLElement {
   }
 }
 
-customElements.define('dx-show', DxShow);
+customElements.define("dx-show", DxShow);

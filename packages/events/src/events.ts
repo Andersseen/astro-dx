@@ -1,102 +1,183 @@
-type Target = string | Element | Document | Window;
+export type Target = string | Element | Document | Window;
+
+const VALUE_EVENTS = new Set([
+  "input",
+  "change",
+  "keyup",
+  "keydown",
+  "keypress",
+]);
 
 function resolve(target: Target): Element | Document | Window | null {
-  return typeof target === 'string' ? document.querySelector(target) : target;
+  return typeof target === "string" ? document.querySelector(target) : target;
 }
 
 function extractValue(event: Event): string {
   const target = event.target;
-  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+  if (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  ) {
     return target.value;
   }
-  if (target instanceof HTMLSelectElement) {
-    return target.value;
+  return "";
+}
+
+function onPaired(
+  target: Target,
+  eventA: string,
+  handlerA: (() => void) | undefined,
+  eventB: string,
+  handlerB: (() => void) | undefined,
+): () => void {
+  const el = resolve(target);
+  if (!el) return () => {};
+
+  const cleanups: Array<() => void> = [];
+
+  if (handlerA) {
+    el.addEventListener(eventA, handlerA);
+    cleanups.push(() => el.removeEventListener(eventA, handlerA));
   }
-  return '';
+
+  if (handlerB) {
+    el.addEventListener(eventB, handlerB);
+    cleanups.push(() => el.removeEventListener(eventB, handlerB));
+  }
+
+  return () => {
+    for (const cleanup of cleanups) {
+      cleanup();
+    }
+  };
 }
 
 export function on(
   target: Target,
   event: string,
   fn: (valueOrEvent: string | Event) => void,
-  options?: AddEventListenerOptions
+  options?: AddEventListenerOptions,
 ): () => void {
   const el = resolve(target);
   if (!el) return () => {};
 
-  const inputEvents = new Set(['input', 'change', 'keyup', 'keydown', 'keypress']);
-  const handler = inputEvents.has(event) ? (e: Event) => fn(extractValue(e)) : (e: Event) => fn(e);
+  const handler = VALUE_EVENTS.has(event)
+    ? (e: Event) => fn(extractValue(e))
+    : (e: Event) => fn(e);
 
   el.addEventListener(event, handler, options);
   return () => el.removeEventListener(event, handler, options);
 }
 
-export function onHover(
+export function onClick(
   target: Target,
-  handlers: { enter?: () => void; leave?: () => void }
+  fn: (event: MouseEvent) => void,
+  options?: AddEventListenerOptions,
 ): () => void {
   const el = resolve(target);
   if (!el) return () => {};
 
-  const unsubscribers: Array<() => void> = [];
+  const handler = (event: Event) => fn(event as MouseEvent);
+  el.addEventListener("click", handler, options);
+  return () => el.removeEventListener("click", handler, options);
+}
 
-  if (handlers.enter) {
-    const enter = handlers.enter;
-    el.addEventListener('mouseenter', enter);
-    unsubscribers.push(() => el.removeEventListener('mouseenter', enter));
-  }
-  if (handlers.leave) {
-    const leave = handlers.leave;
-    el.addEventListener('mouseleave', leave);
-    unsubscribers.push(() => el.removeEventListener('mouseleave', leave));
-  }
+export function onInput(
+  target: Target,
+  fn: (value: string) => void,
+): () => void {
+  const el = resolve(target);
+  if (!el) return () => {};
 
-  return () => {
-    for (const unsubscribe of unsubscribers) {
-      unsubscribe();
-    }
+  const handler = (event: Event) => fn(extractValue(event));
+  el.addEventListener("input", handler);
+  return () => el.removeEventListener("input", handler);
+}
+
+export function onChange(
+  target: Target,
+  fn: (value: string) => void,
+): () => void {
+  const el = resolve(target);
+  if (!el) return () => {};
+
+  const handler = (event: Event) => fn(extractValue(event));
+  el.addEventListener("change", handler);
+  return () => el.removeEventListener("change", handler);
+}
+
+export function onSubmit(
+  target: Target,
+  fn: (event: SubmitEvent) => void,
+): () => void {
+  const el = resolve(target);
+  if (!el) return () => {};
+
+  const handler = (event: Event) => {
+    event.preventDefault();
+    fn(event as SubmitEvent);
   };
+
+  el.addEventListener("submit", handler);
+  return () => el.removeEventListener("submit", handler);
+}
+
+export function onHover(
+  target: Target,
+  handlers: { enter?: () => void; leave?: () => void },
+): () => void {
+  return onPaired(
+    target,
+    "mouseenter",
+    handlers.enter,
+    "mouseleave",
+    handlers.leave,
+  );
 }
 
 export function onKey(
   target: Target,
-  key: KeyboardEvent['key'],
-  fn: (event: KeyboardEvent) => void
+  key: KeyboardEvent["key"],
+  fn: (event: KeyboardEvent) => void,
 ): () => void {
   const el = resolve(target);
   if (!el) return () => {};
 
-  const handler = (e: Event) => {
-    if (e instanceof KeyboardEvent && e.key === key) fn(e);
+  const handler = (event: Event) => {
+    if (event instanceof KeyboardEvent && event.key === key) {
+      fn(event);
+    }
   };
 
-  el.addEventListener('keydown', handler);
-  return () => el.removeEventListener('keydown', handler);
+  el.addEventListener("keydown", handler);
+  return () => el.removeEventListener("keydown", handler);
 }
 
 export function onFocus(
   target: Target,
-  handlers: { focus?: () => void; blur?: () => void }
+  handlers: { focus?: () => void; blur?: () => void },
+): () => void {
+  return onPaired(target, "focus", handlers.focus, "blur", handlers.blur);
+}
+
+export function onResize(
+  target: Target,
+  fn: (entry: ResizeObserverEntry) => void,
 ): () => void {
   const el = resolve(target);
-  if (!el) return () => {};
-
-  const unsubscribers: Array<() => void> = [];
-
-  if (handlers.focus) {
-    const focus = handlers.focus;
-    el.addEventListener('focus', focus);
-    unsubscribers.push(() => el.removeEventListener('focus', focus));
-  }
-  if (handlers.blur) {
-    const blur = handlers.blur;
-    el.addEventListener('blur', blur);
-    unsubscribers.push(() => el.removeEventListener('blur', blur));
+  if (!(el instanceof Element)) {
+    console.warn("[onResize] target must resolve to an Element");
+    return () => {};
   }
 
-  return () => {
-    for (const unsubscribe of unsubscribers) {
-      unsubscribe();
+  const observer = new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (entry) {
+      fn(entry);
     }
-  };
+  });
+
+  observer.observe(el);
+  return () => observer.disconnect();
 }

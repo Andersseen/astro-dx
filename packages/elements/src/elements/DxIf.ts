@@ -1,21 +1,22 @@
-import { resolve } from '../registry.ts';
+import { resolve } from "../registry.ts";
 
 export class DxIf extends HTMLElement {
   private _cleanup: (() => void) | null = null;
-  private _template = '';
+  private _tpl: HTMLTemplateElement | null = null;
   private _isMounted = false;
 
   connectedCallback(): void {
-    const signalName = this.getAttribute('signal');
+    const signalName = this.getAttribute("signal");
     if (!signalName) {
       console.warn('[dx-if] missing "signal" attribute');
       return;
     }
 
-    this._template = this.innerHTML;
-    this.innerHTML = '';
+    this._tpl = document.createElement("template");
+    this._tpl.innerHTML = this.innerHTML;
+    this.innerHTML = "";
 
-    requestAnimationFrame(() => this._connect(signalName));
+    this._connect(signalName);
   }
 
   private _connect(signalName: string): void {
@@ -25,15 +26,33 @@ export class DxIf extends HTMLElement {
       return;
     }
 
+    const initialValue = Boolean(sig());
+    this._isMounted = initialValue;
+
+    if (initialValue) {
+      this._mount();
+    }
+
     this._cleanup = sig.subscribe((value) => {
       if (value && !this._isMounted) {
-        this.innerHTML = this._template;
-        this._isMounted = true;
+        this._mount();
       } else if (!value && this._isMounted) {
-        this.innerHTML = '';
-        this._isMounted = false;
+        this._unmount();
       }
     });
+  }
+
+  private _mount(): void {
+    if (!this._tpl) return;
+
+    const clone = this._tpl.content.cloneNode(true);
+    this.appendChild(clone);
+    this._isMounted = true;
+  }
+
+  private _unmount(): void {
+    this.innerHTML = "";
+    this._isMounted = false;
   }
 
   disconnectedCallback(): void {
@@ -42,4 +61,4 @@ export class DxIf extends HTMLElement {
   }
 }
 
-customElements.define('dx-if', DxIf);
+customElements.define("dx-if", DxIf);
