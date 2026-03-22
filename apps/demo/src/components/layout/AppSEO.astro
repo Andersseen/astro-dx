@@ -15,7 +15,9 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
 const socialImageURL = new URL(image, Astro.url);
-const siteTitle = `${title} — astro-dx`;
+const siteTitle = title === 'Home' 
+  ? 'Astro-DX | Developer Experience Utilities'
+  : `${title} | Astro-DX`;
 ---
 
 <!-- Global Metadata -->
