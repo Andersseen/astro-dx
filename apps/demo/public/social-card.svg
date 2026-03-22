@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="white" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#gradient)" />
+  <circle cx="600" cy="315" r="400" fill="url(#glow)" />
+  
+  <rect x="420" y="135" width="360" height="360" rx="72" fill="white" fill-opacity="0.1" stroke="white" stroke-width="4" stroke-opacity="0.2" />
+  <text x="600" y="375" font-family="system-ui, -apple-system, sans-serif" font-size="200" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-4">DX</text>
+  
+  <text x="600" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="600" fill="white" fill-opacity="0.9" text-anchor="middle" letter-spacing="1">Astro Developer Experience Utilities</text>
+</svg>
