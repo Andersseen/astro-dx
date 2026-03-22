@@ -5,6 +5,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import signalsCode from '../../snippets/demo/signals.example.ts?raw';
 import signalsWithCode from '../../snippets/demo/signals.with-astro-dx.ts?raw';
 import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?raw';
+import signalsConditionalCode from '../../snippets/demo/signals.conditional-effect.ts?raw';
+import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?raw';
 ---
 <BaseLayout title="Signals demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -47,6 +49,59 @@ import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?
       <CodeBlock lang="typescript" code={signalsCode} />
     </div>
 
+    <DemoCard title="Dynamic deps — conditional effect + peek()">
+      <div and-layout="vertical gap:md" class="p-6">
+        <p and-text="p-sm" class="opacity-70">
+          Change branch between A/B and verify re-tracking. Updating peek-only value must not re-run the effect.
+        </p>
+
+        <div and-layout="horizontal gap:sm wrap">
+          <and-button variant="outline" id="btn-use-a">Use A</and-button>
+          <and-button variant="outline" id="btn-use-b">Use B</and-button>
+          <and-button variant="ghost" id="btn-inc-a">A +1</and-button>
+          <and-button variant="ghost" id="btn-inc-b">B +10</and-button>
+          <and-button variant="ghost" id="btn-inc-peek">Peek value +1</and-button>
+        </div>
+
+        <div and-layout="grid cols:2 cols@md:5 gap:sm" class="text-sm">
+          <div class="rounded-lg bg-white/5 px-3 py-2">
+            <span class="opacity-60">Branch</span>
+            <div id="branch-display" class="font-mono">A</div>
+          </div>
+          <div class="rounded-lg bg-white/5 px-3 py-2">
+            <span class="opacity-60">Selected value</span>
+            <div id="selected-display" class="font-mono">0</div>
+          </div>
+          <div class="rounded-lg bg-white/5 px-3 py-2">
+            <span class="opacity-60">Effect runs</span>
+            <div id="runs-display" class="font-mono">0</div>
+          </div>
+          <div class="rounded-lg bg-white/5 px-3 py-2">
+            <span class="opacity-60">A source</span>
+            <div id="source-a-display" class="font-mono">1</div>
+          </div>
+          <div class="rounded-lg bg-white/5 px-3 py-2">
+            <span class="opacity-60">B source</span>
+            <div id="source-b-display" class="font-mono">100</div>
+          </div>
+        </div>
+
+        <p and-text="p-sm" class="opacity-70">
+          Peek-only signal value: <span id="peek-display" class="font-mono">0</span>
+        </p>
+      </div>
+    </DemoCard>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Conditional dependencies snippet</h2>
+      <CodeBlock lang="typescript" code={signalsConditionalCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">peek() best practices</h2>
+      <CodeBlock lang="typescript" code={signalsPeekCode} />
+    </div>
+
     <!-- Code comparison tabs -->
     <and-tabs>
       <and-tab slot="tabs" value="with">With astro-dx</and-tab>
@@ -64,7 +119,7 @@ import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?
   </section>
 
   <script>
-    import { signal, computed } from '@astro-dx/core';
+    import { signal, computed, effect } from '@astro-dx/core';
     import { getElement } from '@astro-dx/dom';
 
     const count  = signal(0);
@@ -78,6 +133,34 @@ import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?
     getElement('#btn-inc').on('click', () => count.update(v => v + 1));
     getElement('#btn-dec').on('click', () => count.update(v => v - 1));
     getElement('#btn-reset').on('click', () => count.set(0));
+
+    const useA = signal(true);
+    const sourceA = signal(1);
+    const sourceB = signal(100);
+    const peekOnly = signal(0);
+    const selected = signal(0);
+    const runs = signal(0);
+    const branch = computed(() => useA() ? 'A' : 'B');
+
+    effect(() => {
+      const current = useA() ? sourceA() : sourceB();
+      selected.set(current);
+      peekOnly.peek();
+      runs.update(v => v + 1);
+    });
+
+    getElement('#branch-display').text(branch);
+    getElement('#selected-display').text(selected);
+    getElement('#runs-display').text(runs);
+    getElement('#source-a-display').text(sourceA);
+    getElement('#source-b-display').text(sourceB);
+    getElement('#peek-display').text(peekOnly);
+
+    getElement('#btn-use-a').on('click', () => useA.set(true));
+    getElement('#btn-use-b').on('click', () => useA.set(false));
+    getElement('#btn-inc-a').on('click', () => sourceA.update(v => v + 1));
+    getElement('#btn-inc-b').on('click', () => sourceB.update(v => v + 10));
+    getElement('#btn-inc-peek').on('click', () => peekOnly.update(v => v + 1));
   </script>
 
 </BaseLayout>

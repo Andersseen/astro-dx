@@ -1,27 +1,88 @@
-import { computed as nanoComputed } from 'nanostores';
-import type { Signal } from './signal.ts';
-import { startTracking, stopTracking } from './tracking.ts';
+import {
+  startTracking,
+  stopTracking,
+  trackAtomRead,
+  untracked,
+} from "./tracking.ts";
+import type { AtomLike } from "./tracking.ts";
 
 export type Computed<T> = {
+  /** Reads the computed value and registers a reactive dependency. */
   (): T;
+  /** Reads the computed value without registering a reactive dependency. */
+  peek(): T;
   subscribe(fn: (value: T) => void): () => void;
+  /** @internal */
+  _atom: { subscribe: (fn: (value: T) => void) => () => void };
 };
 
-export function trackRead<T>(sig: Signal<T>): T {
-  return sig();
-}
-
 export function computed<T>(fn: () => T): Computed<T> {
-  const trackedAtoms = new Set<Signal<unknown>['_atom']>();
-  startTracking(trackedAtoms);
-  fn();
-  stopTracking();
-  const deps = [...trackedAtoms];
+  let value = undefined as unknown as T;
+  let initialized = false;
+  const subscribers = new Set<(value: T) => void>();
+  let depSubscriptions: Array<() => void> = [];
 
-  const store = nanoComputed(deps as Parameters<typeof nanoComputed>[0], () => fn());
+  const recompute = (): void => {
+    for (const unsub of depSubscriptions) {
+      unsub();
+    }
+    depSubscriptions = [];
 
-  const read = () => store.get();
-  read.subscribe = (cb: (value: T) => void) => store.subscribe(cb);
+    const deps = new Set<AtomLike>();
+    startTracking(deps);
+    let newValue: T;
+    try {
+      newValue = fn();
+    } finally {
+      stopTracking();
+    }
+
+    for (const dep of deps) {
+      let skipInitial = true;
+      const unsub = dep.subscribe(() => {
+        if (skipInitial) {
+          skipInitial = false;
+          return;
+        }
+        recompute();
+      });
+      depSubscriptions.push(unsub);
+    }
+
+    const changed = !initialized || !Object.is(value, newValue!);
+    value = newValue!;
+    initialized = true;
+
+    if (changed) {
+      const currentSubscribers = [...subscribers];
+      for (const sub of currentSubscribers) {
+        sub(value);
+      }
+    }
+  };
+
+  recompute();
+
+  const read = (): T => {
+    trackAtomRead(read._atom as unknown as AtomLike);
+    return value;
+  };
+
+  read.peek = (): T => untracked(() => value);
+
+  read.subscribe = (cb: (value: T) => void): (() => void) => {
+    subscribers.add(cb);
+    cb(value);
+    return () => subscribers.delete(cb);
+  };
+
+  read._atom = {
+    subscribe: (cb: (value: T) => void): (() => void) => {
+      subscribers.add(cb);
+      cb(value);
+      return () => subscribers.delete(cb);
+    },
+  };
 
   return read as Computed<T>;
 }
