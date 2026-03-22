@@ -31,7 +31,7 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
     </DemoCard>
 
     <!-- Product list demo -->
-    <DemoCard title="Product list — getElements + onHover + on">
+    <DemoCard title="Product list — getElements + onHover + onClick">
       <div and-layout="vertical gap:md" class="p-6">
         <ul id="product-list" and-layout="vertical gap:xs">
           <li class="demo-product py-2 px-3 rounded-lg bg-white/5 cursor-pointer transition-opacity" data-id="1">Product A</li>
@@ -52,6 +52,7 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
   <script>
     import { signal, onPageLoad, onBeforeSwap } from '@astro-dx/core';
     import { getElement, getElements, destroyAll } from '@astro-dx/dom';
+    import { onClick } from '@astro-dx/events';
 
     onPageLoad(() => {
       const isOpen = signal(false);
@@ -59,14 +60,11 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
       const lastClicked = signal('none');
 
       const modal    = getElement<HTMLDialogElement>('#demo-modal');
-      const btnOpen  = getElement<HTMLButtonElement>('#btn-open-modal');
-      const btnClose = getElement<HTMLButtonElement>('#btn-close-modal');
-
       getElement('#modal-title').text(modalTitle);
       getElement('#last-clicked').text(lastClicked);
 
-      btnOpen.on('click', () => isOpen.set(true));
-      btnClose.on('click', () => isOpen.set(false));
+      onClick('#btn-open-modal', () => isOpen.set(true));
+      onClick('#btn-close-modal', () => isOpen.set(false));
       modal.on('close', () => isOpen.set(false));
 
       modal.effect(() => {
@@ -79,12 +77,11 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
 
       const items = getElements<HTMLLIElement>('.demo-product');
       for (const item of items) {
-        item
-          .onHover({
-            enter: () => item.el.style.setProperty('opacity', '0.6'),
-            leave: () => item.el.style.removeProperty('opacity'),
-          })
-          .on('click', () => lastClicked.set(item.el.dataset.id ?? 'unknown'));
+        item.onHover({
+          enter: () => item.el.style.setProperty('opacity', '0.6'),
+          leave: () => item.el.style.removeProperty('opacity'),
+        });
+        onClick(item.el, () => lastClicked.set(item.el.dataset.id ?? 'unknown'));
       }
     });
 

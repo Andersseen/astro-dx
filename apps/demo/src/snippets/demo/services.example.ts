@@ -1,18 +1,12 @@
-import { signal, computed } from "@astro-dx/core";
+// services/index.ts (loaded once from BaseLayout)
+import { register } from "@astro-dx/core";
+import { CounterServiceClass } from "../../services/counter.service";
+import { ShopServiceClass } from "../../services/shop.service";
 
-class CartServiceClass {
-  private _items = signal<{ name: string }[]>([]);
-  readonly items = this._items;
-  readonly total = computed(() => this._items().length);
+register([CounterServiceClass, ShopServiceClass]);
 
-  add(name: string) {
-    this._items.update((prev) => [...prev, { name }]);
-  }
+// Any island/component
+import { inject } from "@astro-dx/core";
 
-  clear() {
-    this._items.set([]);
-  }
-}
-
-// Shared singleton between islands
-export const CartService = new CartServiceClass();
+const cart = inject(ShopServiceClass);
+cart.addToCart({ id: "k-1", name: "Keyboard", price: 99 });

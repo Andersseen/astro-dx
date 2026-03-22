@@ -1,8 +1,12 @@
 ---
 import CodeBlock from '../../components/CodeBlock.astro';
+import Counter from '../../components/Counter.astro';
+import CounterStats from '../../components/CounterStats.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import servicesCode from '../../snippets/demo/services.example.ts?raw';
+import serviceManagerCode from '../../snippets/demo/services.manager-component.example.ts?raw';
+import serviceReceiverCode from '../../snippets/demo/services.receiver-component.example.ts?raw';
 ---
 <BaseLayout title="Services demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -11,14 +15,45 @@ import servicesCode from '../../snippets/demo/services.example.ts?raw';
       <and-badge variant="outline" class="w-fit">@astro-dx/core · Services</and-badge>
       <h1 and-text="h2 weight:bold">Services</h1>
       <p and-text="p" class="opacity-70">
-        Singleton classes. Share reactive state across any island — no prop drilling, no parent needed.
+        Singleton classes with register/inject. Share reactive state across any island with explicit dependencies.
       </p>
     </div>
 
     <and-alert variant="info">
       The two cards below are completely independent Astro islands.
-      They share state via CartService — no props passed between them.
+      Component A mutates the service, Component B receives derived state from the same instance.
     </and-alert>
+
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+      <DemoCard title="Component A — manages service state">
+        <div class="p-4">
+          <Counter />
+        </div>
+      </DemoCard>
+
+      <DemoCard title="Component B — receives from service">
+        <div class="p-4">
+          <CounterStats />
+        </div>
+      </DemoCard>
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code — manager component</h2>
+      <CodeBlock lang="typescript" code={serviceManagerCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code — receiver component</h2>
+      <CodeBlock lang="typescript" code={serviceReceiverCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Cross-island list with shared service</h2>
+      <p and-text="p-sm" class="opacity-70">
+        This pair of islands also shares one service instance via inject().
+      </p>
+    </div>
 
     <div and-layout="grid cols:1 cols@md:2 gap:lg">
 
@@ -63,37 +98,37 @@ import servicesCode from '../../snippets/demo/services.example.ts?raw';
   </section>
 
   <script>
-    import { signal, computed } from '@astro-dx/core';
+    import { inject } from '@astro-dx/core';
     import { getElement, getElements } from '@astro-dx/dom';
+    import { onClick } from '@astro-dx/events';
+    import { ShopServiceClass } from '../../services/shop.service';
 
-    // Service — defined once, shared across both islands via module singleton
-    class CartServiceClass {
-      private _items = signal<{ name: string }[]>([]);
-      readonly items = this._items;
-      readonly total = computed(() => this._items().length);
-
-      add(name: string) { this._items.update(p => [...p, { name }]); }
-      clear() { this._items.set([]); }
-    }
-    const CartService = new CartServiceClass();
+    const cart = inject(ShopServiceClass);
 
     // Island A — product buttons
     const productBtns = getElements<HTMLButtonElement>('.product-btn');
     for (const btn of productBtns) {
-      btn.on('click', () => CartService.add(btn.el.dataset.name!));
+      onClick(btn.el, () => {
+        const name = btn.el.dataset.name ?? 'Product';
+        cart.addToCart({
+          id: `${name.toLowerCase()}-${Date.now()}`,
+          name,
+          price: 0,
+        });
+      });
     }
 
     // Island B — reactive summary
-    getElement('#cart-total').text(CartService.total);
+    getElement('#cart-total').text(cart.cartTotal);
 
-    const cartList = document.querySelector('#cart-list')!;
-    CartService.items.subscribe(items => {
-      cartList.innerHTML = items
+    const cartList = getElement<HTMLUListElement>('#cart-list');
+    cart.cartItems.subscribe(items => {
+      cartList.el.innerHTML = items
         .map(item => `<li class="text-sm opacity-70 py-1 border-b border-white/10">${item.name}</li>`)
         .join('');
     });
 
-    getElement('#btn-clear').on('click', () => CartService.clear());
+    onClick('#btn-clear', () => cart.clearCart());
   </script>
 
 </BaseLayout>

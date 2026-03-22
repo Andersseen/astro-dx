@@ -66,6 +66,7 @@ import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
     import { signal } from '@astro-dx/core';
     import { register, bootstrap } from '@astro-dx/attributes';
     import { getElement } from '@astro-dx/dom';
+    import { onClick } from '@astro-dx/events';
 
     const isVisible = signal(true);
     const isMounted = signal(true);
@@ -74,8 +75,8 @@ import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
     register({ isVisible, isMounted, listItems });
     bootstrap();
 
-    getElement('#btn-toggle-show').on('click', () => isVisible.update(v => !v));
-    getElement('#btn-toggle-if').on('click', () => isMounted.update(v => !v));
+    onClick('#btn-toggle-show', () => isVisible.update(v => !v));
+    onClick('#btn-toggle-if', () => isMounted.update(v => !v));
 
     const input = getElement<HTMLInputElement>('#input-item');
     const addItem = () => {
@@ -85,7 +86,7 @@ import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
       (input.el as any).value = '';
     };
 
-    getElement('#btn-add-item').on('click', addItem);
+    onClick('#btn-add-item', addItem);
     input.onKey('Enter', addItem);
   </script>
 

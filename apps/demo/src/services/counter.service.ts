@@ -1,7 +1,7 @@
 // apps/demo/src/services/counter.service.ts
-import { computed, signal } from '@astro-dx/core';
+import { computed, signal } from "@astro-dx/core";
 
-class CounterServiceClass {
+export class CounterServiceClass {
   private _count = signal(0);
   readonly count = this._count;
   readonly double = computed(() => this._count() * 2);

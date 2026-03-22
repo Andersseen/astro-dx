@@ -9,17 +9,16 @@
 </div>
 
 <script>
-  import { CounterService } from '../services/counter.service';
-  import { effect } from '@astro-dx/core';
-  import { on } from '@astro-dx/events';
+  import { inject } from '@astro-dx/core';
+  import { getElement } from '@astro-dx/dom';
+  import { onClick } from '@astro-dx/events';
+  import { CounterServiceClass } from '../services/counter.service';
 
-  const countEl = document.querySelector('#count-value');
-  if (countEl) {
-    effect(() => {
-      countEl.textContent = String(CounterService.count());
-    });
-  }
-  on('#btn-inc', 'click', () => CounterService.increment());
-  on('#btn-dec', 'click', () => CounterService.decrement());
-  on('#btn-reset', 'click', () => CounterService.reset());
+  const counter = inject(CounterServiceClass);
+
+  getElement('#count-value').text(counter.count);
+
+  onClick('#btn-inc', () => counter.increment());
+  onClick('#btn-dec', () => counter.decrement());
+  onClick('#btn-reset', () => counter.reset());
 </script>

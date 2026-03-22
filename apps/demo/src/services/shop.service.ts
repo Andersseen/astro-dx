@@ -1,9 +1,9 @@
 // apps/demo/src/services/shop.service.ts
-import { computed, signal } from '@astro-dx/core';
+import { computed, signal } from "@astro-dx/core";
 
 type Product = { id: string; name: string; price: number };
 
-class ShopServiceClass {
+export class ShopServiceClass {
   private _cart = signal<Product[]>([]);
   private _modalOpen = signal(false);
 

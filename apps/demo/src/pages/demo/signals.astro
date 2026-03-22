@@ -121,6 +121,7 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
   <script>
     import { signal, computed, effect } from '@astro-dx/core';
     import { getElement } from '@astro-dx/dom';
+    import { onClick } from '@astro-dx/events';
 
     const count  = signal(0);
     const double = computed(() => count() * 2);
@@ -130,9 +131,9 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
     getElement('#double-display').text(double);
     getElement('#sign-display').text(sign);
 
-    getElement('#btn-inc').on('click', () => count.update(v => v + 1));
-    getElement('#btn-dec').on('click', () => count.update(v => v - 1));
-    getElement('#btn-reset').on('click', () => count.set(0));
+    onClick('#btn-inc', () => count.update(v => v + 1));
+    onClick('#btn-dec', () => count.update(v => v - 1));
+    onClick('#btn-reset', () => count.set(0));
 
     const useA = signal(true);
     const sourceA = signal(1);
@@ -156,11 +157,11 @@ import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?
     getElement('#source-b-display').text(sourceB);
     getElement('#peek-display').text(peekOnly);
 
-    getElement('#btn-use-a').on('click', () => useA.set(true));
-    getElement('#btn-use-b').on('click', () => useA.set(false));
-    getElement('#btn-inc-a').on('click', () => sourceA.update(v => v + 1));
-    getElement('#btn-inc-b').on('click', () => sourceB.update(v => v + 10));
-    getElement('#btn-inc-peek').on('click', () => peekOnly.update(v => v + 1));
+    onClick('#btn-use-a', () => useA.set(true));
+    onClick('#btn-use-b', () => useA.set(false));
+    onClick('#btn-inc-a', () => sourceA.update(v => v + 1));
+    onClick('#btn-inc-b', () => sourceB.update(v => v + 10));
+    onClick('#btn-inc-peek', () => peekOnly.update(v => v + 1));
   </script>
 
 </BaseLayout>
