@@ -1,8 +1,10 @@
 ---
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
+import Playground from '../../components/playground/Playground.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
+import { attributesPlayground } from '../../snippets/playground/attributes.ts';
 ---
 <BaseLayout title="Attributes demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -58,6 +60,15 @@ import attributesCode from '../../snippets/demo/attributes.example.ts?raw';
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">Code example</h2>
       <CodeBlock lang="typescript" code={attributesCode} />
+    </div>
+
+    <!-- Interactive Playground -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Playground</h2>
+      <p and-text="p-sm" class="opacity-70">
+        dx-if, dx-show, dx-for — edit and run.
+      </p>
+      <Playground id="attributes" files={attributesPlayground} height={380} />
     </div>
 
   </section>

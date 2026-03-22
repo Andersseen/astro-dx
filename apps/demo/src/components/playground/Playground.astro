@@ -1,0 +1,375 @@
+---
+interface Props {
+  /** Unique id for this playground instance */
+  id: string;
+  /** The code files to display */
+  files: { js: string; html: string };
+  /** Height of the preview iframe in px */
+  height?: number;
+}
+
+const { id, files, height = 360 } = Astro.props;
+---
+
+<div class="playground" id={`playground-${id}`} data-height={height}>
+  <!-- Tabs -->
+  <div class="playground-header">
+    <div class="playground-tabs">
+      <button class="playground-tab active" data-tab="preview" data-for={id}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16"/></svg>
+        Preview
+      </button>
+      <button class="playground-tab" data-tab="js" data-for={id}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        JS
+      </button>
+      <button class="playground-tab" data-tab="html" data-for={id}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        HTML
+      </button>
+    </div>
+    <button class="playground-run" data-run={id} title="Run code">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21"/></svg>
+      Run
+    </button>
+  </div>
+
+  <!-- Panels -->
+  <div class="playground-panel active" data-panel="preview" data-owner={id}>
+    <iframe
+      id={`iframe-${id}`}
+      class="playground-iframe"
+      sandbox="allow-scripts"
+      style={`height:${height}px`}
+      title={`${id} preview`}
+    ></iframe>
+  </div>
+
+  <div class="playground-panel" data-panel="js" data-owner={id}>
+    <div class="playground-editor" id={`editor-js-${id}`}></div>
+  </div>
+
+  <div class="playground-panel" data-panel="html" data-owner={id}>
+    <div class="playground-editor" id={`editor-html-${id}`}></div>
+  </div>
+
+  <!-- Hidden data carriers -->
+  <script type="application/json" id={`data-js-${id}`} set:html={JSON.stringify(files.js)} />
+  <script type="application/json" id={`data-html-${id}`} set:html={JSON.stringify(files.html)} />
+</div>
+
+<script>
+  import { EditorView, basicSetup } from 'codemirror';
+  import { javascript } from '@codemirror/lang-javascript';
+  import { html } from '@codemirror/lang-html';
+  import { oneDark } from '@codemirror/theme-one-dark';
+  import { EditorState } from '@codemirror/state';
+
+  function initPlayground(container: HTMLElement) {
+    const id = container.id.replace('playground-', '');
+    const height = Number(container.dataset.height) || 360;
+
+    // Parse embedded code
+    const jsCode = JSON.parse(document.getElementById(`data-js-${id}`)!.textContent!);
+    const htmlCode = JSON.parse(document.getElementById(`data-html-${id}`)!.textContent!);
+
+    // Editors (lazy init)
+    let jsEditor: EditorView | null = null;
+    let htmlEditor: EditorView | null = null;
+
+    function getOrCreateEditor(type: 'js' | 'html'): EditorView {
+      if (type === 'js' && jsEditor) return jsEditor;
+      if (type === 'html' && htmlEditor) return htmlEditor;
+
+      const el = document.getElementById(`editor-${type}-${id}`)!;
+      const extensions = [
+        basicSetup,
+        oneDark,
+        EditorView.theme({
+          '&': { height: `${height}px`, fontSize: '13px' },
+          '.cm-scroller': { overflow: 'auto' },
+        }),
+        type === 'js'
+          ? javascript({ typescript: true })
+          : html(),
+      ];
+
+      const view = new EditorView({
+        state: EditorState.create({
+          doc: type === 'js' ? jsCode : htmlCode,
+          extensions,
+        }),
+        parent: el,
+      });
+
+      if (type === 'js') jsEditor = view;
+      else htmlEditor = view;
+      return view;
+    }
+
+    // Run code in iframe
+    function runCode() {
+      const currentJs = jsEditor?.state.doc.toString() ?? jsCode;
+      const currentHtml = htmlEditor?.state.doc.toString() ?? htmlCode;
+
+      const iframe = document.getElementById(`iframe-${id}`) as HTMLIFrameElement;
+      const doc = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 1rem;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px; line-height: 1.5;
+    color: #e4e4e7; background: hsl(240 6% 10%);
+  }
+  button {
+    cursor: pointer; border: 1px solid #3f3f46;
+    background: #27272a; color: #e4e4e7;
+    padding: .375rem .75rem; border-radius: 6px;
+    font-size: .8125rem; transition: background .15s;
+  }
+  button:hover { background: #3f3f46; }
+  input, select, textarea {
+    border: 1px solid #3f3f46; background: #18181b;
+    color: #e4e4e7; padding: .375rem .5rem;
+    border-radius: 6px; font-size: .8125rem;
+    width: 100%;
+  }
+  input[type="range"] { padding: 0; }
+  strong { color: #fb923c; }
+</style>
+</head>
+<body>
+${currentHtml}
+<script type="module">
+// Minimal astro-dx shim for playground
+const _subs = new Map();
+function signal(init) {
+  let val = init;
+  const subs = new Set();
+  const read = () => val;
+  read.peek = () => val;
+  read.set = (v) => { val = v; subs.forEach(fn => fn(val)); };
+  read.update = (fn) => read.set(fn(val));
+  read.subscribe = (fn) => { subs.add(fn); fn(val); return () => subs.delete(fn); };
+  return read;
+}
+function computed(fn) {
+  const deps = [];
+  let val;
+  const subs = new Set();
+  const recompute = () => {
+    const prev = val;
+    val = fn();
+    if (prev !== val) subs.forEach(s => s(val));
+  };
+  // Initial compute
+  val = fn();
+  const read = () => val;
+  read.peek = () => val;
+  read.subscribe = (cb) => { subs.add(cb); cb(val); return () => subs.delete(cb); };
+  // Poll-based reactivity for simplicity in sandbox
+  setInterval(recompute, 50);
+  return read;
+}
+function effect(fn) {
+  fn();
+  const id = setInterval(fn, 50);
+  return () => clearInterval(id);
+}
+
+function _resolve(target) {
+  return typeof target === 'string' ? document.querySelector(target) : target;
+}
+function text(sel, source) {
+  const el = _resolve(sel);
+  if (!el) return;
+  if (source && source.subscribe) {
+    source.subscribe(v => { el.textContent = String(v ?? ''); });
+  }
+}
+function cls(sel, className, source) {
+  const el = _resolve(sel);
+  if (!el) return;
+  if (source && source.subscribe) {
+    source.subscribe(v => { el.classList.toggle(className, Boolean(v)); });
+  }
+}
+function onClick(sel, fn) {
+  const el = _resolve(sel);
+  if (el) el.addEventListener('click', fn);
+}
+function onInput(sel, fn) {
+  const el = _resolve(sel);
+  if (el) el.addEventListener('input', e => fn(e.target.value));
+}
+function onKey(target, key, fn) {
+  const el = _resolve(target);
+  if (el) el.addEventListener('keydown', e => { if (e.key === key) fn(e); });
+}
+function onHover(sel, handlers) {
+  const el = _resolve(sel);
+  if (!el) return;
+  if (handlers.enter) el.addEventListener('mouseenter', handlers.enter);
+  if (handlers.leave) el.addEventListener('mouseleave', handlers.leave);
+}
+function onResize(sel, fn) {
+  const el = _resolve(sel);
+  if (!(el instanceof Element)) return;
+  new ResizeObserver(([e]) => fn(e)).observe(el);
+}
+function onSubmit(sel, fn) {
+  const el = _resolve(sel);
+  if (el) el.addEventListener('submit', e => { e.preventDefault(); fn(e); });
+}
+
+// Make available
+window.signal = signal;
+window.computed = computed;
+window.effect = effect;
+window.text = text;
+window.cls = cls;
+window.onClick = onClick;
+window.onInput = onInput;
+window.onKey = onKey;
+window.onHover = onHover;
+window.onResize = onResize;
+window.onSubmit = onSubmit;
+
+try {
+${currentJs
+  .replace(/^import\s+\{[^}]*\}\s+from\s+['"][^'"]*['"]\s*;?\s*$/gm, '// [import removed — shimmed]')
+  .replace(/^import\s+.*from\s+['"][^'"]*['"]\s*;?\s*$/gm, '// [import removed — shimmed]')
+}
+} catch(e) {
+  document.body.innerHTML += '<pre style="color:#ef4444;font-size:12px;margin-top:1rem">' + e.message + '</pre>';
+}
+<\/script>
+</body>
+</html>`;
+      iframe.srcdoc = doc;
+    }
+
+    // Tab switching
+    const tabs = container.querySelectorAll<HTMLButtonElement>(`.playground-tab[data-for="${id}"]`);
+    const panels = container.querySelectorAll<HTMLElement>(`.playground-panel[data-owner="${id}"]`);
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab!;
+
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+
+        tab.classList.add('active');
+        container.querySelector(`.playground-panel[data-panel="${target}"][data-owner="${id}"]`)!.classList.add('active');
+
+        // Lazy init editors
+        if (target === 'js') getOrCreateEditor('js');
+        if (target === 'html') getOrCreateEditor('html');
+      });
+    });
+
+    // Run button
+    container.querySelector(`[data-run="${id}"]`)?.addEventListener('click', runCode);
+
+    // Initial run
+    runCode();
+  }
+
+  // Init all playgrounds on page
+  document.querySelectorAll<HTMLElement>('.playground').forEach(initPlayground);
+</script>
+
+<style>
+  .playground {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: hsl(240 6% 10%);
+  }
+
+  .playground-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(240 6% 8%);
+  }
+
+  .playground-tabs {
+    display: flex;
+    gap: 0;
+  }
+
+  .playground-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.875rem;
+    border: none;
+    background: transparent;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .playground-tab:hover {
+    color: hsl(var(--foreground));
+  }
+
+  .playground-tab.active {
+    color: hsl(var(--foreground));
+    border-bottom-color: hsl(var(--primary));
+  }
+
+  .playground-run {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    margin-right: 0.5rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 6px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .playground-run:hover { opacity: 0.85; }
+
+  .playground-panel {
+    display: none;
+  }
+  .playground-panel.active {
+    display: block;
+  }
+
+  .playground-iframe {
+    width: 100%;
+    border: none;
+    display: block;
+    background: hsl(240 6% 10%);
+  }
+
+  .playground-editor {
+    overflow: auto;
+  }
+
+  /* Override CodeMirror to match */
+  .playground-editor :global(.cm-editor) {
+    border-radius: 0;
+  }
+  .playground-editor :global(.cm-gutters) {
+    border-right: 1px solid hsl(var(--border));
+  }
+</style>

@@ -1,8 +1,10 @@
 ---
 import CodeBlock from '../../components/CodeBlock.astro';
 import DemoCard from '../../components/DemoCard.astro';
+import Playground from '../../components/playground/Playground.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import domCode from '../../snippets/demo/dom.example.ts?raw';
+import { domPlayground } from '../../snippets/playground/dom.ts';
 ---
 <BaseLayout title="DOM demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
@@ -46,6 +48,15 @@ import domCode from '../../snippets/demo/dom.example.ts?raw';
 
     <!-- Code example -->
     <CodeBlock lang="typescript" code={domCode} />
+
+    <!-- Interactive Playground -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Playground</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Edit the code and hit Run to see it live.
+      </p>
+      <Playground id="dom" files={domPlayground} height={380} />
+    </div>
 
   </section>
 
