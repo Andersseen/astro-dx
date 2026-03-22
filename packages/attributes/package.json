@@ -1,0 +1,29 @@
+{
+  "name": "@astro-dx/attributes",
+  "version": "0.1.0",
+  "description": "Angular-style attribute directives for Astro - dx-if, dx-show, dx-for",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@astro-dx/core": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "happy-dom": "^14.0.0"
+  }
+}

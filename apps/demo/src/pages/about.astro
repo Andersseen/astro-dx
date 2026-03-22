@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About">
+  <section class="section">
+    <div class="container-sm flex flex-col gap-10">
+
+      <!-- Header -->
+      <div class="flex flex-col gap-3">
+        <span class="text-xs uppercase tracking-[0.08em] opacity-50">About</span>
+        <h1 class="m-0 font-sans text-4xl font-extrabold">What is astro-dx?</h1>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="surface-theme border-theme rounded-lg border px-4 py-3.5 text-sm leading-7">
+        <strong class="text-theme-accent">Community library</strong> —
+        astro-dx is not affiliated with, endorsed by, or part of the official Astro project.
+      </div>
+
+      <!-- Content -->
+      <div class="flex flex-col gap-4">
+        <p class="m-0 text-[0.9375rem] leading-7 opacity-75">
+          Astro is great for content-focused sites with zero JS by default.
+          But when you need client-side interactivity across islands,
+          the DX gets rough — raw nanostores, manual querySelector, no cleanup, no structure.
+        </p>
+        <p class="m-0 text-[0.9375rem] leading-7 opacity-75">
+          astro-dx brings the patterns Angular developers know —
+          signals, computed values, singleton services, declarative DOM bindings —
+          to Astro client scripts. No compiler, no framework, just ergonomic TypeScript.
+        </p>
+      </div>
+
+      <!-- FAQ -->
+      <div class="flex flex-col">
+        <and-accordion>
+          <and-accordion-item>
+            <span slot="header">Why not just use Preact or Vue islands?</span>
+            <p slot="content" class="m-0 text-sm leading-7 opacity-65">
+              You can — and sometimes you should. astro-dx fills the gap for components
+              that need interactivity but not a full framework. Less JS, more native.
+            </p>
+          </and-accordion-item>
+          <and-accordion-item>
+            <span slot="header">Why not Alpine.js?</span>
+            <p slot="content" class="m-0 text-sm leading-7 opacity-65">
+              Alpine uses eval() for HTML expressions. astro-dx keeps all logic
+              in TypeScript where you have type safety and editor autocompletion.
+            </p>
+          </and-accordion-item>
+          <and-accordion-item>
+            <span slot="header">Does it work with Cloudflare Pages?</span>
+            <p slot="content" class="m-0 text-sm leading-7 opacity-65">
+              Yes. astro-dx is fully static — no server runtime needed.
+              Built specifically with Cloudflare + Astro in mind.
+            </p>
+          </and-accordion-item>
+          <and-accordion-item>
+            <span slot="header">Does it support Astro ViewTransitions?</span>
+            <p slot="content" class="m-0 text-sm leading-7 opacity-65">
+              Yes. Use onPageLoad() and onBeforeSwap() from @astro-dx/core
+              to initialize and clean up safely across navigations.
+            </p>
+          </and-accordion-item>
+        </and-accordion>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>

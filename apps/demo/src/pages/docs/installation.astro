@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Installation">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs</and-badge>
+      <h1 and-text="h2 weight:bold">Installation</h1>
+    </div>
+
+    <and-alert variant="warning">
+      Community library — not affiliated with the Astro core team.
+    </and-alert>
+
+    <!-- CLI -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 1 — CLI (recommended)</h2>
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm">
+        npx @astro-dx/init
+      </div>
+    </div>
+
+    <!-- All in one -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 2 — All packages</h2>
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm">
+        npm install astro-dx
+      </div>
+    </div>
+
+    <!-- Granular -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Option 3 — Only what you need</h2>
+      <div class="surface-theme border-theme px-4 py-3 rounded-lg border font-mono text-sm space-y-1">
+        <div><span class="opacity-40"># signals only</span></div>
+        <div>npm install @astro-dx/core</div>
+        <div class="pt-1"><span class="opacity-40"># signals + DOM utilities</span></div>
+        <div>npm install @astro-dx/core @astro-dx/dom</div>
+        <div class="pt-1"><span class="opacity-40"># signals + custom elements</span></div>
+        <div>npm install @astro-dx/core @astro-dx/elements</div>
+      </div>
+    </div>
+
+    <!-- Package table -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Packages</h2>
+      <div and-layout="vertical gap:xs">
+        {[
+          { pkg: '@astro-dx/core', desc: 'signal, computed, effect, createService, lifecycle' },
+          { pkg: '@astro-dx/events', desc: 'on, onHover, onKey, onFocus' },
+          { pkg: '@astro-dx/attributes', desc: 'dx-if, dx-show, dx-for, dx-model + bootstrap()' },
+          { pkg: '@astro-dx/elements', desc: 'dx-if, dx-show, dx-for as custom elements' },
+          { pkg: '@astro-dx/dom', desc: 'getElement, getElements — re-exports events + attributes' },
+          { pkg: 'astro-dx', desc: 'All of the above in one install' },
+          { pkg: '@astro-dx/init', desc: 'CLI — npx @astro-dx/init' },
+        ].map(row => (
+          <div
+            and-layout="horizontal gap:md align:start"
+            class="py-3 border-b border-theme"
+          >
+            <code class="text-theme-accent text-sm min-w-[200px] shrink-0">
+              {row.pkg}
+            </code>
+            <span and-text="p-sm" class="opacity-60">{row.desc}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </section>
+</BaseLayout>

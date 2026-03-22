@@ -1,0 +1,49 @@
+{
+  "name": "astro-dx",
+  "version": "0.1.0",
+  "description": "All astro-dx packages in one install - signals, events, attributes, elements",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core.js",
+      "types": "./dist/core.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events.js",
+      "types": "./dist/events.d.ts"
+    },
+    "./attributes": {
+      "import": "./dist/attributes.js",
+      "types": "./dist/attributes.d.ts"
+    },
+    "./elements": {
+      "import": "./dist/elements.js",
+      "types": "./dist/elements.d.ts"
+    },
+    "./dom": {
+      "import": "./dist/dom.js",
+      "types": "./dist/dom.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@astro-dx/core": "workspace:*",
+    "@astro-dx/events": "workspace:*",
+    "@astro-dx/attributes": "workspace:*",
+    "@astro-dx/elements": "workspace:*",
+    "@astro-dx/dom": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -1,17 +1,26 @@
 {
-  "name": "astro-dx",
-  "type": "module",
-  "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
+  "name": "astro-dx-root",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@changesets/cli": "^2.30.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "astro": "^6.0.8"
+    "dev": "pnpm --filter astro-dx-demo dev",
+    "build": "pnpm build:packages && pnpm --filter astro-dx-demo build",
+    "build:packages": "pnpm --filter './packages/*' build",
+    "test": "pnpm --filter './packages/*' test --if-present",
+    "test:e2e": "pnpm --filter astro-dx-demo test:e2e",
+    "test:e2e:ui": "pnpm --filter astro-dx-demo test:e2e:ui",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "pnpm build:packages && changeset publish",
+    "changeset:status": "changeset status"
   }
 }

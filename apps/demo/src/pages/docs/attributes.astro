@@ -1,0 +1,56 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="@astro-dx/attributes">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs · @astro-dx/attributes</and-badge>
+      <h1 and-text="h2 weight:bold">@astro-dx/attributes</h1>
+      <p and-text="p" class="opacity-70">
+        dx-if, dx-show, dx-for — add reactive behaviour directly to any HTML element.
+      </p>
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Setup — register + bootstrap</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal } from '@astro-dx/core';
+import { register, bootstrap } from '@astro-dx/attributes';
+
+const isOpen = signal(false);
+const items  = signal<{ name: string }[]>([]);
+
+// Register signals by name — names must match dx-* attribute values
+register({ isOpen, items });
+
+// Walk the DOM, apply bindings
+bootstrap();
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">dx-show</h2>
+      <p and-text="p-sm" class="opacity-70">Toggles visibility. The element stays in the DOM.</p>
+      <CodeBlock lang="html" code={`<div dx-show="isOpen">Content</div>`} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">dx-if</h2>
+      <p and-text="p-sm" class="opacity-70">Creates and destroys the element based on signal value.</p>
+      <CodeBlock lang="html" code={`<div dx-if="isOpen">Content</div>`} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">dx-for + dx-text</h2>
+      <p and-text="p-sm" class="opacity-70">Renders a list reactively. Each item property is accessible via dx-text.</p>
+      <CodeBlock lang="html" code={`
+<ul>
+  <li dx-for="items" dx-text="name"></li>
+</ul>
+      `} />
+    </div>
+
+  </section>
+</BaseLayout>

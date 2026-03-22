@@ -1,0 +1,81 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="@astro-dx/core">
+  <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">Docs · @astro-dx/core</and-badge>
+      <h1 and-text="h2 weight:bold">@astro-dx/core</h1>
+      <p and-text="p" class="opacity-70">
+        Reactive primitives — signal, computed, effect — and lifecycle hooks for ViewTransitions.
+      </p>
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">signal()</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal } from '@astro-dx/core';
+
+const count = signal(0);
+
+count();           // read → 0
+count.set(5);      // write
+count.update(v => v + 1);  // update with function
+count.subscribe(v => console.log(v)); // subscribe
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">computed()</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal, computed } from '@astro-dx/core';
+
+const count = signal(0);
+const double = computed(() => count() * 2);
+
+double();  // → 0
+count.set(3);
+double();  // → 6
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">effect()</h2>
+      <CodeBlock lang="typescript" code={`
+import { signal, effect } from '@astro-dx/core';
+
+const count = signal(0);
+const stop = effect(() => {
+  console.log('count changed:', count());
+});
+
+// stop() to clean up
+      `} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">onPageLoad() / onBeforeSwap()</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Lifecycle hooks for Astro ViewTransitions. Fall back gracefully without ViewTransitions.
+      </p>
+      <CodeBlock lang="typescript" code={`
+import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
+import { getElement, destroyAll } from '@astro-dx/dom';
+
+onPageLoad(() => {
+  // runs on every navigation AND on first load
+  const btn = getElement('#btn');
+  btn.on('click', () => { /* ... */ });
+});
+
+onBeforeSwap(() => {
+  // runs before DOM is replaced
+  destroyAll(); // clean up all getElement refs
+});
+      `} />
+    </div>
+
+  </section>
+</BaseLayout>

@@ -1,0 +1,167 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import DemoCard from '../../components/DemoCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import signalsCode from '../../snippets/demo/signals.example.ts?raw';
+import signalsWithCode from '../../snippets/demo/signals.with-astro-dx.ts?raw';
+import signalsWithoutCode from '../../snippets/demo/signals.without-astro-dx.ts?raw';
+import signalsConditionalCode from '../../snippets/demo/signals.conditional-effect.ts?raw';
+import signalsPeekCode from '../../snippets/demo/signals.peek-best-practices.ts?raw';
+---
+<BaseLayout title="Signals demo">
+  <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
+
+    <div and-layout="vertical gap:sm">
+      <and-badge variant="outline" class="w-fit">@astro-dx/core</and-badge>
+      <h1 and-text="h2 weight:bold">Signals</h1>
+      <p and-text="p" class="opacity-70">
+        signal(), computed(), effect() — same API as Angular 20+
+      </p>
+    </div>
+
+    <!-- Live demo -->
+    <DemoCard title="Counter — signal + computed">
+      <div and-layout="vertical gap:lg align:center" class="py-8">
+        <div and-layout="horizontal gap:lg align:center">
+          <and-button variant="outline" id="btn-dec" size="lg">−</and-button>
+          <div and-layout="vertical gap:xs align:center">
+            <span id="count-display" class="text-theme-accent text-6xl font-bold">0</span>
+            <span and-text="p-sm" class="opacity-50">count</span>
+          </div>
+          <and-button variant="outline" id="btn-inc" size="lg">+</and-button>
+        </div>
+        <div and-layout="horizontal gap:xl">
+          <div and-layout="vertical gap:xs align:center">
+            <span id="double-display" class="text-theme-accent-soft text-2xl font-mono">0</span>
+            <span and-text="p-sm" class="opacity-50">double</span>
+          </div>
+          <div and-layout="vertical gap:xs align:center">
+            <span id="sign-display" class="text-2xl font-mono">neutral</span>
+            <span and-text="p-sm" class="opacity-50">sign</span>
+          </div>
+        </div>
+        <and-button variant="ghost" size="sm" id="btn-reset">Reset</and-button>
+      </div>
+    </DemoCard>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code example</h2>
+      <CodeBlock lang="typescript" code={signalsCode} />
+    </div>
+
+    <DemoCard title="Dynamic deps — conditional effect + peek()">
+      <div and-layout="vertical gap:md" class="p-6">
+        <p and-text="p-sm" class="opacity-70">
+          Change branch between A/B and verify re-tracking. Updating peek-only value must not re-run the effect.
+        </p>
+
+        <div and-layout="horizontal gap:sm wrap">
+          <and-button variant="outline" id="btn-use-a">Use A</and-button>
+          <and-button variant="outline" id="btn-use-b">Use B</and-button>
+          <and-button variant="ghost" id="btn-inc-a">A +1</and-button>
+          <and-button variant="ghost" id="btn-inc-b">B +10</and-button>
+          <and-button variant="ghost" id="btn-inc-peek">Peek value +1</and-button>
+        </div>
+
+        <div and-layout="grid cols:2 cols@md:5 gap:sm" class="text-sm">
+          <div class="surface-theme rounded-lg px-3 py-2">
+            <span class="opacity-60">Branch</span>
+            <div id="branch-display" class="font-mono">A</div>
+          </div>
+          <div class="surface-theme rounded-lg px-3 py-2">
+            <span class="opacity-60">Selected value</span>
+            <div id="selected-display" class="font-mono">0</div>
+          </div>
+          <div class="surface-theme rounded-lg px-3 py-2">
+            <span class="opacity-60">Effect runs</span>
+            <div id="runs-display" class="font-mono">0</div>
+          </div>
+          <div class="surface-theme rounded-lg px-3 py-2">
+            <span class="opacity-60">A source</span>
+            <div id="source-a-display" class="font-mono">1</div>
+          </div>
+          <div class="surface-theme rounded-lg px-3 py-2">
+            <span class="opacity-60">B source</span>
+            <div id="source-b-display" class="font-mono">100</div>
+          </div>
+        </div>
+
+        <p and-text="p-sm" class="opacity-70">
+          Peek-only signal value: <span id="peek-display" class="font-mono">0</span>
+        </p>
+      </div>
+    </DemoCard>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Conditional dependencies snippet</h2>
+      <CodeBlock lang="typescript" code={signalsConditionalCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">peek() best practices</h2>
+      <CodeBlock lang="typescript" code={signalsPeekCode} />
+    </div>
+
+    <!-- Code comparison tabs -->
+    <and-tabs>
+      <and-tab slot="tabs" value="with">With astro-dx</and-tab>
+      <and-tab slot="tabs" value="without">Without</and-tab>
+
+      <div slot="panel-with">
+        <CodeBlock lang="typescript" code={signalsWithCode} />
+      </div>
+
+      <div slot="panel-without">
+        <CodeBlock lang="typescript" code={signalsWithoutCode} />
+      </div>
+    </and-tabs>
+
+  </section>
+
+  <script>
+    import { signal, computed, effect } from '@astro-dx/core';
+    import { getElement } from '@astro-dx/dom';
+    import { onClick } from '@astro-dx/events';
+
+    const count  = signal(0);
+    const double = computed(() => count() * 2);
+    const sign   = computed(() => count() > 0 ? 'positive' : count() < 0 ? 'negative' : 'neutral');
+
+    getElement('#count-display').text(count);
+    getElement('#double-display').text(double);
+    getElement('#sign-display').text(sign);
+
+    onClick('#btn-inc', () => count.update(v => v + 1));
+    onClick('#btn-dec', () => count.update(v => v - 1));
+    onClick('#btn-reset', () => count.set(0));
+
+    const useA = signal(true);
+    const sourceA = signal(1);
+    const sourceB = signal(100);
+    const peekOnly = signal(0);
+    const selected = signal(0);
+    const runs = signal(0);
+    const branch = computed(() => useA() ? 'A' : 'B');
+
+    effect(() => {
+      const current = useA() ? sourceA() : sourceB();
+      selected.set(current);
+      peekOnly.peek();
+      runs.update(v => v + 1);
+    });
+
+    getElement('#branch-display').text(branch);
+    getElement('#selected-display').text(selected);
+    getElement('#runs-display').text(runs);
+    getElement('#source-a-display').text(sourceA);
+    getElement('#source-b-display').text(sourceB);
+    getElement('#peek-display').text(peekOnly);
+
+    onClick('#btn-use-a', () => useA.set(true));
+    onClick('#btn-use-b', () => useA.set(false));
+    onClick('#btn-inc-a', () => sourceA.update(v => v + 1));
+    onClick('#btn-inc-b', () => sourceB.update(v => v + 10));
+    onClick('#btn-inc-peek', () => peekOnly.update(v => v + 1));
+  </script>
+
+</BaseLayout>

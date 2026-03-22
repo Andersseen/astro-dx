@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import AppFooter from '../components/layout/AppFooter.astro';
+import AppNavbar from '../components/layout/AppNavbar.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const {
+  title,
+  description = 'Angular-inspired DX for Astro — community library',
+} = Astro.props;
+const pathname = Astro.url.pathname;
+---
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} — astro-dx</title>
+  </head>
+  <body class="app-shell">
+    <div class="ambient-glow ambient-glow-a"></div>
+    <div class="ambient-glow ambient-glow-b"></div>
+
+    <AppNavbar currentPath={pathname} />
+
+    <main class="relative z-10">
+      <slot />
+    </main>
+
+    <AppFooter />
+
+    <script>
+      import '../scripts/bootstrap.ts';
+    </script>
+
+  </body>
+</html>
