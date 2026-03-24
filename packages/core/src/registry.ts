@@ -8,9 +8,12 @@ type ServiceConstructor<T extends object> = new () => T;
  * It can have a parent registry for fallback lookups.
  */
 export class Registry {
-  private instances = new Map<ServiceConstructor<object>, object>();
+  #instances = new Map<ServiceConstructor<object>, object>();
+  #parent?: Registry;
   
-  constructor(private parent?: Registry) {}
+  constructor(parent?: Registry) {
+    this.#parent = parent;
+  }
 
   /**
    * Registers a service constructor.
@@ -20,8 +23,8 @@ export class Registry {
   ): void {
     const list = Array.isArray(services) ? services : [services];
     for (const Service of list) {
-      if (this.instances.has(Service as ServiceConstructor<object>)) continue;
-      this.instances.set(Service as ServiceConstructor<object>, new Service());
+      if (this.#instances.has(Service as ServiceConstructor<object>)) continue;
+      this.#instances.set(Service as ServiceConstructor<object>, new Service());
     }
   }
 
@@ -29,12 +32,12 @@ export class Registry {
    * Retrieves a service instance, falling back to parent if not found locally.
    */
   inject<T extends object>(Service: ServiceConstructor<T>): T {
-    let instance = this.instances.get(Service as ServiceConstructor<object>);
+    let instance = this.#instances.get(Service as ServiceConstructor<object>);
 
     if (instance) return instance as T;
 
-    if (this.parent) {
-      return this.parent.inject(Service);
+    if (this.#parent) {
+      return this.#parent.inject(Service);
     }
 
     // Auto-instantiate in current registry if not found (and log warning)
@@ -44,12 +47,12 @@ export class Registry {
     );
     
     instance = new Service();
-    this.instances.set(Service as ServiceConstructor<object>, instance);
+    this.#instances.set(Service as ServiceConstructor<object>, instance);
     return instance as T;
   }
 
   clear(): void {
-    this.instances.clear();
+    this.#instances.clear();
   }
 }
 
