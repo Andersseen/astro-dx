@@ -1,28 +1,56 @@
-import type { atom } from "nanostores";
+/**
+ * Core tracking context for the Push-Pull reactivity engine.
+ * Manages the global state of active observers (effects/computeds).
+ */
 
-export type AtomLike = ReturnType<typeof atom<unknown>>;
-
-let activeCollector: Set<AtomLike> | null = null;
-let peekDepth = 0;
-
-export function startTracking(collector: Set<AtomLike>): void {
-  activeCollector = collector;
+export interface ReactiveNode {
+  /** Notifies the node that one of its dependencies has changed. */
+  notify(): void;
+  /** Set of dependencies this node is currently observing. */
+  dependencies: Set<{ observers: Set<ReactiveNode> }>;
+  /** Versioning to detect actual changes (Diamond Problem solution). */
+  version: number;
 }
 
-export function stopTracking(): void {
-  activeCollector = null;
+let activeObserver: ReactiveNode | null = null;
+let trackingDisabled = 0;
+
+/**
+ * Returns the currently active observer, if any.
+ */
+export function getActiveObserver(): ReactiveNode | null {
+  return trackingDisabled > 0 ? null : activeObserver;
 }
 
-export function untracked<T>(fn: () => T): T {
-  peekDepth++;
-  try {
-    return fn();
-  } finally {
-    peekDepth--;
+/**
+ * Establishes a bidirectional link between a dependency and the active observer.
+ */
+export function trackDependency(dep: { observers: Set<ReactiveNode> }): void {
+  const observer = getActiveObserver();
+  if (observer) {
+    dep.observers.add(observer);
+    observer.dependencies.add(dep);
   }
 }
 
-export function trackAtomRead(store: AtomLike): void {
-  if (peekDepth > 0) return;
-  activeCollector?.add(store);
+/**
+ * Sets the active observer and returns the previous one.
+ * Used for nested tracking (Effects calling Computeds).
+ */
+export function setActiveObserver(node: ReactiveNode | null): ReactiveNode | null {
+  const prev = activeObserver;
+  activeObserver = node;
+  return prev;
+}
+
+/**
+ * Executes a function without tracking any dependencies.
+ */
+export function untracked<T>(fn: () => T): T {
+  trackingDisabled++;
+  try {
+    return fn();
+  } finally {
+    trackingDisabled--;
+  }
 }

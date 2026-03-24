@@ -1,7 +1,7 @@
 {
   "name": "@astro-dx/core",
   "version": "0.1.0",
-  "description": "Signals, computed, effect and services for Astro built on nanostores",
+  "description": "Zero-dependency Signals, computed, effect and services for Astro",
   "type": "module",
   "exports": {
     ".": {
@@ -16,9 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "dependencies": {
-    "nanostores": "^0.11.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",

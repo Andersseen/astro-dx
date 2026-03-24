@@ -1,32 +1,63 @@
-import { atom } from "nanostores";
-import { trackAtomRead, untracked } from "./tracking.ts";
+import { trackDependency, type ReactiveNode } from "./tracking.ts";
 
-export type Signal<T> = {
-  /** Reads the value and registers a reactive dependency. */
+/**
+ * A Signal is a primitive reactive cell that holds a value.
+ * It notifies its observers whenever the value changes.
+ */
+export interface Signal<T> {
+  /** Reads the value and registers a dependency. */
   (): T;
-  /** Reads the current value without registering a reactive dependency. */
+  /** Reads the value without registering a dependency. */
   peek(): T;
+  /** Sets a new value. If the value changed, notifies observers. */
   set(value: T): void;
+  /** Updates the value based on the previous state. */
   update(fn: (prev: T) => T): void;
+  /** Manually subscribes to changes. */
   subscribe(fn: (value: T) => void): () => void;
-  /** @internal */
-  _atom: ReturnType<typeof atom<T>>;
-};
+  /** @internal Version counter for change detection. */
+  version: number;
+  /** @internal Set of observers currently watching this signal. */
+  observers: Set<ReactiveNode>;
+}
 
-export function signal<T>(initial: T): Signal<T> {
-  const store = atom<T>(initial);
+export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is): Signal<T> {
+  let value = initial;
+  const observers = new Set<ReactiveNode>();
 
-  const read = (): T => {
-    trackAtomRead(store);
-    return store.get();
+  const node: Signal<T> = (() => {
+    trackDependency(node);
+    return value;
+  }) as Signal<T>;
+
+  node.version = 0;
+  node.observers = observers;
+
+  node.peek = () => value;
+
+  node.set = (newValue: T) => {
+    if (!equal(value, newValue)) {
+      value = newValue;
+      node.version++;
+      // Notify all observers (Push phase)
+      for (const observer of [...observers]) {
+        observer.notify();
+      }
+    }
   };
 
-  read.peek = (): T => untracked(() => store.get());
-  read.set = (value: T): void => store.set(value);
-  read.update = (fn: (prev: T) => T): void => store.set(fn(store.get()));
-  read.subscribe = (fn: (value: T) => void): (() => void) =>
-    store.subscribe(fn);
-  read._atom = store;
+  node.update = (fn: (prev: T) => T) => node.set(fn(value));
 
-  return read as Signal<T>;
+  node.subscribe = (fn: (value: T) => void) => {
+    const observer: ReactiveNode = {
+      version: -1,
+      dependencies: new Set(),
+      notify: () => fn(value),
+    };
+    observers.add(observer);
+    fn(value);
+    return () => observers.delete(observer);
+  };
+
+  return node;
 }
