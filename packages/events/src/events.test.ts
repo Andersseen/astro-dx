@@ -131,8 +131,8 @@ describe('onHover()', () => {
     onHover('#card', { enter, leave });
 
     const el = document.querySelector('#card');
-    el?.dispatchEvent(new MouseEvent('mouseenter'));
-    el?.dispatchEvent(new MouseEvent('mouseleave'));
+    el?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    el?.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }));
 
     expect(enter).toHaveBeenCalledTimes(1);
     expect(leave).toHaveBeenCalledTimes(1);
@@ -170,8 +170,8 @@ describe('onKey()', () => {
     onKey('#i', 'Enter', spy);
 
     const el = document.querySelector('#i');
-    el?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-    el?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    el?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    el?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
