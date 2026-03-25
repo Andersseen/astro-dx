@@ -129,4 +129,49 @@ describe("computed()", () => {
     count.set(10);
     expect(spy.mock.calls.length).toBe(callsAfterSubscribe);
   });
+
+  it("does not recompute if dependencies haven't changed", () => {
+    const count = signal(0);
+    const spy = vi.fn(() => count() * 2);
+    const doubled = computed(spy);
+
+    expect(doubled()).toBe(0);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // Read again - should NOT recompute
+    expect(doubled()).toBe(0);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    count.set(1);
+    expect(doubled()).toBe(2);
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
+  it("cleans up dependencies when it becomes unobserved", () => {
+    const count = signal(0);
+    const spy = vi.fn(() => count() * 2);
+    const doubled = computed(spy);
+
+    // Initial run (not observed)
+    expect(doubled()).toBe(0);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // Now observe it with an effect
+    const stop = effect(() => {
+      doubled();
+    });
+    expect(spy).toHaveBeenCalledTimes(1); // Already computed
+
+    count.set(1);
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    stop(); // Unobserved - should trigger onBecomeUnobserved
+    
+    count.set(2);
+    // As unobserved, it shouldn't recompute until read again
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    expect(doubled()).toBe(4);
+    expect(spy).toHaveBeenCalledTimes(3);
+  });
 });

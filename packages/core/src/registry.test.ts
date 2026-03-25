@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { clearRegistry, inject, register, createLocalRegistry } from "./registry.ts";
 
 class CounterService {
@@ -81,5 +81,30 @@ describe("Scoped DI (Local Registry)", () => {
     const localCount = local.inject(CounterService);
     
     expect(globalCount).not.toBe(localCount);
+  });
+
+  it("is strictly isolated by default (new instance per tree node if not shared)", () => {
+    class PrivateService {}
+    const local = createLocalRegistry();
+    
+    const globalInstance = inject(PrivateService);
+    const localInstance = local.inject(PrivateService);
+    
+    expect(globalInstance).not.toBe(localInstance);
+  });
+
+  it("uses registerShared to share service across all registries", () => {
+    class TopSharedService {}
+    register(TopSharedService, { shared: true });
+    
+    const local = createLocalRegistry();
+    const subLocal = createLocalRegistry(local);
+    
+    const globalInst = inject(TopSharedService);
+    const localInst = local.inject(TopSharedService);
+    const subLocalInst = subLocal.inject(TopSharedService);
+    
+    expect(localInst).toBe(globalInst);
+    expect(subLocalInst).toBe(globalInst);
   });
 });

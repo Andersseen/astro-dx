@@ -128,4 +128,14 @@ describe("effect()", () => {
     count.set(2);
     expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  it("detects and throws on infinite loops", () => {
+    const count = signal(0);
+    expect(() => {
+      effect(() => {
+        count();
+        count.set(count.peek() + 1);
+      });
+    }).toThrow("[astro-dx] Infinite loop detected in effect");
+  });
 });

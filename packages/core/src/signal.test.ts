@@ -69,4 +69,20 @@ describe("signal", () => {
       expect(spy).toHaveBeenCalledTimes(2);
     });
   });
+
+  it("callback in subscribe is untracked", () => {
+    const s1 = signal(0);
+    const s2 = signal(0);
+    const spy = vi.fn();
+
+    s1.subscribe(() => {
+      s2(); // This should not register a dependency anywhere
+      spy();
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    s2.set(1);
+    // If s2 was tracked, it would trigger something, but here it shouldn't
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
 });
