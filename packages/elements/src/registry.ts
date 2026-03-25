@@ -16,7 +16,11 @@ export function resolve(name: string): AnyReadable | undefined {
   return window.__dx__?.[name];
 }
 
-export function waitRegister(name: string, callback: (sig: AnyReadable) => void, maxRetries = 10): void {
+export function waitRegister(
+  name: string,
+  callback: (sig: AnyReadable) => void,
+  maxRetries = 10
+): void {
   let count = 0;
   const check = () => {
     const sig = resolve(name);

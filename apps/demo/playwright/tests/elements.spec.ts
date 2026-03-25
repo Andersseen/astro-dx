@@ -8,12 +8,12 @@ test.describe('Elements — dx-show', () => {
   test('dx-show element hides content when signal is false', async ({ page }) => {
     // Initial state hasItems might be visible if the page rendered before hydration
     const el = page.locator('dx-show[signal="hasItems"]');
-    
+
     // Ensure cart is clear
     await page.locator('#btn-clear-cart').click();
     await page.waitForTimeout(200);
     await expect(el).toBeHidden();
-    
+
     // Add product to make hasItems true
     await page.locator('#btn-add-product').click();
     await page.waitForTimeout(200);

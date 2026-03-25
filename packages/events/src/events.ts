@@ -21,7 +21,7 @@ function extractValue(event: Event): string {
 export function on(
   target: Target,
   event: string,
-  fn: (valueOrEvent: any) => void,
+  fn: (valueOrEvent: unknown) => void,
   options?: AddEventListenerOptions
 ): () => void {
   const handler = (e: Event) => {
@@ -40,9 +40,15 @@ export function on(
   const actualTarget = typeof target === 'string' ? document : target;
   if (!actualTarget) return () => {};
 
-  actualTarget.addEventListener(event, handler, { ...options, capture: typeof target === 'string' });
+  actualTarget.addEventListener(event, handler, {
+    ...options,
+    capture: typeof target === 'string',
+  });
   return () =>
-    actualTarget.removeEventListener(event, handler, { ...options, capture: typeof target === 'string' });
+    actualTarget.removeEventListener(event, handler, {
+      ...options,
+      capture: typeof target === 'string',
+    });
 }
 
 export function onClick(
@@ -64,7 +70,7 @@ export function onChange(target: Target, fn: (value: string) => void): () => voi
 export function onSubmit(target: Target, fn: (event: SubmitEvent) => void): () => void {
   return on(target, 'submit', (e) => {
     if (e instanceof Event) {
-       e.preventDefault();
+      e.preventDefault();
     }
     fn(e as SubmitEvent);
   });
@@ -75,34 +81,40 @@ export function onHover(
   handlers: { enter?: () => void; leave?: () => void }
 ): () => void {
   const cleanups: Array<() => void> = [];
-  
+
   if (typeof target === 'string') {
     if (handlers.enter) {
-      cleanups.push(on(target, 'mouseover', (e) => {
-        const event = e as MouseEvent;
-        const to = event.target as Element;
-        const from = event.relatedTarget as Element;
-        if (to?.closest?.(target) && (!from || !from.closest?.(target))) {
-          handlers.enter?.();
-        }
-      }));
+      cleanups.push(
+        on(target, 'mouseover', (e) => {
+          const event = e as MouseEvent;
+          const to = event.target as Element;
+          const from = event.relatedTarget as Element;
+          if (to?.closest?.(target) && (!from || !from.closest?.(target))) {
+            handlers.enter?.();
+          }
+        })
+      );
     }
     if (handlers.leave) {
-      cleanups.push(on(target, 'mouseout', (e) => {
-        const event = e as MouseEvent;
-        const from = event.target as Element;
-        const to = event.relatedTarget as Element;
-        if (from?.closest?.(target) && (!to || !to.closest?.(target))) {
-          handlers.leave?.();
-        }
-      }));
+      cleanups.push(
+        on(target, 'mouseout', (e) => {
+          const event = e as MouseEvent;
+          const from = event.target as Element;
+          const to = event.relatedTarget as Element;
+          if (from?.closest?.(target) && (!to || !to.closest?.(target))) {
+            handlers.leave?.();
+          }
+        })
+      );
     }
   } else {
     if (handlers.enter) cleanups.push(on(target, 'mouseenter', handlers.enter));
     if (handlers.leave) cleanups.push(on(target, 'mouseleave', handlers.leave));
   }
-  
-  return () => cleanups.forEach((c) => c());
+
+  return () => {
+    for (const c of cleanups) c();
+  };
 }
 
 export function onKey(
@@ -124,7 +136,9 @@ export function onFocus(
   const cleanups: Array<() => void> = [];
   if (handlers.focus) cleanups.push(on(target, 'focus', handlers.focus));
   if (handlers.blur) cleanups.push(on(target, 'blur', handlers.blur));
-  return () => cleanups.forEach((c) => c());
+  return () => {
+    for (const c of cleanups) c();
+  };
 }
 
 export function onResize(target: Target, fn: (entry: ResizeObserverEntry) => void): () => void {

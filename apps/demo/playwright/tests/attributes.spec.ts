@@ -44,12 +44,16 @@ test.describe('Attributes — dx-for', () => {
   test('dx-for renders items reactively', async ({ page }) => {
     // Web Component interaction: explicitly set the 'value' property and trigger add
     const input = page.locator('#input-item');
-    
-    await input.evaluate((el: any) => el.value = 'Apple');
+
+    await input.evaluate((el) => {
+      (el as HTMLInputElement).value = 'Apple';
+    });
     await page.locator('#btn-add-item').click();
     await page.waitForTimeout(100);
 
-    await input.evaluate((el: any) => el.value = 'Banana');
+    await input.evaluate((el) => {
+      (el as HTMLInputElement).value = 'Banana';
+    });
     await page.locator('#btn-add-item').click();
     await page.waitForTimeout(100);
 

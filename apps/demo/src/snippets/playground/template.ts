@@ -1,11 +1,11 @@
 export function stripImports(code: string): string {
-  return code.replace(/^import\s+['"][^'"]*\.css['"]\s*;?\s*$/gm, "");
+  return code.replace(/^import\s+['"][^'"]*\.css['"]\s*;?\s*$/gm, '');
 }
 
 export function buildSrcdoc(
   jsCode: string,
   htmlCode: string,
-  urls: { core: string; dom: string; events: string; attributes: string },
+  urls: { core: string; dom: string; events: string; attributes: string }
 ): string {
   return `<!DOCTYPE html>
 <html>
