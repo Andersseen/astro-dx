@@ -1,9 +1,10 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const attributesPlayground: PlaygroundFiles = {
   js: `\
 // ── With @astro-dx/attributes ─────────────────────────────────────────────────
-import { signal, computed } from '@astro-dx/core'
+import { signal, computed } from '@astro-dx/core';
+import { onClick} from '@astro-dx/events';
 
 // Signals that control the directives
 const isVisible = signal(true)

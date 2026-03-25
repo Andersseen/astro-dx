@@ -1,101 +1,114 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-
-// ==========================================
-// 🗄️ CÓDIGO ORIGINAL (COMENTADO PARA NO PERDERLO)
-// ==========================================
-/*
 import CodeBlock from '../../components/CodeBlock.astro';
 import Counter from '../../components/Counter.astro';
 import CounterStats from '../../components/CounterStats.astro';
 import DemoCard from '../../components/DemoCard.astro';
 import Playground from '../../components/playground/Playground.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import servicesCode from '../../snippets/demo/services.example.ts?raw';
 import serviceManagerCode from '../../snippets/demo/services.manager-component.example.ts?raw';
 import serviceReceiverCode from '../../snippets/demo/services.receiver-component.example.ts?raw';
 import { servicesPlayground } from '../../snippets/playground/services.ts';
-*/
 ---
-<BaseLayout title="Test de Services">
+<BaseLayout title="Services demo">
   <section and-layout="vertical gap:xl" class="max-w-4xl mx-auto px-6 py-24">
 
     <div and-layout="vertical gap:sm">
-      <and-badge variant="outline" class="w-fit">TEST DE AISLAMIENTO</and-badge>
-      <h1 and-text="h2 weight:bold">Detector de Mentiras (Global vs Local)</h1>
+      <and-badge variant="outline" class="w-fit">@astro-dx/core · Services</and-badge>
+      <h1 and-text="h2 weight:bold">Services</h1>
       <p and-text="p" class="opacity-70">
-        Prueba pura de inyección. Abre la consola de desarrollo (F12) para ver los resultados.
+        Singleton classes with register/inject. Share reactive state across any island with explicit dependencies.
+      </p>
+    </div>
+
+    <and-alert variant="info">
+      The two cards below are completely independent Astro islands.
+      Component A mutates the service, Component B receives derived state from the same instance.
+    </and-alert>
+
+    <div and-layout="grid cols:1 cols@md:2 gap:lg">
+      <DemoCard title="Component A — manages service state">
+        <div class="p-4">
+          <Counter />
+        </div>
+      </DemoCard>
+
+      <DemoCard title="Component B — receives from service">
+        <div class="p-4">
+          <CounterStats />
+        </div>
+      </DemoCard>
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code — manager component</h2>
+      <CodeBlock lang="typescript" code={serviceManagerCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code — receiver component</h2>
+      <CodeBlock lang="typescript" code={serviceReceiverCode} />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Cross-island list with shared service</h2>
+      <p and-text="p-sm" class="opacity-70">
+        This pair of islands also shares one service instance via inject().
       </p>
     </div>
 
     <div and-layout="grid cols:1 cols@md:2 gap:lg">
-      
-      <div style="padding: 1.5rem; border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card));">
-        <h3 and-text="h6 weight:bold" style="color: hsl(var(--primary))">Registro Global</h3>
-        <div id="txt-global" style="font-size: 4rem; font-weight: 800; margin: 1rem 0;">0</div>
-        <and-button id="btn-global" variant="primary" class="w-full">Global +1</and-button>
-      </div>
 
-      <div style="padding: 1.5rem; border: 1px dashed hsl(var(--border)); border-radius: 12px; background: hsl(var(--muted));">
-        <h3 and-text="h6 weight:bold" class="opacity-70">Registro Local (Aislado)</h3>
-        <div id="txt-local" style="font-size: 4rem; font-weight: 800; margin: 1rem 0;">0</div>
-        <and-button id="btn-local" variant="outline" class="w-full">Local +1</and-button>
-      </div>
+      <!-- Island A: add products -->
+      <DemoCard title="Island A — Add to cart">
+        <div and-layout="vertical gap:sm" class="p-4">
+          {['Keyboard', 'Mouse', 'Monitor', 'Headphones'].map(name => (
+            <and-button
+              variant="outline"
+              class="product-btn w-full"
+              data-name={name}
+            >
+              <and-icon name="plus" size="14"></and-icon>
+              {name}
+            </and-button>
+          ))}
+        </div>
+      </DemoCard>
+
+      <!-- Island B: cart summary -->
+      <DemoCard title="Island B — Cart summary">
+        <div and-layout="vertical gap:md" class="p-4">
+          <div and-layout="horizontal gap:sm align:center justify:between">
+            <span and-text="p-sm" class="opacity-60">Total items</span>
+            <and-badge id="cart-total" variant="default">0</and-badge>
+          </div>
+          <ul id="cart-list" and-layout="vertical gap:xs" class="min-h-16">
+          </ul>
+          <and-button variant="ghost" size="sm" id="btn-clear" class="w-full">
+            Clear cart
+          </and-button>
+        </div>
+      </DemoCard>
 
     </div>
 
-    </section>
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Code example</h2>
+      <CodeBlock lang="typescript" code={servicesCode} />
+    </div>
+
+    <!-- Interactive Playground -->
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Playground</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Two independent islands sharing reactive state. Edit the code and hit Run.
+      </p>
+      <Playground id="services" files={servicesPlayground} height={320} />
+    </div>
+
+  </section>
 
   <script>
-    import { signal, GlobalRegistry, createLocalRegistry } from '@astro-dx/core';
-
-    // 1. CLASE DE PRUEBA BLINDADA
-    class TestCounterService {
-      count;
-      constructor() {
-        this.count = signal(0);
-      }
-    }
-
-    // 2. INYECCIÓN
-    const globalCounter = GlobalRegistry.inject(TestCounterService);
-    
-    const localRegistry = createLocalRegistry();
-    const localCounter = localRegistry.inject(TestCounterService);
-
-    // 🚨 3. EL DETECTOR DE MENTIRAS (Revisa la consola) 🚨
-    console.log("%c=== RESULTADOS DEL TEST ===", "color: #00ff00; font-weight: bold; font-size: 14px;");
-    console.log("1. ¿Son exactamente la misma CLASE?:", globalCounter === localCounter);
-    console.log("2. ¿Son exactamente el mismo SIGNAL?:", globalCounter.count === localCounter.count);
-    
-    if (globalCounter === localCounter) {
-      console.warn("⚠️ ALERTA: El Registry está devolviendo la misma instancia. Revisa si usaste registerShared() en algún lado.");
-    } else {
-      console.log("✅ ÉXITO: Las instancias están correctamente separadas en memoria.");
-    }
-
-    // 4. BINDING DE UI
-    const txtGlobal = document.getElementById('txt-global');
-    const btnGlobal = document.getElementById('btn-global');
-    const txtLocal = document.getElementById('txt-local');
-    const btnLocal = document.getElementById('btn-local');
-
-    // Suscripciones
-    globalCounter.count.subscribe(v => { if (txtGlobal) txtGlobal.innerText = String(v); });
-    localCounter.count.subscribe(v => { if (txtLocal) txtLocal.innerText = String(v); });
-
-    // Eventos
-    btnGlobal?.addEventListener('click', () => {
-      globalCounter.count.set(globalCounter.count.peek() + 1);
-    });
-    
-    btnLocal?.addEventListener('click', () => {
-      localCounter.count.set(localCounter.count.peek() + 1);
-    });
-
-    // ==========================================
-    // 🗄️ SCRIPT ORIGINAL (COMENTADO)
-    // ==========================================
-    /*
     import { inject } from '@astro-dx/core';
     import { getElement, getElements } from '@astro-dx/dom';
     import { onClick } from '@astro-dx/events';
@@ -108,7 +121,11 @@ import { servicesPlayground } from '../../snippets/playground/services.ts';
     for (const btn of productBtns) {
       onClick(btn.el, () => {
         const name = btn.el.dataset.name ?? 'Product';
-        cart.addToCart({ id: `${name.toLowerCase()}-${Date.now()}`, name, price: 0 });
+        cart.addToCart({
+          id: `${name.toLowerCase()}-${Date.now()}`,
+          name,
+          price: 0,
+        });
       });
     }
 
@@ -123,6 +140,6 @@ import { servicesPlayground } from '../../snippets/playground/services.ts';
     });
 
     onClick('#btn-clear', () => cart.clearCart());
-    */
   </script>
+
 </BaseLayout>

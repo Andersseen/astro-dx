@@ -1,9 +1,11 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const domPlayground: PlaygroundFiles = {
   js: `\
 // ── With @astro-dx/dom ─────────────────────────────────────────────────────────
-import { signal, computed } from '@astro-dx/core'
+import { signal, computed } from '@astro-dx/core';
+import { text} from '@astro-dx/dom';
+import { onInput} from '@astro-dx/events';
 
 const query   = signal('')
 const opacity = signal(100)
