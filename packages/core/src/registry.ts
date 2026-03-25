@@ -1,14 +1,17 @@
 // --- TIPOS Y ESTADO GLOBAL ---
 
 // Definimos el tipo para cualquier clase instanciable
+// biome-ignore lint/suspicious/noExplicitAny: DI registry requires any for constructor generic
 export type ServiceConstructor<T = any> = new (...args: any[]) => T;
 
 // Conjunto para guardar las clases que se comparten entre registros
+// biome-ignore lint/suspicious/noExplicitAny: generic service constructor requires any for flexibility
 const SHARED_SERVICES = new Set<ServiceConstructor<any>>();
 
 // --- CLASE PRINCIPAL ---
 
 export class Registry {
+  // biome-ignore lint/suspicious/noExplicitAny: internal instances map requires any for heterogeneous types
   private instances: Map<ServiceConstructor<any>, any>;
   private parent?: Registry;
 
@@ -18,8 +21,9 @@ export class Registry {
   }
 
   register(
+    // biome-ignore lint/suspicious/noExplicitAny: constructor generic
     services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
-    options: { shared?: boolean } = {},
+    options: { shared?: boolean } = {}
   ): void {
     const list = Array.isArray(services) ? services : [services];
     for (const Service of list) {
@@ -59,14 +63,16 @@ export const GlobalRegistry = new Registry();
 
 // 2. Funciones globales que usan el GlobalRegistry por debajo
 export function register(
+  // biome-ignore lint/suspicious/noExplicitAny: constructor generic
   services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
-  options?: { shared?: boolean },
+  options?: { shared?: boolean }
 ): void {
   GlobalRegistry.register(services, options);
 }
 
 export function registerShared(
-  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+  // biome-ignore lint/suspicious/noExplicitAny: constructor generic
+  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>
 ): void {
   GlobalRegistry.register(services, { shared: true });
 }
@@ -81,8 +87,6 @@ export function clearRegistry(): void {
 }
 
 // 3. Creador de registros locales (usando el global como padre por defecto)
-export function createLocalRegistry(
-  parent: Registry = GlobalRegistry,
-): Registry {
+export function createLocalRegistry(parent: Registry = GlobalRegistry): Registry {
   return new Registry(parent);
 }

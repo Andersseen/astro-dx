@@ -1,9 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
-import { effect } from "./effect.ts";
-import { signal } from "./signal.ts";
+import { describe, expect, it, vi } from 'vitest';
+import { effect } from './effect.ts';
+import { signal } from './signal.ts';
 
-describe("effect()", () => {
-  it("runs immediately on creation", () => {
+describe('effect()', () => {
+  it('runs immediately on creation', () => {
     const count = signal(0);
     const spy = vi.fn();
 
@@ -15,7 +15,7 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it("re-runs when a dependency changes", () => {
+  it('re-runs when a dependency changes', () => {
     const count = signal(0);
     const spy = vi.fn();
 
@@ -31,7 +31,7 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(3);
   });
 
-  it("tracks multiple dependencies", () => {
+  it('tracks multiple dependencies', () => {
     const a = signal(0);
     const b = signal(0);
     const spy = vi.fn();
@@ -49,7 +49,7 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(3);
   });
 
-  it("does not re-run for peek() reads", () => {
+  it('does not re-run for peek() reads', () => {
     const count = signal(0);
     const other = signal(0);
     const spy = vi.fn();
@@ -67,7 +67,7 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
-  it("cleanup stops re-runs", () => {
+  it('cleanup stops re-runs', () => {
     const count = signal(0);
     const spy = vi.fn();
 
@@ -81,10 +81,10 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it("handles conditional dependencies correctly", () => {
+  it('handles conditional dependencies correctly', () => {
     const flag = signal(true);
-    const a = signal("a");
-    const b = signal("b");
+    const a = signal('a');
+    const b = signal('b');
     const spy = vi.fn();
 
     effect(() => {
@@ -96,23 +96,23 @@ describe("effect()", () => {
       spy();
     });
 
-    a.set("a2");
+    a.set('a2');
     expect(spy).toHaveBeenCalledTimes(2);
 
-    b.set("b2");
+    b.set('b2');
     expect(spy).toHaveBeenCalledTimes(2);
 
     flag.set(false);
     expect(spy).toHaveBeenCalledTimes(3);
 
-    b.set("b3");
+    b.set('b3');
     expect(spy).toHaveBeenCalledTimes(4);
 
-    a.set("a3");
+    a.set('a3');
     expect(spy).toHaveBeenCalledTimes(4);
   });
 
-  it("does not run after stop() is called", () => {
+  it('does not run after stop() is called', () => {
     const count = signal(0);
     const spy = vi.fn();
 
@@ -129,13 +129,13 @@ describe("effect()", () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it("detects and throws on infinite loops", () => {
+  it('detects and throws on infinite loops', () => {
     const count = signal(0);
     expect(() => {
       effect(() => {
         count();
         count.set(count.peek() + 1);
       });
-    }).toThrow("[astro-dx] Infinite loop detected in effect");
+    }).toThrow('[astro-dx] Infinite loop detected in effect');
   });
 });

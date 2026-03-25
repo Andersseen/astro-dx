@@ -1,10 +1,10 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 export class DxShow extends HTMLElement {
   private _cleanup: (() => void) | null = null;
 
   connectedCallback(): void {
-    const signalName = this.getAttribute("signal");
+    const signalName = this.getAttribute('signal');
     if (!signalName) {
       console.warn('[dx-show] missing "signal" attribute');
       return;
@@ -20,7 +20,7 @@ export class DxShow extends HTMLElement {
       return;
     }
 
-    this.hidden = !Boolean(sig());
+    this.hidden = !sig();
 
     this._cleanup = sig.subscribe((value) => {
       this.hidden = !value;
@@ -33,4 +33,4 @@ export class DxShow extends HTMLElement {
   }
 }
 
-customElements.define("dx-show", DxShow);
+customElements.define('dx-show', DxShow);

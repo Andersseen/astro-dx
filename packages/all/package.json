@@ -29,9 +29,7 @@
       "types": "./dist/dom.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup"
   },

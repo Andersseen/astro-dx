@@ -1,4 +1,4 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 type Item = Record<string, unknown>;
 
@@ -13,16 +13,16 @@ export class DxFor extends HTMLElement {
   private _keyedNodes = new Map<unknown, Element>();
 
   connectedCallback(): void {
-    const signalName = this.getAttribute("signal");
+    const signalName = this.getAttribute('signal');
     if (!signalName) {
       console.warn('[dx-for] missing "signal" attribute');
       return;
     }
 
-    this._keyField = this.getAttribute("key");
-    this._tpl = document.createElement("template");
+    this._keyField = this.getAttribute('key');
+    this._tpl = document.createElement('template');
     this._tpl.innerHTML = this.innerHTML;
-    this.innerHTML = "";
+    this.innerHTML = '';
 
     requestAnimationFrame(() => this._connect(signalName));
   }
@@ -35,7 +35,7 @@ export class DxFor extends HTMLElement {
     }
 
     this._cleanup = (sig as unknown as SubscribableItems).subscribe((items) =>
-      this._render(items ?? []),
+      this._render(items ?? [])
     );
   }
 
@@ -59,7 +59,7 @@ export class DxFor extends HTMLElement {
       fragment.appendChild(clone);
     }
 
-    this.innerHTML = "";
+    this.innerHTML = '';
     this.appendChild(fragment);
   }
 
@@ -112,9 +112,7 @@ export class DxFor extends HTMLElement {
   private _bindItem(el: Element, item: Item): void {
     applyBinding(el, item);
 
-    for (const child of Array.from(
-      el.querySelectorAll("[dx-text],[dx-attr],[dx-class]"),
-    )) {
+    for (const child of Array.from(el.querySelectorAll('[dx-text],[dx-attr],[dx-class]'))) {
       applyBinding(child, item);
     }
   }
@@ -127,26 +125,26 @@ export class DxFor extends HTMLElement {
 }
 
 function applyBinding(el: Element, item: Item): void {
-  const textField = el.getAttribute("dx-text");
+  const textField = el.getAttribute('dx-text');
   if (textField && textField in item) {
-    el.textContent = String(item[textField] ?? "");
+    el.textContent = String(item[textField] ?? '');
   }
 
-  const attrValue = el.getAttribute("dx-attr");
+  const attrValue = el.getAttribute('dx-attr');
   if (attrValue) {
-    const separatorIndex = attrValue.indexOf(":");
+    const separatorIndex = attrValue.indexOf(':');
     if (separatorIndex !== -1) {
       const attrName = attrValue.slice(0, separatorIndex);
       const field = attrValue.slice(separatorIndex + 1);
       if (field in item) {
-        el.setAttribute(attrName, String(item[field] ?? ""));
+        el.setAttribute(attrName, String(item[field] ?? ''));
       }
     }
   }
 
-  const clsValue = el.getAttribute("dx-class");
+  const clsValue = el.getAttribute('dx-class');
   if (clsValue) {
-    const separatorIndex = clsValue.indexOf(":");
+    const separatorIndex = clsValue.indexOf(':');
     if (separatorIndex !== -1) {
       const className = clsValue.slice(0, separatorIndex);
       const field = clsValue.slice(separatorIndex + 1);
@@ -157,4 +155,4 @@ function applyBinding(el: Element, item: Item): void {
   }
 }
 
-customElements.define("dx-for", DxFor);
+customElements.define('dx-for', DxFor);

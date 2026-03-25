@@ -1,4 +1,4 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 export class DxIf extends HTMLElement {
   private _cleanup: (() => void) | null = null;
@@ -6,15 +6,15 @@ export class DxIf extends HTMLElement {
   private _isMounted = false;
 
   connectedCallback(): void {
-    const signalName = this.getAttribute("signal");
+    const signalName = this.getAttribute('signal');
     if (!signalName) {
       console.warn('[dx-if] missing "signal" attribute');
       return;
     }
 
-    this._tpl = document.createElement("template");
+    this._tpl = document.createElement('template');
     this._tpl.innerHTML = this.innerHTML;
-    this.innerHTML = "";
+    this.innerHTML = '';
 
     this._connect(signalName);
   }
@@ -51,7 +51,7 @@ export class DxIf extends HTMLElement {
   }
 
   private _unmount(): void {
-    this.innerHTML = "";
+    this.innerHTML = '';
     this._isMounted = false;
   }
 
@@ -61,4 +61,4 @@ export class DxIf extends HTMLElement {
   }
 }
 
-customElements.define("dx-if", DxIf);
+customElements.define('dx-if', DxIf);

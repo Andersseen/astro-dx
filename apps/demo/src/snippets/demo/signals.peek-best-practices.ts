@@ -1,8 +1,8 @@
-import { signal, effect } from "@astro-dx/core";
+import { effect, signal } from '@astro-dx/core';
 
 const visible = signal(true);
 const total = signal(99);
-const title = signal("Cart");
+const title = signal('Cart');
 
 effect(() => {
   if (!visible()) return;

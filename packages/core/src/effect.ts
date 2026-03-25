@@ -1,8 +1,4 @@
-import {
-  setActiveObserver,
-  removeObserver,
-  type ReactiveNode,
-} from "./tracking.ts";
+import { type ReactiveNode, removeObserver, setActiveObserver } from './tracking.ts';
 
 const MAX_ITERATIONS = 100;
 
@@ -28,7 +24,7 @@ export function effect(fn: () => void): () => void {
 
   const run = () => {
     if (iterationCount >= MAX_ITERATIONS) {
-      throw new Error("[astro-dx] Infinite loop detected in effect");
+      throw new Error('[astro-dx] Infinite loop detected in effect');
     }
 
     iterationCount++;
@@ -39,7 +35,9 @@ export function effect(fn: () => void): () => void {
       fn();
     } finally {
       setActiveObserver(prevObserver);
-      setTimeout(() => (iterationCount = 0), 0);
+      setTimeout(() => {
+        iterationCount = 0;
+      }, 0);
     }
   };
 

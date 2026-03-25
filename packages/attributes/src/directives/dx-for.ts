@@ -1,4 +1,4 @@
-import { resolve } from "../registry.ts";
+import { resolve } from '../registry.ts';
 
 type Item = Record<string, unknown>;
 
@@ -7,10 +7,10 @@ type SubscribableItems = {
 };
 
 export function applyDxFor(template: Element): void {
-  const signalName = template.getAttribute("dx-for");
+  const signalName = template.getAttribute('dx-for');
   if (!signalName) return;
 
-  const keyField = template.getAttribute("dx-key");
+  const keyField = template.getAttribute('dx-key');
 
   const sig = resolve(signalName);
   if (!sig) {
@@ -26,8 +26,8 @@ export function applyDxFor(template: Element): void {
   parent.removeChild(template);
 
   const cleanTemplate = template.cloneNode(true) as Element;
-  cleanTemplate.removeAttribute("dx-for");
-  cleanTemplate.removeAttribute("dx-key");
+  cleanTemplate.removeAttribute('dx-for');
+  cleanTemplate.removeAttribute('dx-key');
 
   const keyedNodes = new Map<unknown, Element>();
   let renderedNodes: Element[] = [];
@@ -49,7 +49,7 @@ function reconcileSimple(
   anchor: Comment,
   template: Element,
   items: Item[],
-  previous: Element[],
+  previous: Element[]
 ): void {
   for (const node of previous) {
     node.parentNode?.removeChild(node);
@@ -71,7 +71,7 @@ function reconcileKeyed(
   template: Element,
   items: Item[],
   keyField: string,
-  keyedNodes: Map<unknown, Element>,
+  keyedNodes: Map<unknown, Element>
 ): void {
   const nextKeys = new Set(items.map((item) => item[keyField]));
 
@@ -120,34 +120,32 @@ function getRenderedNodes(anchor: Comment): Element[] {
 function bindItem(el: Element, item: Item): void {
   applyBinding(el, item);
 
-  for (const child of Array.from(
-    el.querySelectorAll("[dx-text],[dx-attr],[dx-class]"),
-  )) {
+  for (const child of Array.from(el.querySelectorAll('[dx-text],[dx-attr],[dx-class]'))) {
     applyBinding(child, item);
   }
 }
 
 function applyBinding(el: Element, item: Item): void {
-  const textField = el.getAttribute("dx-text");
+  const textField = el.getAttribute('dx-text');
   if (textField && textField in item) {
-    el.textContent = String(item[textField] ?? "");
+    el.textContent = String(item[textField] ?? '');
   }
 
-  const attrValue = el.getAttribute("dx-attr");
+  const attrValue = el.getAttribute('dx-attr');
   if (attrValue) {
-    const separatorIndex = attrValue.indexOf(":");
+    const separatorIndex = attrValue.indexOf(':');
     if (separatorIndex !== -1) {
       const attrName = attrValue.slice(0, separatorIndex);
       const field = attrValue.slice(separatorIndex + 1);
       if (field in item) {
-        el.setAttribute(attrName, String(item[field] ?? ""));
+        el.setAttribute(attrName, String(item[field] ?? ''));
       }
     }
   }
 
-  const clsValue = el.getAttribute("dx-class");
+  const clsValue = el.getAttribute('dx-class');
   if (clsValue) {
-    const separatorIndex = clsValue.indexOf(":");
+    const separatorIndex = clsValue.indexOf(':');
     if (separatorIndex !== -1) {
       const className = clsValue.slice(0, separatorIndex);
       const field = clsValue.slice(separatorIndex + 1);

@@ -18,7 +18,7 @@ const activeItem =
   navItems.find((item) =>
     item.href === '/'
       ? currentPath === '/'
-      : currentPath === item.href || currentPath.startsWith(`${item.href}/`),
+      : currentPath === item.href || currentPath.startsWith(`${item.href}/`)
   )?.id ?? 'home';
 ---
 <header class="sticky top-0 z-50 border-b border-theme backdrop-blur-xl">

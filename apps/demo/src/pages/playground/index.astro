@@ -1,18 +1,43 @@
 ---
 import Playground from '../../components/playground/Playground.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { signalsPlayground } from '../../snippets/playground/signals.ts';
-import { domPlayground } from '../../snippets/playground/dom.ts';
-import { servicesPlayground } from '../../snippets/playground/services.ts';
 import { attributesPlayground } from '../../snippets/playground/attributes.ts';
+import { domPlayground } from '../../snippets/playground/dom.ts';
 import { eventsPlayground } from '../../snippets/playground/events.ts';
+import { servicesPlayground } from '../../snippets/playground/services.ts';
+import { signalsPlayground } from '../../snippets/playground/signals.ts';
 
 const playgrounds = {
-  signals:    { title: 'Signals',    desc: 'signal(), computed(), effect()', badge: '@astro-dx/core',       files: signalsPlayground },
-  services:   { title: 'Services',   desc: 'Singleton state across islands',  badge: '@astro-dx/core',       files: servicesPlayground },
-  dom:        { title: 'DOM',        desc: 'getElement(), text(), cls()',      badge: '@astro-dx/dom',        files: domPlayground },
-  events:     { title: 'Events',     desc: 'onClick, onInput, onKey, onHover', badge: '@astro-dx/events',     files: eventsPlayground },
-  attributes: { title: 'Directives', desc: 'dx-if, dx-show, dx-for',          badge: '@astro-dx/attributes', files: attributesPlayground },
+  signals: {
+    title: 'Signals',
+    desc: 'signal(), computed(), effect()',
+    badge: '@astro-dx/core',
+    files: signalsPlayground,
+  },
+  services: {
+    title: 'Services',
+    desc: 'Singleton state across islands',
+    badge: '@astro-dx/core',
+    files: servicesPlayground,
+  },
+  dom: {
+    title: 'DOM',
+    desc: 'getElement(), text(), cls()',
+    badge: '@astro-dx/dom',
+    files: domPlayground,
+  },
+  events: {
+    title: 'Events',
+    desc: 'onClick, onInput, onKey, onHover',
+    badge: '@astro-dx/events',
+    files: eventsPlayground,
+  },
+  attributes: {
+    title: 'Directives',
+    desc: 'dx-if, dx-show, dx-for',
+    badge: '@astro-dx/attributes',
+    files: attributesPlayground,
+  },
 };
 
 const entries = Object.entries(playgrounds);

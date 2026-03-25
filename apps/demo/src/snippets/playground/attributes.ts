@@ -1,4 +1,4 @@
-import type { PlaygroundFiles } from "../../lib/playground/types.ts";
+import type { PlaygroundFiles } from '../../lib/playground/types.ts';
 
 export const attributesPlayground: PlaygroundFiles = {
   js: `\

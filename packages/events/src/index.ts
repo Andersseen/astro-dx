@@ -8,5 +8,5 @@ export {
   onFocus,
   onKey,
   onResize,
-} from "./events.ts";
-export type { Target } from "./events.ts";
+} from './events.ts';
+export type { Target } from './events.ts';

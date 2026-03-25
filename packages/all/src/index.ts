@@ -12,7 +12,7 @@ export {
   onKey,
   onFocus,
   register as registerAttributes,
-  bootstrap
+  bootstrap,
 } from '@astro-dx/dom';
 
 export {

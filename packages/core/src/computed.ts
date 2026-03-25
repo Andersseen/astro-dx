@@ -1,10 +1,10 @@
 import {
-  trackDependency,
-  setActiveObserver,
-  removeObserver,
-  untracked, // Importamos untracked
   type ReactiveNode,
-} from "./tracking.ts";
+  removeObserver,
+  setActiveObserver,
+  trackDependency,
+  untracked, // Importamos untracked
+} from './tracking.ts';
 
 export interface Computed<T> {
   (): T;
@@ -112,8 +112,8 @@ export function computed<T>(fn: () => T): Computed<T> {
     return () => removeObserver(node, observer);
   };
 
-  Object.defineProperty(read, "version", { get: () => version });
-  Object.defineProperty(read, "observers", { value: observers });
+  Object.defineProperty(read, 'version', { get: () => version });
+  Object.defineProperty(read, 'observers', { value: observers });
 
   return read as unknown as Computed<T>;
 }
