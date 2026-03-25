@@ -47,6 +47,16 @@ function installCommand(pm: string, packages: string[]): string {
 }
 
 async function init(): Promise<void> {
+  console.log("");
+  console.log(
+    kleur.bold().cyan("  astro-dx") +
+      kleur.gray(" - Angular-inspired DX for Astro"),
+  );
+  console.log(
+    kleur.gray("  Community library, not affiliated with the Astro core team."),
+  );
+  console.log("");
+
   const rl = readline.createInterface({ input, output });
   const selected: PackageKey[] = ["core"];
 
@@ -71,23 +81,40 @@ async function init(): Promise<void> {
   const pm = await detectPackageManager();
   const cmd = installCommand(pm, packagesToInstall);
 
+  console.log("");
+  console.log(kleur.gray(`  Running: ${cmd}`));
+  console.log("");
+
   try {
     execSync(cmd, { stdio: "inherit" });
-
+    console.log("");
+    console.log(kleur.green("  Done!") + kleur.gray(" astro-dx installed."));
+    console.log("");
+    console.log(kleur.gray("  Quick start:"));
+    console.log(
+      kleur.white("  import { signal, computed } from '@astro-dx/core'"),
+    );
     if (selected.includes("events")) {
-   
+      console.log(
         kleur.white("  import { on, onHover } from '@astro-dx/events'"),
       );
     }
     if (selected.includes("attributes")) {
-  
+      console.log(
+        kleur.white(
+          "  import { register, bootstrap } from '@astro-dx/attributes'",
+        ),
+      );
     }
     if (selected.includes("elements")) {
-
+      console.log(
+        kleur.white("  import { register } from '@astro-dx/elements'"),
+      );
     }
-
+    console.log("");
   } catch {
-   
+    console.error(kleur.red("  Install failed. Run manually:"));
+    console.error(kleur.white(`  ${cmd}`));
     process.exit(1);
   }
 }
