@@ -3,7 +3,7 @@ export interface ReactiveNode {
   observers: Set<ReactiveNode>;
   dependencies: Set<ReactiveNode>;
   notify(): void;
-  /** Hook opcional para limpiar recursos cuando el nodo se queda sin observadores */
+
   onBecomeUnobserved?: () => void;
 }
 
@@ -37,9 +37,6 @@ export function trackDependency(producer: ReactiveNode): void {
   }
 }
 
-/** * Utilidad vital para evitar fugas de memoria.
- * Elimina un observador de un productor y avisa al productor si se queda "huérfano".
- */
 export function removeObserver(producer: ReactiveNode, observer: ReactiveNode): void {
   producer.observers.delete(observer);
   if (producer.observers.size === 0 && producer.onBecomeUnobserved) {

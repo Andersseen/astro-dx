@@ -138,7 +138,6 @@ describe('computed()', () => {
     expect(doubled()).toBe(0);
     expect(spy).toHaveBeenCalledTimes(1);
 
-    // Read again - should NOT recompute
     expect(doubled()).toBe(0);
     expect(spy).toHaveBeenCalledTimes(1);
 
@@ -152,23 +151,21 @@ describe('computed()', () => {
     const spy = vi.fn(() => count() * 2);
     const doubled = computed(spy);
 
-    // Initial run (not observed)
     expect(doubled()).toBe(0);
     expect(spy).toHaveBeenCalledTimes(1);
 
-    // Now observe it with an effect
     const stop = effect(() => {
       doubled();
     });
-    expect(spy).toHaveBeenCalledTimes(1); // Already computed
+    expect(spy).toHaveBeenCalledTimes(1);
 
     count.set(1);
     expect(spy).toHaveBeenCalledTimes(2);
 
-    stop(); // Unobserved - should trigger onBecomeUnobserved
+    stop();
 
     count.set(2);
-    // As unobserved, it shouldn't recompute until read again
+
     expect(spy).toHaveBeenCalledTimes(2);
 
     expect(doubled()).toBe(4);

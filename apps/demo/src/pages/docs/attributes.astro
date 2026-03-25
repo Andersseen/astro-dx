@@ -22,10 +22,10 @@ import { register, bootstrap } from '@astro-dx/attributes';
 const isOpen = signal(false);
 const items  = signal<{ name: string }[]>([]);
 
-// Register signals by name — names must match dx-* attribute values
+
 register({ isOpen, items });
 
-// Walk the DOM, apply bindings
+
 bootstrap();
       `} />
     </div>

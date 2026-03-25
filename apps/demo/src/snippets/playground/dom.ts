@@ -2,7 +2,7 @@ import type { PlaygroundFiles } from '../../lib/playground/types.ts';
 
 export const domPlayground: PlaygroundFiles = {
   js: `\
-// ── With @astro-dx/dom ─────────────────────────────────────────────────────────
+
 import { signal, computed } from '@astro-dx/core';
 import { text} from '@astro-dx/dom';
 import { onInput} from '@astro-dx/events';
@@ -14,13 +14,13 @@ const results = computed(() =>
     .filter(r => r.toLowerCase().includes(query().toLowerCase()))
 )
 
-// text — reactive textContent
+
 text('#query-display', query)
 
-// onInput — value extraction built-in
+
 onInput('#search', val => query.set(val))
 
-// Subscribe to update the list
+
 results.subscribe(items => {
   document.querySelector('#results').innerHTML = items
     .map(r => \`<li style="padding:.25rem 0;border-bottom:1px solid #333;
@@ -28,7 +28,7 @@ results.subscribe(items => {
     .join('')
 })
 
-// Style binding via subscribe
+
 const opSlider = document.querySelector('#opacity-slider')
 const opTarget = document.querySelector('#opacity-target')
 
@@ -41,10 +41,10 @@ opacity.subscribe(v => {
   if (label) label.textContent = String(v)
 })
 
-// ── What this replaces ────────────────────────────────────────────────────────
-// const input = document.querySelector('#search')
-// input.addEventListener('input', e => ...)
-// query.subscribe(v => display.textContent = v)
+
+
+
+
 `,
 
   html: `\

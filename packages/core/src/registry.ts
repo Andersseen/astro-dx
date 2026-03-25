@@ -1,18 +1,9 @@
-// --- TIPOS Y ESTADO GLOBAL ---
+export type ServiceConstructor<T = unknown> = new (...args: unknown[]) => T;
 
-// Definimos el tipo para cualquier clase instanciable
-// biome-ignore lint/suspicious/noExplicitAny: DI registry requires any for constructor generic
-export type ServiceConstructor<T = any> = new (...args: any[]) => T;
-
-// Conjunto para guardar las clases que se comparten entre registros
-// biome-ignore lint/suspicious/noExplicitAny: generic service constructor requires any for flexibility
-const SHARED_SERVICES = new Set<ServiceConstructor<any>>();
-
-// --- CLASE PRINCIPAL ---
+const SHARED_SERVICES = new Set<ServiceConstructor<unknown>>();
 
 export class Registry {
-  // biome-ignore lint/suspicious/noExplicitAny: internal instances map requires any for heterogeneous types
-  private instances: Map<ServiceConstructor<any>, any>;
+  private instances: Map<ServiceConstructor<unknown>, unknown>;
   private parent?: Registry;
 
   constructor(parent?: Registry) {
@@ -21,8 +12,7 @@ export class Registry {
   }
 
   register(
-    // biome-ignore lint/suspicious/noExplicitAny: constructor generic
-    services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+    services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>,
     options: { shared?: boolean } = {}
   ): void {
     const list = Array.isArray(services) ? services : [services];
@@ -37,18 +27,16 @@ export class Registry {
   }
 
   inject<T>(Service: ServiceConstructor<T>): T {
-    let instance = this.instances.get(Service);
+    const instance = this.instances.get(Service) as T | undefined;
     if (instance) return instance;
 
-    // Fallback al padre solo si está explícitamente compartido
     if (this.parent && SHARED_SERVICES.has(Service)) {
       return this.parent.inject(Service);
     }
 
-    // Aislado por defecto: Crea uno nuevo aquí
-    instance = new Service();
-    this.instances.set(Service, instance);
-    return instance;
+    const newInstance = new Service();
+    this.instances.set(Service as ServiceConstructor<unknown>, newInstance as unknown);
+    return newInstance;
   }
 
   clear(): void {
@@ -56,23 +44,17 @@ export class Registry {
   }
 }
 
-// --- EXPORTACIONES GLOBALES (Lo que pedía index.ts) ---
-
-// 1. Instancia global por defecto
 export const GlobalRegistry = new Registry();
 
-// 2. Funciones globales que usan el GlobalRegistry por debajo
 export function register(
-  // biome-ignore lint/suspicious/noExplicitAny: constructor generic
-  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+  services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>,
   options?: { shared?: boolean }
 ): void {
   GlobalRegistry.register(services, options);
 }
 
 export function registerShared(
-  // biome-ignore lint/suspicious/noExplicitAny: constructor generic
-  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>
+  services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>
 ): void {
   GlobalRegistry.register(services, { shared: true });
 }
@@ -83,10 +65,9 @@ export function inject<T>(Service: ServiceConstructor<T>): T {
 
 export function clearRegistry(): void {
   GlobalRegistry.clear();
-  SHARED_SERVICES.clear(); // Limpiamos también el Set global
+  SHARED_SERVICES.clear();
 }
 
-// 3. Creador de registros locales (usando el global como padre por defecto)
 export function createLocalRegistry(parent: Registry = GlobalRegistry): Registry {
   return new Registry(parent);
 }

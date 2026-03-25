@@ -2,7 +2,7 @@ import type { PlaygroundFiles } from '../../lib/playground/types.ts';
 
 export const eventsPlayground: PlaygroundFiles = {
   js: `\
-// ── With @astro-dx/events ─────────────────────────────────────────────────────
+
 import { signal, computed } from '@astro-dx/core';
 import { onClick,onInput,onKey,onHover,onResize} from '@astro-dx/events';
 import { text} from '@astro-dx/dom';
@@ -12,15 +12,15 @@ const inputValue = signal('')
 const isHovered  = signal(false)
 const boxWidth   = signal(0)
 
-// onClick — typed, clean
+
 onClick('#click-target', () => clickCount.update(v => v + 1))
 text('#click-count', clickCount)
 
-// onInput — value already extracted
+
 onInput('#text-input', val => inputValue.set(val))
 text('#input-display', inputValue)
 
-// onKey — fires only for the specified key
+
 onKey('#text-input', 'Enter', () => {
   document.querySelector('#enter-msg').textContent =
     \`Submitted: "\${inputValue()}"\`
@@ -28,7 +28,7 @@ onKey('#text-input', 'Enter', () => {
   document.querySelector('#text-input').value = ''
 })
 
-// onHover — enter and leave together
+
 onHover('#hover-target', {
   enter: () => isHovered.set(true),
   leave: () => isHovered.set(false),
@@ -41,18 +41,18 @@ isHovered.subscribe(v => {
     v ? 'hovering ✓' : 'not hovering'
 })
 
-// onResize — ResizeObserver made easy
+
 onResize('#resize-target', entry => {
   boxWidth.set(Math.round(entry.contentRect.width))
 })
 text('#box-width', computed(() => boxWidth() + 'px'))
 
-// ── What this replaces ────────────────────────────────────────────────────────
-// btn.addEventListener('click', e => ...)
-// input.addEventListener('input', e => fn(e.target.value))  ← manual extraction
-// el.addEventListener('mouseenter', fn)                      ← split into two calls
-// el.addEventListener('mouseleave', fn)
-// new ResizeObserver(([e]) => fn(e)).observe(el)
+
+
+
+
+
+
 `,
 
   html: `\

@@ -1,4 +1,3 @@
-// apps/demo/src/services/counter.service.ts
 import { computed, signal } from '@astro-dx/core';
 
 export class CounterServiceClass {

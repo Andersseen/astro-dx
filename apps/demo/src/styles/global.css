@@ -1,30 +1,12 @@
-/* ============================================
-   IMPORTS — must be at top level, never nested
-   ============================================ */
-
-/* 7. Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap");
 
-/* 6. Tailwind 4 */
 @import "tailwindcss";
-/* 1. Andersseen web components base styles */
+
 @import "@andersseen/web-components/dist/web-components/web-components.css";
 
-/* 2. Style theme */
-/* Not available in @andersseen/web-components@0.0.2 exports */
-
-/* 3. Color palette */
-/* Not available in @andersseen/web-components@0.0.2 exports */
-
-/* 4. Motion */
 @import "@andersseen/motion/style.css";
 
-/* 5. Layout system */
 @import "@andersseen/layout/dist/layout.css";
-
-/* ============================================
-   BASE RESETS
-   ============================================ */
 
 *,
 *::before,
@@ -78,14 +60,9 @@ a {
   color: inherit;
 }
 
-/* Prevent flash of unstyled custom elements */
 :not(:defined) {
   visibility: hidden;
 }
-
-/* ============================================
-   DESIGN TOKENS — override defaults
-   ============================================ */
 
 :root {
   --background: 222 36% 6%;
@@ -105,10 +82,6 @@ a {
   --font-sans: "Sora", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
-
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
 
 .container {
   width: 100%;
@@ -133,7 +106,6 @@ a {
   display: none;
 }
 
-/* Code blocks */
 .code-block {
   font-family: "JetBrains Mono", monospace;
   font-size: 0.85rem;
@@ -144,7 +116,6 @@ a {
   overflow-x: auto;
 }
 
-/* Section spacing */
 .section {
   padding-block: 5rem;
 }

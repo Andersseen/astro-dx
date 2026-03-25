@@ -3,7 +3,7 @@ import {
   removeObserver,
   setActiveObserver,
   trackDependency,
-  untracked, // Importamos untracked
+  untracked,
 } from './tracking.ts';
 
 export interface Computed<T> {
@@ -101,13 +101,13 @@ export function computed<T>(fn: () => T): Computed<T> {
         const newValue = read();
         if (!Object.is(lastValue, newValue)) {
           lastValue = newValue;
-          untracked(() => fn(newValue)); // Seguro
+          untracked(() => fn(newValue));
         }
       },
     };
     observers.add(observer);
     lastValue = read();
-    untracked(() => fn(lastValue)); // Seguro
+    untracked(() => fn(lastValue));
 
     return () => removeObserver(node, observer);
   };

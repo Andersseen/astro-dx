@@ -16,7 +16,7 @@ Brings structured patterns (Signals, Computed, Services, Directives) to vanilla 
 ## Quick-start example
 
 \`\`\`ts
-// store.ts — shared state
+
 import { signal, computed } from '@astro-dx/core';
 
 export const count = signal(0);
@@ -24,7 +24,7 @@ export const doubled = computed(() => count() * 2);
 \`\`\`
 
 \`\`\`ts
-// counter.ts — island script
+
 import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
 import { getElement, destroyAll } from '@astro-dx/dom';
 import { count, doubled } from './store';

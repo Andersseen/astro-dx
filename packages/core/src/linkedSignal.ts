@@ -1,10 +1,5 @@
 import { computed } from './computed.ts';
-import {
-  type ReactiveNode,
-  removeObserver,
-  trackDependency,
-  untracked, // Importamos untracked
-} from './tracking.ts';
+import { type ReactiveNode, removeObserver, trackDependency, untracked } from './tracking.ts';
 
 export interface LinkedSignal<T> {
   (): T;
@@ -59,8 +54,8 @@ export function linkedSignal<S, T>(
 
   const sync = () => {
     const currentSource = sourceComp();
-    // biome-ignore lint/suspicious/noExplicitAny: internal version property access
-    const sv = (sourceComp as any).version;
+
+    const sv = (sourceComp as { version?: number }).version ?? 0;
 
     if (sv !== lastSourceVersion) {
       state = computation(currentSource, state);
@@ -102,13 +97,13 @@ export function linkedSignal<S, T>(
         const newValue = read();
         if (!equal(lastValue, newValue)) {
           lastValue = newValue;
-          untracked(() => fn(newValue)); // Seguro
+          untracked(() => fn(newValue));
         }
       },
     };
     observers.add(observer);
     lastValue = read();
-    untracked(() => fn(lastValue)); // Seguro
+    untracked(() => fn(lastValue));
 
     return () => removeObserver(node, observer);
   };

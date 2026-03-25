@@ -116,7 +116,7 @@ import { servicesPlayground } from '../../snippets/playground/services.ts';
 
     const cart = inject(ShopServiceClass);
 
-    // Island A — product buttons
+    
     const productBtns = getElements<HTMLButtonElement>('.product-btn');
     for (const btn of productBtns) {
       onClick(btn.el, () => {
@@ -129,7 +129,7 @@ import { servicesPlayground } from '../../snippets/playground/services.ts';
       });
     }
 
-    // Island B — reactive summary
+    
     getElement('#cart-total').text(cart.cartTotal);
 
     const cartList = getElement<HTMLUListElement>('#cart-list');

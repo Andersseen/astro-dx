@@ -28,7 +28,7 @@ export function effect(fn: () => void): () => void {
     }
 
     iterationCount++;
-    cleanupDeps(); // Cleanup before re-running
+    cleanupDeps();
 
     const prevObserver = setActiveObserver(node);
     try {
@@ -43,5 +43,5 @@ export function effect(fn: () => void): () => void {
 
   run();
 
-  return () => cleanupDeps(); // Manual teardown
+  return () => cleanupDeps();
 }

@@ -20,10 +20,10 @@ import { signal } from '@astro-dx/core';
 
 const count = signal(0);
 
-count();           // read → 0
-count.set(5);      // write
-count.update(v => v + 1);  // update with function
-count.subscribe(v => console.log(v)); // subscribe
+count();           
+count.set(5);      
+count.update(v => v + 1);  
+count.subscribe(v => console.log(v)); 
       `} />
     </div>
 
@@ -35,9 +35,9 @@ import { signal, computed } from '@astro-dx/core';
 const count = signal(0);
 const double = computed(() => count() * 2);
 
-double();  // → 0
+double();  
 count.set(3);
-double();  // → 6
+double();  
       `} />
     </div>
 
@@ -50,7 +50,7 @@ const count = signal(0);
 const stop = effect(() => {
 });
 
-// stop() to clean up
+
       `} />
     </div>
 
@@ -64,14 +64,14 @@ import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
 import { getElement, destroyAll } from '@astro-dx/dom';
 
 onPageLoad(() => {
-  // runs on every navigation AND on first load
+  
   const btn = getElement('#btn');
-  btn.on('click', () => { /* ... */ });
+  btn.on('click', () => {  });
 });
 
 onBeforeSwap(() => {
-  // runs before DOM is replaced
-  destroyAll(); // clean up all getElement refs
+  
+  destroyAll(); 
 });
       `} />
     </div>

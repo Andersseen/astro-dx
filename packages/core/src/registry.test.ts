@@ -67,7 +67,7 @@ describe('Scoped DI (Local Registry)', () => {
     class SharedService {
       name = 'shared';
     }
-    register(SharedService, { shared: true }); // Explicitly mark as shared
+    register(SharedService, { shared: true });
 
     const local = createLocalRegistry();
     const instance = local.inject(SharedService);

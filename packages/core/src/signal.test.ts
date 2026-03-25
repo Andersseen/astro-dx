@@ -76,13 +76,13 @@ describe('signal', () => {
     const spy = vi.fn();
 
     s1.subscribe(() => {
-      s2(); // This should not register a dependency anywhere
+      s2();
       spy();
     });
 
     expect(spy).toHaveBeenCalledTimes(1);
     s2.set(1);
-    // If s2 was tracked, it would trigger something, but here it shouldn't
+
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });
