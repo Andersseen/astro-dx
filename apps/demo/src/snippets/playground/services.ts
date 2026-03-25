@@ -1,97 +1,59 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const servicesPlayground: PlaygroundFiles = {
   js: `\
-// ── With astro-dx services ────────────────────────────────────────────────────
+import { signal, GlobalRegistry, createLocalRegistry } from '@astro-dx/core'
+import { text } from '@astro-dx/dom'
+import { onClick } from '@astro-dx/events'
 
-// 1. Define the service — state + logic co-located
-const cartItems = signal([])
-const total     = computed(() => cartItems().length)
-const isEmpty   = computed(() => cartItems().length === 0)
+// 1. Definimos un Servicio
+class CounterService {
+  count;
+  
+  constructor() {
+    this.count = signal(0);
+  }
 
-function addItem(name) {
-  cartItems.update(p => [...p, { id: Date.now(), name }])
+  increment() {
+    this.count.update(n => n + 1);
+  }
 }
-function removeItem(id) {
-  cartItems.update(p => p.filter(i => i.id !== id))
-}
-function clearCart() {
-  cartItems.set([])
-}
 
-// Make remove available globally for inline handlers
-window.removeItem = removeItem
+// 2. Registro Global
+const globalCounter = GlobalRegistry.inject(CounterService)
 
-// 2. Island A — products
-onClick('#add-kb',  () => addItem('Keyboard'))
-onClick('#add-ms',  () => addItem('Mouse'))
-onClick('#add-mon', () => addItem('Monitor'))
-onClick('#add-hdp', () => addItem('Headphones'))
+// 3. Registro Local (Aislado / Island)
+const localReg = createLocalRegistry()
+const localCounter = localReg.inject(CounterService)
 
-// 3. Island B — cart display
-text('#total', total)
+// --- Vincular UI Global ---
+// Vinculamos la UI usando las utilidades reactivas de Astro-DX
+text('#global-count', globalCounter.count)
+onClick('#global-inc', () => globalCounter.increment())
 
-isEmpty.subscribe(empty => {
-  document.querySelector('#empty-msg').style.display = empty ? 'block' : 'none'
-  document.querySelector('#list-section').style.display = empty ? 'none' : 'block'
-})
-
-cartItems.subscribe(items => {
-  document.querySelector('#list').innerHTML = items
-    .map(i => \`
-      <li style="display:flex;align-items:center;justify-content:space-between;
-                 padding:.25rem 0;border-bottom:1px solid #333;font-size:.875rem">
-        <span>\${i.name}</span>
-        <button onclick="removeItem(\${i.id})"
-          style="font-size:.75rem;padding:.125rem .375rem;opacity:.5">
-          ×
-        </button>
-      </li>\`)
-    .join('')
-})
-
-onClick('#clear', () => clearCart())
-
-// ── What this replaces ────────────────────────────────────────────────────────
-// Scattered atoms in stores/, manual querySelector everywhere
-// No encapsulation, no clear ownership of state
+// --- Vincular UI Local ---
+// Misma lógica, pero esta instancia es totalmente independiente
+text('#local-count', localCounter.count)
+onClick('#local-inc', () => localCounter.increment())
 `,
 
   html: `\
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;min-height:220px">
-
-  <div style="padding:.75rem;border-radius:8px;border:1px solid #3f3f46">
-    <p style="font-size:.7rem;font-weight:600;opacity:.4;
-               text-transform:uppercase;letter-spacing:.05em;margin:0 0 .5rem">
-      Island A — Products
-    </p>
-    <div style="display:flex;flex-direction:column;gap:.375rem">
-      <button id="add-kb">+ Keyboard</button>
-      <button id="add-ms">+ Mouse</button>
-      <button id="add-mon">+ Monitor</button>
-      <button id="add-hdp">+ Headphones</button>
-    </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+  
+  <div style="padding:1.25rem;border-radius:12px;background:hsl(var(--muted));border:1px solid hsl(var(--border))">
+    <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;opacity:0.5;margin-bottom:0.75rem">Global Scope</div>
+    <div id="global-count" style="font-size:3rem;font-weight:800;margin-bottom:1rem">0</div>
+    <and-button id="global-inc" variant="primary" size="sm" style="width:100%">Global +1</and-button>
   </div>
 
-  <div style="padding:.75rem;border-radius:8px;border:1px solid #3f3f46">
-    <p style="font-size:.7rem;font-weight:600;opacity:.4;
-               text-transform:uppercase;letter-spacing:.05em;margin:0 0 .5rem">
-      Island B — Cart (<span id="total">0</span> items)
-    </p>
-
-    <p id="empty-msg"
-      style="font-size:.8rem;opacity:.35;font-style:italic;margin:0">
-      Cart is empty
-    </p>
-
-    <div id="list-section" style="display:none">
-      <ul id="list" style="list-style:none;padding:0;margin:0 0 .5rem"></ul>
-      <button id="clear"
-        style="width:100%;font-size:.75rem;opacity:.5">
-        Clear all
-      </button>
-    </div>
+  <div style="padding:1.25rem;border-radius:12px;background:hsl(var(--card));border:1px solid hsl(var(--primary)/0.2)">
+    <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:hsl(var(--primary));margin-bottom:0.75rem">Local Scope (Island)</div>
+    <div id="local-count" style="font-size:3rem;font-weight:800;margin-bottom:1rem">0</div>
+    <and-button id="local-inc" variant="outline" size="sm" style="width:100%">Local +1</and-button>
   </div>
 
-</div>`,
+</div>
+<p style="font-size:0.8rem;opacity:0.5;margin-top:1rem;text-align:center">
+  Notice how incrementing the local counter doesn't affect the global one.
+</p>`,
 };

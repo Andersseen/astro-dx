@@ -1,56 +1,88 @@
-/**
- * A service class constructor with no required arguments.
- * All services registered via register() must follow this contract.
- */
-type ServiceConstructor<T extends object> = new () => T;
+// --- TIPOS Y ESTADO GLOBAL ---
 
-/**
- * Internal registry - maps constructor to singleton instance.
- * Module-level singleton guaranteed by ESM.
- */
-const registry = new Map<ServiceConstructor<object>, object>();
+// Definimos el tipo para cualquier clase instanciable
+export type ServiceConstructor<T = any> = new (...args: any[]) => T;
 
-/**
- * Registers one or more service classes as singletons.
- * Each class is instantiated once and stored in the registry.
- * Subsequent calls to register() with the same class are ignored.
- */
-export function register<T extends object>(
-  services: ServiceConstructor<T> | Array<ServiceConstructor<T>>,
+// Conjunto para guardar las clases que se comparten entre registros
+const SHARED_SERVICES = new Set<ServiceConstructor<any>>();
+
+// --- CLASE PRINCIPAL ---
+
+export class Registry {
+  private instances: Map<ServiceConstructor<any>, any>;
+  private parent?: Registry;
+
+  constructor(parent?: Registry) {
+    this.instances = new Map();
+    this.parent = parent;
+  }
+
+  register(
+    services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+    options: { shared?: boolean } = {},
+  ): void {
+    const list = Array.isArray(services) ? services : [services];
+    for (const Service of list) {
+      if (options.shared) {
+        SHARED_SERVICES.add(Service);
+      }
+      if (!this.instances.has(Service)) {
+        this.instances.set(Service, new Service());
+      }
+    }
+  }
+
+  inject<T>(Service: ServiceConstructor<T>): T {
+    let instance = this.instances.get(Service);
+    if (instance) return instance;
+
+    // Fallback al padre solo si está explícitamente compartido
+    if (this.parent && SHARED_SERVICES.has(Service)) {
+      return this.parent.inject(Service);
+    }
+
+    // Aislado por defecto: Crea uno nuevo aquí
+    instance = new Service();
+    this.instances.set(Service, instance);
+    return instance;
+  }
+
+  clear(): void {
+    this.instances.clear();
+  }
+}
+
+// --- EXPORTACIONES GLOBALES (Lo que pedía index.ts) ---
+
+// 1. Instancia global por defecto
+export const GlobalRegistry = new Registry();
+
+// 2. Funciones globales que usan el GlobalRegistry por debajo
+export function register(
+  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+  options?: { shared?: boolean },
 ): void {
-  const list = Array.isArray(services) ? services : [services];
-
-  for (const Service of list) {
-    if (registry.has(Service as ServiceConstructor<object>)) continue;
-    registry.set(Service as ServiceConstructor<object>, new Service());
-  }
+  GlobalRegistry.register(services, options);
 }
 
-/**
- * Retrieves the singleton instance of a registered service.
- * If missing, inject() lazy-registers it and logs a warning.
- */
-export function inject<T extends object>(Service: ServiceConstructor<T>): T {
-  const existing = registry.get(Service as ServiceConstructor<object>);
-
-  if (existing) {
-    return existing as T;
-  }
-
-  console.warn(
-    `[astro-dx] inject(${Service.name}) - service was not pre-registered. ` +
-      "Add it to register([...]) in your bootstrap file for better control.",
-  );
-
-  const instance = new Service();
-  registry.set(Service as ServiceConstructor<object>, instance);
-  return instance;
+export function registerShared(
+  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+): void {
+  GlobalRegistry.register(services, { shared: true });
 }
 
-/**
- * Removes all registered services from the registry.
- * Intended for tests to ensure isolation between cases.
- */
+export function inject<T>(Service: ServiceConstructor<T>): T {
+  return GlobalRegistry.inject(Service);
+}
+
 export function clearRegistry(): void {
-  registry.clear();
+  GlobalRegistry.clear();
+  SHARED_SERVICES.clear(); // Limpiamos también el Set global
+}
+
+// 3. Creador de registros locales (usando el global como padre por defecto)
+export function createLocalRegistry(
+  parent: Registry = GlobalRegistry,
+): Registry {
+  return new Registry(parent);
 }

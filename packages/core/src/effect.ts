@@ -1,46 +1,49 @@
-import { startTracking, stopTracking } from "./tracking.ts";
-import type { AtomLike } from "./tracking.ts";
+import {
+  setActiveObserver,
+  removeObserver,
+  type ReactiveNode,
+} from "./tracking.ts";
+
+const MAX_ITERATIONS = 100;
 
 export function effect(fn: () => void): () => void {
-  let subscriptions: Array<() => void> = [];
-  let stopped = false;
+  const dependencies = new Set<ReactiveNode>();
+  let iterationCount = 0;
 
-  const run = (): void => {
-    if (stopped) return;
+  const node: ReactiveNode = {
+    version: 0,
+    observers: new Set(),
+    dependencies,
+    notify: () => {
+      run();
+    },
+  };
 
-    for (const unsub of subscriptions) {
-      unsub();
+  const cleanupDeps = () => {
+    for (const dep of dependencies) {
+      removeObserver(dep, node);
     }
-    subscriptions = [];
+    dependencies.clear();
+  };
 
-    const deps = new Set<AtomLike>();
-    startTracking(deps);
+  const run = () => {
+    if (iterationCount >= MAX_ITERATIONS) {
+      throw new Error("[astro-dx] Infinite loop detected in effect");
+    }
+
+    iterationCount++;
+    cleanupDeps(); // Cleanup before re-running
+
+    const prevObserver = setActiveObserver(node);
     try {
       fn();
     } finally {
-      stopTracking();
-    }
-
-    for (const dep of deps) {
-      let skipInitial = true;
-      const unsub = dep.subscribe(() => {
-        if (skipInitial) {
-          skipInitial = false;
-          return;
-        }
-        run();
-      });
-      subscriptions.push(unsub);
+      setActiveObserver(prevObserver);
+      setTimeout(() => (iterationCount = 0), 0);
     }
   };
 
   run();
 
-  return () => {
-    stopped = true;
-    for (const unsub of subscriptions) {
-      unsub();
-    }
-    subscriptions = [];
-  };
+  return () => cleanupDeps(); // Manual teardown
 }

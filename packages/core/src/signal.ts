@@ -1,32 +1,72 @@
-import { atom } from "nanostores";
-import { trackAtomRead, untracked } from "./tracking.ts";
+import {
+  trackDependency,
+  removeObserver,
+  untracked, // Importamos untracked
+  type ReactiveNode,
+} from "./tracking.ts";
 
-export type Signal<T> = {
-  /** Reads the value and registers a reactive dependency. */
+export interface Signal<T> extends ReactiveNode {
   (): T;
-  /** Reads the current value without registering a reactive dependency. */
   peek(): T;
   set(value: T): void;
   update(fn: (prev: T) => T): void;
   subscribe(fn: (value: T) => void): () => void;
-  /** @internal */
-  _atom: ReturnType<typeof atom<T>>;
-};
+}
 
-export function signal<T>(initial: T): Signal<T> {
-  const store = atom<T>(initial);
+export function signal<T>(
+  initial: T,
+  equal: (a: T, b: T) => boolean = Object.is,
+): Signal<T> {
+  let value = initial;
+  const observers = new Set<ReactiveNode>();
 
-  const read = (): T => {
-    trackAtomRead(store);
-    return store.get();
+  const node = (() => {
+    trackDependency(node);
+    return value;
+  }) as Signal<T>;
+
+  node.version = 0;
+  node.observers = observers;
+  node.dependencies = new Set();
+  node.notify = () => {};
+
+  node.peek = () => value;
+
+  node.set = (newValue: T) => {
+    if (!equal(value, newValue)) {
+      value = newValue;
+      node.version++;
+      for (const observer of [...observers]) {
+        observer.notify();
+      }
+    }
   };
 
-  read.peek = (): T => untracked(() => store.get());
-  read.set = (value: T): void => store.set(value);
-  read.update = (fn: (prev: T) => T): void => store.set(fn(store.get()));
-  read.subscribe = (fn: (value: T) => void): (() => void) =>
-    store.subscribe(fn);
-  read._atom = store;
+  node.update = (fn: (prev: T) => T) => node.set(fn(value));
 
-  return read as Signal<T>;
+  node.subscribe = (fn: (value: T) => void) => {
+    let lastValue = value;
+
+    const observer: ReactiveNode = {
+      version: -1,
+      observers: new Set(),
+      dependencies: new Set(),
+      notify: () => {
+        const newValue = node.peek();
+        if (!equal(lastValue, newValue)) {
+          lastValue = newValue;
+          // Ejecución segura sin trackear dependencias accidentales
+          untracked(() => fn(newValue));
+        }
+      },
+    };
+
+    observers.add(observer);
+    // Ejecución segura inicial
+    untracked(() => fn(value));
+
+    return () => removeObserver(node, observer);
+  };
+
+  return node;
 }

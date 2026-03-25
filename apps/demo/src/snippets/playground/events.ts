@@ -1,9 +1,11 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const eventsPlayground: PlaygroundFiles = {
   js: `\
 // ── With @astro-dx/events ─────────────────────────────────────────────────────
-import { signal, computed } from '@astro-dx/core'
+import { signal, computed } from '@astro-dx/core';
+import { onClick,onInput,onKey,onHover,onResize} from '@astro-dx/events';
+import { text} from '@astro-dx/dom';
 
 const clickCount = signal(0)
 const inputValue = signal('')

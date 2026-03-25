@@ -1,88 +1,119 @@
 import {
-  startTracking,
-  stopTracking,
-  trackAtomRead,
-  untracked,
+  trackDependency,
+  setActiveObserver,
+  removeObserver,
+  untracked, // Importamos untracked
+  type ReactiveNode,
 } from "./tracking.ts";
-import type { AtomLike } from "./tracking.ts";
 
-export type Computed<T> = {
-  /** Reads the computed value and registers a reactive dependency. */
+export interface Computed<T> {
   (): T;
-  /** Reads the computed value without registering a reactive dependency. */
   peek(): T;
   subscribe(fn: (value: T) => void): () => void;
-  /** @internal */
-  _atom: { subscribe: (fn: (value: T) => void) => () => void };
-};
+  version: number;
+  observers: Set<ReactiveNode>;
+}
 
 export function computed<T>(fn: () => T): Computed<T> {
-  let value = undefined as unknown as T;
-  let initialized = false;
-  const subscribers = new Set<(value: T) => void>();
-  let depSubscriptions: Array<() => void> = [];
+  let value: T;
+  let dirty = true;
+  let version = 0;
 
-  const recompute = (): void => {
-    for (const unsub of depSubscriptions) {
-      unsub();
-    }
-    depSubscriptions = [];
+  const dependencyVersions = new Map<ReactiveNode, number>();
+  const observers = new Set<ReactiveNode>();
+  const dependencies = new Set<ReactiveNode>();
 
-    const deps = new Set<AtomLike>();
-    startTracking(deps);
-    let newValue: T;
-    try {
-      newValue = fn();
-    } finally {
-      stopTracking();
-    }
-
-    for (const dep of deps) {
-      let skipInitial = true;
-      const unsub = dep.subscribe(() => {
-        if (skipInitial) {
-          skipInitial = false;
-          return;
+  const node: ReactiveNode = {
+    version: 0,
+    observers,
+    dependencies,
+    notify: () => {
+      if (!dirty) {
+        dirty = true;
+        version++;
+        node.version = version;
+        for (const observer of [...observers]) {
+          observer.notify();
         }
-        recompute();
-      });
-      depSubscriptions.push(unsub);
-    }
-
-    const changed = !initialized || !Object.is(value, newValue!);
-    value = newValue!;
-    initialized = true;
-
-    if (changed) {
-      const currentSubscribers = [...subscribers];
-      for (const sub of currentSubscribers) {
-        sub(value);
       }
-    }
-  };
-
-  recompute();
-
-  const read = (): T => {
-    trackAtomRead(read._atom as unknown as AtomLike);
-    return value;
-  };
-
-  read.peek = (): T => untracked(() => value);
-
-  read.subscribe = (cb: (value: T) => void): (() => void) => {
-    subscribers.add(cb);
-    cb(value);
-    return () => subscribers.delete(cb);
-  };
-
-  read._atom = {
-    subscribe: (cb: (value: T) => void): (() => void) => {
-      subscribers.add(cb);
-      cb(value);
-      return () => subscribers.delete(cb);
+    },
+    onBecomeUnobserved: () => {
+      for (const dep of dependencies) {
+        removeObserver(dep, node);
+      }
+      dependencies.clear();
+      dependencyVersions.clear();
+      dirty = true;
     },
   };
 
-  return read as Computed<T>;
+  const shouldRecompute = () => {
+    if (dirty) {
+      for (const [dep, lastVersion] of dependencyVersions) {
+        if (dep.version !== lastVersion) return true;
+      }
+      if (dependencyVersions.size > 0) {
+        dirty = false;
+        return false;
+      }
+    }
+    return dirty;
+  };
+
+  const recompute = () => {
+    for (const dep of dependencies) removeObserver(dep, node);
+    dependencies.clear();
+    dependencyVersions.clear();
+
+    const prevObserver = setActiveObserver(node);
+    try {
+      const newValue = fn();
+      if (!Object.is(value, newValue)) {
+        value = newValue;
+      }
+      for (const dep of dependencies) {
+        dependencyVersions.set(dep, dep.version);
+      }
+      dirty = false;
+    } finally {
+      setActiveObserver(prevObserver);
+    }
+  };
+
+  const read = (): T => {
+    trackDependency(node);
+    if (shouldRecompute()) recompute();
+    return value;
+  };
+
+  read.peek = () => {
+    if (shouldRecompute()) recompute();
+    return value;
+  };
+
+  read.subscribe = (fn: (value: T) => void) => {
+    let lastValue: T;
+    const observer: ReactiveNode = {
+      version: -1,
+      observers: new Set(),
+      dependencies: new Set(),
+      notify: () => {
+        const newValue = read();
+        if (!Object.is(lastValue, newValue)) {
+          lastValue = newValue;
+          untracked(() => fn(newValue)); // Seguro
+        }
+      },
+    };
+    observers.add(observer);
+    lastValue = read();
+    untracked(() => fn(lastValue)); // Seguro
+
+    return () => removeObserver(node, observer);
+  };
+
+  Object.defineProperty(read, "version", { get: () => version });
+  Object.defineProperty(read, "observers", { value: observers });
+
+  return read as unknown as Computed<T>;
 }
