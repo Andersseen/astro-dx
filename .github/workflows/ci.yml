@@ -96,7 +96,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium --with-deps
+        run: pnpm --filter astro-dx-demo exec playwright install chromium --with-deps
 
       - name: Build packages
         run: pnpm build:packages
