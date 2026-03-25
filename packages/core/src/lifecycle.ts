@@ -21,10 +21,10 @@ export function onPageLoad(callback: LifecycleCallback): void {
       pageLoadHandlers.clear();
     };
 
-    document.addEventListener("astro:page-load", fireAll);
+    document.addEventListener('astro:page-load', fireAll);
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", fireAll, { once: true });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireAll, { once: true });
     } else {
       fireAll();
     }
@@ -39,7 +39,7 @@ export function onBeforeSwap(callback: LifecycleCallback): void {
 
   if (!isBeforeSwapAttached) {
     isBeforeSwapAttached = true;
-    document.addEventListener("astro:before-swap", () => {
+    document.addEventListener('astro:before-swap', () => {
       for (const handler of beforeSwapHandlers) handler();
     });
   }

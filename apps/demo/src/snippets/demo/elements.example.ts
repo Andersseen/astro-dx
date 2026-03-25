@@ -1,5 +1,5 @@
-import { register } from "@astro-dx/elements";
-import "@astro-dx/elements";
+import { register } from '@astro-dx/elements';
+import '@astro-dx/elements';
 
 register({
   hasItems: ShopService.hasItems,

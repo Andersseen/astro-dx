@@ -1,9 +1,9 @@
-export type ServiceConstructor<T = any> = new (...args: any[]) => T;
+export type ServiceConstructor<T = unknown> = new (...args: unknown[]) => T;
 
-const SHARED_SERVICES = new Set<ServiceConstructor<any>>();
+const SHARED_SERVICES = new Set<ServiceConstructor<unknown>>();
 
 export class Registry {
-  private instances: Map<ServiceConstructor<any>, any>;
+  private instances: Map<ServiceConstructor<unknown>, unknown>;
   private parent?: Registry;
 
   constructor(parent?: Registry) {
@@ -12,8 +12,8 @@ export class Registry {
   }
 
   register(
-    services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
-    options: { shared?: boolean } = {},
+    services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>,
+    options: { shared?: boolean } = {}
   ): void {
     const list = Array.isArray(services) ? services : [services];
     for (const Service of list) {
@@ -27,16 +27,16 @@ export class Registry {
   }
 
   inject<T>(Service: ServiceConstructor<T>): T {
-    let instance = this.instances.get(Service);
+    const instance = this.instances.get(Service) as T | undefined;
     if (instance) return instance;
 
     if (this.parent && SHARED_SERVICES.has(Service)) {
       return this.parent.inject(Service);
     }
 
-    instance = new Service();
-    this.instances.set(Service, instance);
-    return instance;
+    const newInstance = new Service();
+    this.instances.set(Service as ServiceConstructor<unknown>, newInstance as unknown);
+    return newInstance;
   }
 
   clear(): void {
@@ -47,14 +47,14 @@ export class Registry {
 export const GlobalRegistry = new Registry();
 
 export function register(
-  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
-  options?: { shared?: boolean },
+  services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>,
+  options?: { shared?: boolean }
 ): void {
   GlobalRegistry.register(services, options);
 }
 
 export function registerShared(
-  services: ServiceConstructor<any> | Array<ServiceConstructor<any>>,
+  services: ServiceConstructor<unknown> | Array<ServiceConstructor<unknown>>
 ): void {
   GlobalRegistry.register(services, { shared: true });
 }
@@ -68,8 +68,6 @@ export function clearRegistry(): void {
   SHARED_SERVICES.clear();
 }
 
-export function createLocalRegistry(
-  parent: Registry = GlobalRegistry,
-): Registry {
+export function createLocalRegistry(parent: Registry = GlobalRegistry): Registry {
   return new Registry(parent);
 }

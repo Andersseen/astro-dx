@@ -1,10 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import {
-  clearRegistry,
-  createLocalRegistry,
-  inject,
-  register,
-} from "./registry.ts";
+import { beforeEach, describe, expect, it } from 'vitest';
+import { clearRegistry, createLocalRegistry, inject, register } from './registry.ts';
 
 class CounterService {
   #count = 0;
@@ -28,35 +23,35 @@ beforeEach(() => {
   clearRegistry();
 });
 
-describe("register()", () => {
-  it("registers a single service class", () => {
+describe('register()', () => {
+  it('registers a single service class', () => {
     register(CounterService);
     const counter = inject(CounterService);
     expect(counter).toBeInstanceOf(CounterService);
   });
 
-  it("registers multiple services in one call", () => {
+  it('registers multiple services in one call', () => {
     register([CounterService, GreeterService]);
     expect(inject(CounterService)).toBeInstanceOf(CounterService);
     expect(inject(GreeterService)).toBeInstanceOf(GreeterService);
   });
 });
 
-describe("inject()", () => {
-  it("returns the same instance on every call (singleton)", () => {
+describe('inject()', () => {
+  it('returns the same instance on every call (singleton)', () => {
     const a = inject(CounterService);
     const b = inject(CounterService);
     expect(a).toBe(b);
   });
 
-  it("lazy-registers when service not pre-registered", () => {
+  it('lazy-registers when service not pre-registered', () => {
     const counter = inject(CounterService);
     expect(counter).toBeInstanceOf(CounterService);
   });
 });
 
-describe("Scoped DI (Local Registry)", () => {
-  it("creates isolated instances in local scope when registered", () => {
+describe('Scoped DI (Local Registry)', () => {
+  it('creates isolated instances in local scope when registered', () => {
     const local = createLocalRegistry();
     local.register(CounterService);
     const globalCount = inject(CounterService);
@@ -68,9 +63,9 @@ describe("Scoped DI (Local Registry)", () => {
     expect(globalCount).not.toBe(localCount);
   });
 
-  it("falls back to parent registry if service is marked as shared", () => {
+  it('falls back to parent registry if service is marked as shared', () => {
     class SharedService {
-      name = "shared";
+      name = 'shared';
     }
     register(SharedService, { shared: true });
 
@@ -80,7 +75,7 @@ describe("Scoped DI (Local Registry)", () => {
     expect(instance).toBe(inject(SharedService));
   });
 
-  it("allows overriding parent services in local scope", () => {
+  it('allows overriding parent services in local scope', () => {
     const local = createLocalRegistry();
     local.register(CounterService);
 
@@ -90,7 +85,7 @@ describe("Scoped DI (Local Registry)", () => {
     expect(globalCount).not.toBe(localCount);
   });
 
-  it("is strictly isolated by default (new instance per tree node if not shared)", () => {
+  it('is strictly isolated by default (new instance per tree node if not shared)', () => {
     class PrivateService {}
     const local = createLocalRegistry();
 
@@ -100,7 +95,7 @@ describe("Scoped DI (Local Registry)", () => {
     expect(globalInstance).not.toBe(localInstance);
   });
 
-  it("uses registerShared to share service across all registries", () => {
+  it('uses registerShared to share service across all registries', () => {
     class TopSharedService {}
     register(TopSharedService, { shared: true });
 

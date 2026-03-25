@@ -1,16 +1,16 @@
-import { describe, expect, it, vi } from "vitest";
-import { computed } from "./computed.ts";
-import { effect } from "./effect.ts";
-import { signal } from "./signal.ts";
+import { describe, expect, it, vi } from 'vitest';
+import { computed } from './computed.ts';
+import { effect } from './effect.ts';
+import { signal } from './signal.ts';
 
-describe("computed()", () => {
-  it("returns initial value", () => {
+describe('computed()', () => {
+  it('returns initial value', () => {
     const count = signal(2);
     const doubled = computed(() => count() * 2);
     expect(doubled()).toBe(4);
   });
 
-  it("recomputes when dependency changes", () => {
+  it('recomputes when dependency changes', () => {
     const count = signal(1);
     const doubled = computed(() => count() * 2);
 
@@ -19,7 +19,7 @@ describe("computed()", () => {
     expect(doubled()).toBe(6);
   });
 
-  it("tracks multiple dependencies", () => {
+  it('tracks multiple dependencies', () => {
     const a = signal(1);
     const b = signal(2);
     const sum = computed(() => a() + b());
@@ -31,7 +31,7 @@ describe("computed()", () => {
     expect(sum()).toBe(30);
   });
 
-  it("handles conditional dependencies", () => {
+  it('handles conditional dependencies', () => {
     const flag = signal(true);
     const a = signal(1);
     const b = signal(100);
@@ -49,7 +49,7 @@ describe("computed()", () => {
     expect(result()).toBe(200);
   });
 
-  it("notifies subscribers on value change", () => {
+  it('notifies subscribers on value change', () => {
     const count = signal(0);
     const doubled = computed(() => count() * 2);
     const spy = vi.fn();
@@ -60,7 +60,7 @@ describe("computed()", () => {
     expect(spy).toHaveBeenCalledWith(10);
   });
 
-  it("does NOT notify subscribers when value is equal", () => {
+  it('does NOT notify subscribers when value is equal', () => {
     const count = signal(5);
     const isPositive = computed(() => count() > 0);
     const spy = vi.fn();
@@ -75,7 +75,7 @@ describe("computed()", () => {
     expect(spy).toHaveBeenCalledWith(false);
   });
 
-  it("can be used inside effect()", () => {
+  it('can be used inside effect()', () => {
     const count = signal(1);
     const doubled = computed(() => count() * 2);
     const spy = vi.fn();
@@ -88,7 +88,7 @@ describe("computed()", () => {
     expect(spy).toHaveBeenCalledWith(10);
   });
 
-  it("computed of computed works", () => {
+  it('computed of computed works', () => {
     const count = signal(2);
     const doubled = computed(() => count() * 2);
     const quadrupled = computed(() => doubled() * 2);
@@ -98,7 +98,7 @@ describe("computed()", () => {
     expect(quadrupled()).toBe(12);
   });
 
-  it("peek() reads value without creating dependency", () => {
+  it('peek() reads value without creating dependency', () => {
     const count = signal(0);
     const doubled = computed(() => count() * 2);
     const other = signal(0);
@@ -117,7 +117,7 @@ describe("computed()", () => {
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
-  it("subscribe returns unsubscribe function", () => {
+  it('subscribe returns unsubscribe function', () => {
     const count = signal(0);
     const doubled = computed(() => count() * 2);
     const spy = vi.fn();
@@ -146,7 +146,7 @@ describe("computed()", () => {
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
-  it("cleans up dependencies when it becomes unobserved", () => {
+  it('cleans up dependencies when it becomes unobserved', () => {
     const count = signal(0);
     const spy = vi.fn(() => count() * 2);
     const doubled = computed(spy);

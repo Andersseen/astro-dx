@@ -14,9 +14,7 @@ export function getActiveObserver(): ReactiveNode | null {
   return trackingDisabled > 0 ? null : activeObserver;
 }
 
-export function setActiveObserver(
-  node: ReactiveNode | null,
-): ReactiveNode | null {
+export function setActiveObserver(node: ReactiveNode | null): ReactiveNode | null {
   const prev = activeObserver;
   activeObserver = node;
   return prev;
@@ -39,10 +37,7 @@ export function trackDependency(producer: ReactiveNode): void {
   }
 }
 
-export function removeObserver(
-  producer: ReactiveNode,
-  observer: ReactiveNode,
-): void {
+export function removeObserver(producer: ReactiveNode, observer: ReactiveNode): void {
   producer.observers.delete(observer);
   if (producer.observers.size === 0 && producer.onBecomeUnobserved) {
     producer.onBecomeUnobserved();

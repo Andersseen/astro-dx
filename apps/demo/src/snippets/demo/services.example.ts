@@ -1,10 +1,10 @@
-import { register } from "@astro-dx/core";
-import { CounterServiceClass } from "../../services/counter.service";
-import { ShopServiceClass } from "../../services/shop.service";
+import { register } from '@astro-dx/core';
+import { CounterServiceClass } from '../../services/counter.service';
+import { ShopServiceClass } from '../../services/shop.service';
 
 register([CounterServiceClass, ShopServiceClass]);
 
-import { inject } from "@astro-dx/core";
+import { inject } from '@astro-dx/core';
 
 const cart = inject(ShopServiceClass);
-cart.addToCart({ id: "k-1", name: "Keyboard", price: 99 });
+cart.addToCart({ id: 'k-1', name: 'Keyboard', price: 99 });

@@ -1,9 +1,4 @@
-import {
-  type ReactiveNode,
-  removeObserver,
-  trackDependency,
-  untracked,
-} from "./tracking.ts";
+import { type ReactiveNode, removeObserver, trackDependency, untracked } from './tracking.ts';
 
 export interface Signal<T> extends ReactiveNode {
   (): T;
@@ -13,10 +8,7 @@ export interface Signal<T> extends ReactiveNode {
   subscribe(fn: (value: T) => void): () => void;
 }
 
-export function signal<T>(
-  initial: T,
-  equal: (a: T, b: T) => boolean = Object.is,
-): Signal<T> {
+export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is): Signal<T> {
   let value = initial;
   const observers = new Set<ReactiveNode>();
 

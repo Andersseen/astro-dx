@@ -1,10 +1,5 @@
-import { computed } from "./computed.ts";
-import {
-  type ReactiveNode,
-  removeObserver,
-  trackDependency,
-  untracked,
-} from "./tracking.ts";
+import { computed } from './computed.ts';
+import { type ReactiveNode, removeObserver, trackDependency, untracked } from './tracking.ts';
 
 export interface LinkedSignal<T> {
   (): T;
@@ -23,13 +18,13 @@ export interface LinkedSignalOptions<S, T> {
 }
 
 export function linkedSignal<S, T>(
-  options: LinkedSignalOptions<S, T> | (() => T),
+  options: LinkedSignalOptions<S, T> | (() => T)
 ): LinkedSignal<T> {
   let sourceFn: () => S;
   let computation: (s: S, prev?: T) => T;
   let equal: (a: T, b: T) => boolean = Object.is;
 
-  if (typeof options === "function") {
+  if (typeof options === 'function') {
     sourceFn = options as unknown as () => S;
     computation = (s: S) => s as unknown as T;
   } else {
@@ -60,7 +55,7 @@ export function linkedSignal<S, T>(
   const sync = () => {
     const currentSource = sourceComp();
 
-    const sv = (sourceComp as any).version;
+    const sv = (sourceComp as { version?: number }).version ?? 0;
 
     if (sv !== lastSourceVersion) {
       state = computation(currentSource, state);
@@ -113,8 +108,8 @@ export function linkedSignal<S, T>(
     return () => removeObserver(node, observer);
   };
 
-  Object.defineProperty(read, "version", { get: () => version });
-  Object.defineProperty(read, "observers", { value: observers });
+  Object.defineProperty(read, 'version', { get: () => version });
+  Object.defineProperty(read, 'observers', { value: observers });
 
   return read as unknown as LinkedSignal<T>;
 }
