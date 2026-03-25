@@ -25,7 +25,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">2. Create a signal</h2>
       <CodeBlock lang="typescript" code={`
-// In any .astro file <script> tag
+
 import { signal, computed } from '@astro-dx/core';
 import { getElement } from '@astro-dx/dom';
 
@@ -50,7 +50,7 @@ class CartServiceClass {
   clear() { this._items.set([]); }
 }
 
-// ESM singleton — same instance across all islands
+
 export const CartService = new CartServiceClass();
       `} />
     </div>

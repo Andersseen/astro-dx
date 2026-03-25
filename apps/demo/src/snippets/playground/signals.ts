@@ -1,4 +1,4 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const signalsPlayground: PlaygroundFiles = {
   js: `\
@@ -6,12 +6,12 @@ import { signal, computed, effect, linkedSignal, untracked } from '@astro-dx/cor
 import { text } from '@astro-dx/dom'
 import { on } from '@astro-dx/events'
 
-// 1. Primitive State
+
 const count = signal(0)
 
-// 2. Push-Pull Derivation (Glitch-Free)
-// Even if 'count' changes, 'double' and 'triple' update atomically
-// and 'sum' pulls them exactly once.
+
+
+
 const double = computed(() => count() * 2)
 const triple = computed(() => count() * 3)
 const sum    = computed(() => {
@@ -19,17 +19,17 @@ const sum    = computed(() => {
   return double() + triple()
 })
 
-// 3. Linked State (Dependent Writable)
-// Resets to double() when double changes, but can be manually overridden.
+
+
 const multiplier = linkedSignal(() => double())
 
-// 4. Side Effects (Auto-tracked)
+
 effect(() => {    
   const current = count()
   const val = sum()
 })
 
-// Bindings using @astro-dx/dom & @astro-dx/events
+
 text('#count',      count)
 text('#sum',        sum)
 text('#multiplier', multiplier)

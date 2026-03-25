@@ -1,12 +1,12 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const attributesPlayground: PlaygroundFiles = {
   js: `\
-// ── With @astro-dx/attributes ─────────────────────────────────────────────────
+
 import { signal, computed } from '@astro-dx/core';
 import { onClick} from '@astro-dx/events';
 
-// Signals that control the directives
+
 const isVisible = signal(true)
 const isMounted = signal(true)
 const items     = signal([
@@ -17,17 +17,17 @@ const items     = signal([
   { id: 5, name: 'Compiler',   done: false },
 ])
 
-// Toggle handlers
+
 onClick('#toggle-show', () => isVisible.update(v => !v))
 onClick('#toggle-if',   () => isMounted.update(v => !v))
 
-// dx-show: toggle hidden property
+
 isVisible.subscribe(v => {
   const el = document.querySelector('#show-target')
   if (el) el.hidden = !v
 })
 
-// dx-if: mount/unmount from DOM
+
 const ifTarget = document.querySelector('#if-target')
 const ifParent = ifTarget?.parentNode
 const ifAnchor = document.createComment('dx-if')
@@ -41,7 +41,7 @@ isMounted.subscribe(v => {
   }
 })
 
-// dx-for: render list
+
 items.subscribe(list => {
   const ul = document.querySelector('#items-list')
   if (!ul) return
@@ -55,10 +55,10 @@ items.subscribe(list => {
   \`).join('')
 })
 
-// ── What this replaces ────────────────────────────────────────────────────────
-// el.hidden = !v                                   → dx-show="isVisible"
-// v ? mount() : unmount()                          → dx-if="isMounted"
-// items.map(i => clone(template, i))               → dx-for="items"
+
+
+
+
 `,
 
   html: `\

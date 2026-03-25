@@ -26,7 +26,7 @@ import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
 import { destroyAll } from '@astro-dx/dom';
 
 onPageLoad(() => {
-  // Setup signals, getElement, bindings...
+  
 });
 
 onBeforeSwap(() => {

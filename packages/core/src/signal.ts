@@ -2,8 +2,8 @@ import {
   type ReactiveNode,
   removeObserver,
   trackDependency,
-  untracked, // Importamos untracked
-} from './tracking.ts';
+  untracked,
+} from "./tracking.ts";
 
 export interface Signal<T> extends ReactiveNode {
   (): T;
@@ -13,7 +13,10 @@ export interface Signal<T> extends ReactiveNode {
   subscribe(fn: (value: T) => void): () => void;
 }
 
-export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is): Signal<T> {
+export function signal<T>(
+  initial: T,
+  equal: (a: T, b: T) => boolean = Object.is,
+): Signal<T> {
   let value = initial;
   const observers = new Set<ReactiveNode>();
 
@@ -52,14 +55,14 @@ export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is
         const newValue = node.peek();
         if (!equal(lastValue, newValue)) {
           lastValue = newValue;
-          // Ejecución segura sin trackear dependencias accidentales
+
           untracked(() => fn(newValue));
         }
       },
     };
 
     observers.add(observer);
-    // Ejecución segura inicial
+
     untracked(() => fn(value));
 
     return () => removeObserver(node, observer);

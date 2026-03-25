@@ -64,6 +64,6 @@ These work without \`ElementRef\`, accepting a CSS selector or Element directly.
 import { text, attr, cls } from '@astro-dx/dom';
 
 const unsub = text('#counter', count);
-// later: unsub();
+
 \`\`\`
 </astro-dx-dom>`;

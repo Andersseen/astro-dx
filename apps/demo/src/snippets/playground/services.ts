@@ -1,4 +1,4 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const servicesPlayground: PlaygroundFiles = {
   js: `\
@@ -6,7 +6,7 @@ import { signal, GlobalRegistry, createLocalRegistry } from '@astro-dx/core'
 import { text } from '@astro-dx/dom'
 import { onClick } from '@astro-dx/events'
 
-// 1. Definimos un Servicio
+
 class CounterService {
   count;
   
@@ -19,20 +19,20 @@ class CounterService {
   }
 }
 
-// 2. Registro Global
+
 const globalCounter = GlobalRegistry.inject(CounterService)
 
-// 3. Registro Local (Aislado / Island)
+
 const localReg = createLocalRegistry()
 const localCounter = localReg.inject(CounterService)
 
-// --- Vincular UI Global ---
-// Vinculamos la UI usando las utilidades reactivas de Astro-DX
+
+
 text('#global-count', globalCounter.count)
 onClick('#global-inc', () => globalCounter.increment())
 
-// --- Vincular UI Local ---
-// Misma lógica, pero esta instancia es totalmente independiente
+
+
 text('#local-count', localCounter.count)
 onClick('#local-inc', () => localCounter.increment())
 `,

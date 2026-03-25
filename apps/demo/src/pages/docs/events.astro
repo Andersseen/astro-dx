@@ -18,13 +18,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <CodeBlock lang="typescript" code={`
 import { on } from '@astro-dx/events';
 
-// Basic click
+
 on('#btn', 'click', () => count.update(v => v + 1));
 
-// Input event — value extracted automatically
+
 on('#search', 'input', (value) => query.set(value as string));
 
-// Pass an element directly
+
 on(document, 'click', (e) => console.log(e));
       `} />
     </div>

@@ -10,12 +10,12 @@ import { signal } from '@astro-dx/core';
 
 const name = signal('World');
 
-name();           // → 'World' (tracked read)
-name.peek();      // → 'World' (untracked read, no dependency)
+name();           
+name.peek();      
 name.set('Astro');
 name.update(prev => prev.toUpperCase());
-const unsub = name.subscribe(v => console.log(v)); // fires immediately + on change
-unsub(); // cleanup
+const unsub = name.subscribe(v => console.log(v)); 
+unsub(); 
 \`\`\`
 
 #### Signal<T> interface
@@ -36,8 +36,8 @@ Derives a value from other signals/computeds. Re-evaluates automatically when de
 import { computed } from '@astro-dx/core';
 
 const fullName = computed(() => \\\`\\\${firstName()} \\\${lastName()}\\\`);
-fullName();        // tracked read
-fullName.peek();   // untracked read
+fullName();        
+fullName.peek();   
 fullName.subscribe(v => console.log(v));
 \`\`\`
 
@@ -52,7 +52,7 @@ import { effect } from '@astro-dx/core';
 const stop = effect(() => {
   document.title = \\\`Count: \\\${count()}\\\`;
 });
-stop(); // cleanup
+stop(); 
 \`\`\`
 
 ---
@@ -82,11 +82,11 @@ class ThemeService {
   toggle() { this.mode.update(m => m === 'light' ? 'dark' : 'light'); }
 }
 
-// bootstrap.ts
+
 import { register } from '@astro-dx/core';
 register(ThemeService);
 
-// any-island.ts
+
 import { inject } from '@astro-dx/core';
 const theme = inject(ThemeService);
 theme.toggle();
@@ -106,7 +106,7 @@ Fires just before Astro swaps the page. Use for cleanup (\`destroyAll()\`, unsub
 import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
 import { destroyAll } from '@astro-dx/dom';
 
-onPageLoad(() => { /* setup */ });
+onPageLoad(() => {  });
 onBeforeSwap(() => destroyAll());
 \`\`\`
 </astro-dx-core>`;

@@ -25,15 +25,15 @@ import { getElement } from '@astro-dx/dom';
 
 const btn = getElement<HTMLButtonElement>('#btn');
 
-btn.text(label);                     // reactive textContent
-btn.attr('disabled', isLoading);     // reactive attribute
-btn.cls('active', isActive);         // reactive class toggle
-btn.on('click', () => { ... });      // event listener
-btn.onHover({ enter, leave });       // mouseenter + mouseleave
-btn.onKey('Enter', fn);              // keydown with key filter
-btn.onFocus({ focus, blur });        // focus + blur
-btn.effect(() => { ... });           // reactive effect
-btn.destroy();                       // remove all listeners + subscriptions
+btn.text(label);                     
+btn.attr('disabled', isLoading);     
+btn.cls('active', isActive);         
+btn.on('click', () => { ... });      
+btn.onHover({ enter, leave });       
+btn.onKey('Enter', fn);              
+btn.onFocus({ focus, blur });        
+btn.effect(() => { ... });           
+btn.destroy();                       
       `} />
     </div>
 
@@ -65,7 +65,7 @@ onPageLoad(() => {
 });
 
 onBeforeSwap(() => {
-  destroyAll(); // cleans everything set up in onPageLoad
+  destroyAll(); 
 });
       `} />
     </div>

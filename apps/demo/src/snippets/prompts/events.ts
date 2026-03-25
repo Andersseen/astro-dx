@@ -20,32 +20,32 @@ Target can be a CSS selector string, Element, Document, or Window.
 \`\`\`ts
 import { onInput, onClick, onKey, onSubmit, onResize } from '@astro-dx/events';
 
-// Auto-extracts value from input
+
 const cleanupInput = onInput('#search', (val) => query.set(val));
 
-// Click
+
 const cleanupClick = onClick('#submit-btn', (e) => {
 
 });
 
-// Global key listener
+
 const cleanupEsc = onKey(window, 'Escape', () => {
   menuOpen.set(false);
 });
 
-// Form submit with auto-preventDefault
+
 const cleanupForm = onSubmit('#my-form', (e) => {
   const formData = new FormData(e.target as HTMLFormElement);
-  // process...
+  
 });
 
-// ResizeObserver
+
 const cleanupResize = onResize('#container', (entry) => {
   const { width, height } = entry.contentRect;
 
 });
 
-// Cleanup all on before-swap
+
 onBeforeSwap(() => {
   cleanupInput();
   cleanupClick();

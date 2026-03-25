@@ -14,10 +14,10 @@ const items = signal([
   { id: 2, name: 'Beta' },
 ]);
 
-// Expose signals globally
+
 register({ isLoggedIn, items });
 
-// Scan DOM and activate dx-if, dx-show, dx-for attributes
+
 bootstrap();
 \`\`\`
 
