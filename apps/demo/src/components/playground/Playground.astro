@@ -6,12 +6,9 @@ interface Props {
 }
 
 const { id, files, height = 360 } = Astro.props;
-
-
-const rootDir = process.cwd();
 ---
 
-<div class="playground" id={`playground-${id}`} data-height={height} data-root={rootDir}>
+<div class="playground" id={`playground-${id}`} data-height={height}>
   <div class="playground-header playground-mobile-only">
     <div class="playground-tabs">
       <button class="playground-tab active" data-tab="preview" data-for={id}>Preview</button>
@@ -43,7 +40,7 @@ const rootDir = process.cwd();
         <div class="playground-editor" id={`editor-html-${id}`}></div>
       </div>
     </div>
-<div class="playground-preview-pane">
+    <div class="playground-preview-pane">
       <iframe
         id={`iframe-${id}`}
         class="playground-iframe"
@@ -54,7 +51,7 @@ const rootDir = process.cwd();
     </div>
   </div>
 
-<div class="playground-mobile-only">
+  <div class="playground-mobile-only">
     <div class="playground-panel active" data-panel="preview" data-owner={id}>
       <iframe
         id={`iframe-mobile-${id}`}
@@ -86,12 +83,23 @@ const rootDir = process.cwd();
   import { getElement, getElements } from '@astro-dx/dom';
   import { on } from '@astro-dx/events';
 
+
+  import coreCode from '../../../../../packages/core/dist/index.js?raw';
+  import domCode from '../../../../../packages/dom/dist/index.js?raw';
+  import eventsCode from '../../../../../packages/events/dist/index.js?raw';
+  import attributesCode from '../../../../../packages/attributes/dist/index.js?raw';
+
+
+  const virtualUrls = {
+    core: URL.createObjectURL(new Blob([coreCode], { type: 'application/javascript' })),
+    dom: URL.createObjectURL(new Blob([domCode], { type: 'application/javascript' })),
+    events: URL.createObjectURL(new Blob([eventsCode], { type: 'application/javascript' })),
+    attributes: URL.createObjectURL(new Blob([attributesCode], { type: 'application/javascript' }))
+  };
+
   function initPlayground(container: HTMLElement) {
     const id = container.id.replace('playground-', '');
     const height = Number(container.dataset.height) || 360;
-    
-
-    const rootDir = container.dataset.root!;
 
     const jsCode = JSON.parse(getElement<HTMLElement>(`#data-js-${id}`).el.textContent!);
     const htmlCode = JSON.parse(getElement<HTMLElement>(`#data-html-${id}`).el.textContent!);
@@ -125,7 +133,6 @@ const rootDir = process.cwd();
     }
 
     function getCurrentCode(): { js: string; html: string } {
- 
       const jsEditorDesktop = editors.get(`editor-js-${id}`);
       const jsEditorMobile = editors.get(`editor-js-mobile-${id}`);
       const htmlEditorDesktop = editors.get(`editor-html-${id}`);
@@ -139,9 +146,9 @@ const rootDir = process.cwd();
 
     function runCode() {
       const code = getCurrentCode();
-      const srcdoc = buildSrcdoc(code.js, code.html, rootDir);
+   
+      const srcdoc = buildSrcdoc(code.js, code.html, virtualUrls);
 
-  
       const desktopIframe = getElement<HTMLIFrameElement>(`#iframe-${id}`).el;
       const mobileIframe = getElement<HTMLIFrameElement>(`#iframe-mobile-${id}`).el;
       if (desktopIframe.id) desktopIframe.srcdoc = srcdoc;
@@ -164,10 +171,8 @@ const rootDir = process.cwd();
       });
     });
 
-
     const desktopRunBtn = getElement(`[data-run-desktop="${id}"]`).el;
     if (desktopRunBtn.className) on(desktopRunBtn, 'click', runCode);
-
 
     const mobileTabs = getElements<HTMLButtonElement>(`.playground-tab[data-for="${id}"]`);
     const mobilePanels = getElements<HTMLElement>(`.playground-panel[data-owner="${id}"]`);
@@ -187,11 +192,9 @@ const rootDir = process.cwd();
       });
     });
 
-    // Mobile run button
     const mobileRunBtn = getElement(`[data-run="${id}"]`).el;
     if (mobileRunBtn.className) on(mobileRunBtn, 'click', runCode);
 
-    // ─── Initial run + init desktop JS editor ───
     getOrCreateEditor(`editor-js-${id}`, 'js', jsCode);
     runCode();
   }
@@ -200,150 +203,32 @@ const rootDir = process.cwd();
 </script>
 
 <style>
-  .playground {
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.75rem;
-    overflow: hidden;
-    background: hsl(240 6% 10%);
-  }
-
-  /* ─── Desktop split layout ─── */
-  .playground-split {
-    display: none;
-  }
-
-  @media (min-width: 768px) {
-    .playground-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .playground-mobile-only {
-      display: none !important;
-    }
-  }
-
-  .playground-code-pane {
-    border-right: 1px solid hsl(var(--border));
-    display: flex;
-    flex-direction: column;
-  }
-
-  .playground-code-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.25rem;
-    border-bottom: 1px solid hsl(var(--border));
-    background: hsl(240 6% 8%);
-  }
-
-  .playground-code-tabs {
-    display: flex;
-  }
-
-  .playground-code-tab {
-    padding: 0.5rem 0.75rem;
-    border: none;
-    background: transparent;
-    color: hsl(var(--muted-foreground));
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    transition: color 0.15s, border-color 0.15s;
-  }
+  
+  .playground { border: 1px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; background: hsl(240 6% 10%); }
+  .playground-split { display: none; }
+  @media (min-width: 768px) { .playground-split { display: grid; grid-template-columns: 1fr 1fr; } .playground-mobile-only { display: none !important; } }
+  .playground-code-pane { border-right: 1px solid hsl(var(--border)); display: flex; flex-direction: column; }
+  .playground-code-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0.25rem; border-bottom: 1px solid hsl(var(--border)); background: hsl(240 6% 8%); }
+  .playground-code-tabs { display: flex; }
+  .playground-code-tab { padding: 0.5rem 0.75rem; border: none; background: transparent; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 0.04em; transition: color 0.15s, border-color 0.15s; }
   .playground-code-tab:hover { color: hsl(var(--foreground)); }
-  .playground-code-tab.active {
-    color: hsl(var(--foreground));
-    border-bottom-color: hsl(var(--primary));
-  }
-
+  .playground-code-tab.active { color: hsl(var(--foreground)); border-bottom-color: hsl(var(--primary)); }
   .playground-code-panel { display: none; }
   .playground-code-panel.active { display: block; }
-
-  .playground-preview-pane {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .playground-run-desktop {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.625rem;
-    margin-right: 0.375rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 5px;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    font-size: 0.6875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
+  .playground-preview-pane { display: flex; flex-direction: column; }
+  .playground-run-desktop { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; margin-right: 0.375rem; border: 1px solid hsl(var(--border)); border-radius: 5px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-size: 0.6875rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
   .playground-run-desktop:hover { opacity: 0.85; }
-
-  /* ─── Mobile tab layout ─── */
-  .playground-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.25rem;
-    border-bottom: 1px solid hsl(var(--border));
-    background: hsl(240 6% 8%);
-  }
-
+  .playground-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0.25rem; border-bottom: 1px solid hsl(var(--border)); background: hsl(240 6% 8%); }
   .playground-tabs { display: flex; }
-
-  .playground-tab {
-    padding: 0.5rem 0.75rem;
-    border: none;
-    background: transparent;
-    color: hsl(var(--muted-foreground));
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-  }
+  .playground-tab { padding: 0.5rem 0.75rem; border: none; background: transparent; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
   .playground-tab:hover { color: hsl(var(--foreground)); }
-  .playground-tab.active {
-    color: hsl(var(--foreground));
-    border-bottom-color: hsl(var(--primary));
-  }
-
-  .playground-run {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.625rem;
-    margin-right: 0.375rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 5px;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    font-size: 0.6875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
+  .playground-tab.active { color: hsl(var(--foreground)); border-bottom-color: hsl(var(--primary)); }
+  .playground-run { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; margin-right: 0.375rem; border: 1px solid hsl(var(--border)); border-radius: 5px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-size: 0.6875rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
   .playground-run:hover { opacity: 0.85; }
-
   .playground-panel { display: none; }
   .playground-panel.active { display: block; }
-
-  /* ─── Shared ─── */
-  .playground-iframe {
-    width: 100%;
-    border: none;
-    display: block;
-    background: hsl(240 6% 10%);
-  }
-
+  .playground-iframe { width: 100%; border: none; display: block; background: hsl(240 6% 10%); }
   .playground-editor { overflow: auto; }
-
   .playground-editor :global(.cm-editor) { border-radius: 0; }
   .playground-editor :global(.cm-gutters) { border-right: 1px solid hsl(var(--border)); }
 </style>

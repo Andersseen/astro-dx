@@ -1,31 +1,30 @@
-// apps/demo/src/services/shop.service.ts
-import { computed, signal } from '@astro-dx/core';
+import { computed, signal } from "@astro-dx/core";
 
 type Product = { id: string; name: string; price: number };
 
 export class ShopServiceClass {
-  private _cart = signal<Product[]>([]);
-  private _modalOpen = signal(false);
+  #cart = signal<Product[]>([]);
+  #modalOpen = signal(false);
 
-  readonly cartItems = this._cart;
-  readonly cartTotal = computed(() => this._cart().length);
-  readonly hasItems = computed(() => this._cart().length > 0);
-  readonly isModalOpen = this._modalOpen;
+  readonly cartItems = this.#cart;
+  readonly cartTotal = computed(() => this.#cart().length);
+  readonly hasItems = computed(() => this.#cart().length > 0);
+  readonly isModalOpen = this.#modalOpen;
 
   addToCart(product: Product): void {
-    this._cart.update((prev) => [...prev, product]);
+    this.#cart.update((prev) => [...prev, product]);
   }
 
   clearCart(): void {
-    this._cart.set([]);
+    this.#cart.set([]);
   }
 
   openModal(): void {
-    this._modalOpen.set(true);
+    this.#modalOpen.set(true);
   }
 
   closeModal(): void {
-    this._modalOpen.set(false);
+    this.#modalOpen.set(false);
   }
 }
 

@@ -5,7 +5,7 @@ export function stripImports(code: string): string {
 export function buildSrcdoc(
   jsCode: string,
   htmlCode: string,
-  rootDir: string,
+  urls: { core: string; dom: string; events: string; attributes: string },
 ): string {
   return `<!DOCTYPE html>
 <html>
@@ -21,9 +21,10 @@ export function buildSrcdoc(
 <script type="importmap">
 {
   "imports": {
-    "@astro-dx/core": "/@fs${rootDir}/../../packages/core/dist/index.js",
-    "@astro-dx/dom": "/@fs${rootDir}/../../packages/dom/dist/index.js",
-    "@astro-dx/events": "/@fs${rootDir}/../../packages/events/dist/index.js"
+    "@astro-dx/core": "${urls.core}",
+    "@astro-dx/dom": "${urls.dom}",
+    "@astro-dx/events": "${urls.events}",
+    "@astro-dx/attributes": "${urls.attributes}"
   }
 }
 </script>
