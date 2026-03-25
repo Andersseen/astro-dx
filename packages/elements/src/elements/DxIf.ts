@@ -1,4 +1,4 @@
-import { resolve } from '../registry.ts';
+import { waitRegister } from '../registry.ts';
 
 export class DxIf extends HTMLElement {
   private _cleanup: (() => void) | null = null;
@@ -20,25 +20,19 @@ export class DxIf extends HTMLElement {
   }
 
   private _connect(signalName: string): void {
-    const sig = resolve(signalName);
-    if (!sig) {
-      console.warn(`[dx-if] signal "${signalName}" not found in registry`);
-      return;
-    }
-
-    const initialValue = Boolean(sig());
-    this._isMounted = initialValue;
-
-    if (initialValue) {
-      this._mount();
-    }
-
-    this._cleanup = sig.subscribe((value) => {
-      if (value && !this._isMounted) {
+    waitRegister(signalName, (sig) => {
+      const initialValue = Boolean(sig());
+      if (initialValue) {
         this._mount();
-      } else if (!value && this._isMounted) {
-        this._unmount();
       }
+
+      this._cleanup = sig.subscribe((value) => {
+        if (value && !this._isMounted) {
+          this._mount();
+        } else if (!value && this._isMounted) {
+          this._unmount();
+        }
+      });
     });
   }
 

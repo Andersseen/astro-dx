@@ -18,48 +18,30 @@ function extractValue(event: Event): string {
   return '';
 }
 
-function onPaired(
-  target: Target,
-  eventA: string,
-  handlerA: (() => void) | undefined,
-  eventB: string,
-  handlerB: (() => void) | undefined
-): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const cleanups: Array<() => void> = [];
-
-  if (handlerA) {
-    el.addEventListener(eventA, handlerA);
-    cleanups.push(() => el.removeEventListener(eventA, handlerA));
-  }
-
-  if (handlerB) {
-    el.addEventListener(eventB, handlerB);
-    cleanups.push(() => el.removeEventListener(eventB, handlerB));
-  }
-
-  return () => {
-    for (const cleanup of cleanups) {
-      cleanup();
-    }
-  };
-}
-
 export function on(
   target: Target,
   event: string,
   fn: (valueOrEvent: string | Event) => void,
   options?: AddEventListenerOptions
 ): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
+  const handler = (e: Event) => {
+    if (typeof target === 'string') {
+      const el = (e.target as Element).closest?.(target);
+      if (el) {
+        const val = VALUE_EVENTS.has(event) ? extractValue(e) : e;
+        fn(val);
+      }
+    } else if (target === e.currentTarget || target === document || target === window) {
+      const val = VALUE_EVENTS.has(event) ? extractValue(e) : e;
+      fn(val);
+    }
+  };
 
-  const handler = VALUE_EVENTS.has(event) ? (e: Event) => fn(extractValue(e)) : (e: Event) => fn(e);
+  const actualTarget = typeof target === 'string' ? document : target;
+  if (!actualTarget) return () => {};
 
-  el.addEventListener(event, handler, options);
-  return () => el.removeEventListener(event, handler, options);
+  actualTarget.addEventListener(event, handler, options);
+  return () => actualTarget.removeEventListener(event, handler, options);
 }
 
 export function onClick(
@@ -67,50 +49,32 @@ export function onClick(
   fn: (event: MouseEvent) => void,
   options?: AddEventListenerOptions
 ): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const handler = (event: Event) => fn(event as MouseEvent);
-  el.addEventListener('click', handler, options);
-  return () => el.removeEventListener('click', handler, options);
+  return on(target, 'click', (e) => fn(e as MouseEvent), options);
 }
 
 export function onInput(target: Target, fn: (value: string) => void): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const handler = (event: Event) => fn(extractValue(event));
-  el.addEventListener('input', handler);
-  return () => el.removeEventListener('input', handler);
+  return on(target, 'input', (v) => fn(v as string));
 }
 
 export function onChange(target: Target, fn: (value: string) => void): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const handler = (event: Event) => fn(extractValue(event));
-  el.addEventListener('change', handler);
-  return () => el.removeEventListener('change', handler);
+  return on(target, 'change', (v) => fn(v as string));
 }
 
 export function onSubmit(target: Target, fn: (event: SubmitEvent) => void): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const handler = (event: Event) => {
-    event.preventDefault();
-    fn(event as SubmitEvent);
-  };
-
-  el.addEventListener('submit', handler);
-  return () => el.removeEventListener('submit', handler);
+  return on(target, 'submit', (e) => {
+    if (e instanceof Event) e.preventDefault();
+    fn(e as SubmitEvent);
+  });
 }
 
 export function onHover(
   target: Target,
   handlers: { enter?: () => void; leave?: () => void }
 ): () => void {
-  return onPaired(target, 'mouseenter', handlers.enter, 'mouseleave', handlers.leave);
+  const cleanups: Array<() => void> = [];
+  if (handlers.enter) cleanups.push(on(target, 'mouseenter', handlers.enter));
+  if (handlers.leave) cleanups.push(on(target, 'mouseleave', handlers.leave));
+  return () => cleanups.forEach((c) => c());
 }
 
 export function onKey(
@@ -118,30 +82,27 @@ export function onKey(
   key: KeyboardEvent['key'],
   fn: (event: KeyboardEvent) => void
 ): () => void {
-  const el = resolve(target);
-  if (!el) return () => {};
-
-  const handler = (event: Event) => {
-    if (event instanceof KeyboardEvent && event.key === key) {
-      fn(event);
+  return on(target, 'keydown', (e) => {
+    if (e instanceof KeyboardEvent && e.key === key) {
+      fn(e);
     }
-  };
-
-  el.addEventListener('keydown', handler);
-  return () => el.removeEventListener('keydown', handler);
+  });
 }
 
 export function onFocus(
   target: Target,
   handlers: { focus?: () => void; blur?: () => void }
 ): () => void {
-  return onPaired(target, 'focus', handlers.focus, 'blur', handlers.blur);
+  const cleanups: Array<() => void> = [];
+  // focus/blur don't bubble, but focusin/focusout do
+  if (handlers.focus) cleanups.push(on(target, 'focusin', handlers.focus));
+  if (handlers.blur) cleanups.push(on(target, 'focusout', handlers.blur));
+  return () => cleanups.forEach((c) => c());
 }
 
 export function onResize(target: Target, fn: (entry: ResizeObserverEntry) => void): () => void {
   const el = resolve(target);
   if (!(el instanceof Element)) {
-    console.warn('[onResize] target must resolve to an Element');
     return () => {};
   }
 

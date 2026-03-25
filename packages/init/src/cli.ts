@@ -20,9 +20,7 @@ const DESCRIPTIONS: Record<PackageKey, string> = {
   elements: "dx-if, dx-show, dx-for as custom elements",
 };
 
-async function detectPackageManager(): Promise<
-  "npm" | "pnpm" | "yarn" | "bun"
-> {
+async function detectPackageManager(): Promise<"npm" | "pnpm" | "yarn" | "bun"> {
   try {
     execSync("pnpm --version", { stdio: "ignore" });
     return "pnpm";
@@ -49,8 +47,7 @@ function installCommand(pm: string, packages: string[]): string {
 async function init(): Promise<void> {
   console.log("");
   console.log(
-    kleur.bold().cyan("  astro-dx") +
-      kleur.gray(" - Angular-inspired DX for Astro"),
+    kleur.bold().cyan("  astro-dx") + kleur.gray(" - Angular-inspired DX for Astro"),
   );
   console.log(
     kleur.gray("  Community library, not affiliated with the Astro core team."),
@@ -60,9 +57,7 @@ async function init(): Promise<void> {
   const rl = readline.createInterface({ input, output });
   const selected: PackageKey[] = ["core"];
 
-  const keys = Object.keys(PACKAGES).filter(
-    (k) => k !== "core",
-  ) as PackageKey[];
+  const keys = Object.keys(PACKAGES).filter((k) => k !== "core") as PackageKey[];
 
   for (const key of keys) {
     const answer = await rl.question(
@@ -91,25 +86,18 @@ async function init(): Promise<void> {
     console.log(kleur.green("  Done!") + kleur.gray(" astro-dx installed."));
     console.log("");
     console.log(kleur.gray("  Quick start:"));
-    console.log(
-      kleur.white("  import { signal, computed } from '@astro-dx/core'"),
-    );
+    console.log(kleur.white("  import { signal, computed } from '@astro-dx/core'"));
+
     if (selected.includes("events")) {
-      console.log(
-        kleur.white("  import { on, onHover } from '@astro-dx/events'"),
-      );
+      console.log(kleur.white("  import { on, onHover } from '@astro-dx/events'"));
     }
     if (selected.includes("attributes")) {
       console.log(
-        kleur.white(
-          "  import { register, bootstrap } from '@astro-dx/attributes'",
-        ),
+        kleur.white("  import { register, bootstrap } from '@astro-dx/attributes'"),
       );
     }
     if (selected.includes("elements")) {
-      console.log(
-        kleur.white("  import { register } from '@astro-dx/elements'"),
-      );
+      console.log(kleur.white("  import { register } from '@astro-dx/elements'"));
     }
     console.log("");
   } catch {

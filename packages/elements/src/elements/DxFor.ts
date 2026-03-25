@@ -1,4 +1,4 @@
-import { resolve } from '../registry.ts';
+import { waitRegister } from '../registry.ts';
 
 type Item = Record<string, unknown>;
 
@@ -24,19 +24,15 @@ export class DxFor extends HTMLElement {
     this._tpl.innerHTML = this.innerHTML;
     this.innerHTML = '';
 
-    requestAnimationFrame(() => this._connect(signalName));
+    this._connect(signalName);
   }
 
   private _connect(signalName: string): void {
-    const sig = resolve(signalName);
-    if (!sig) {
-      console.warn(`[dx-for] signal "${signalName}" not found in registry`);
-      return;
-    }
-
-    this._cleanup = (sig as unknown as SubscribableItems).subscribe((items) =>
-      this._render(items ?? [])
-    );
+    waitRegister(signalName, (sig) => {
+      this._cleanup = (sig as unknown as SubscribableItems).subscribe((items) =>
+        this._render(items ?? [])
+      );
+    });
   }
 
   private _render(items: Item[]): void {

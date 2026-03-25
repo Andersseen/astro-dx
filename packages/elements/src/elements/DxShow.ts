@@ -1,4 +1,4 @@
-import { resolve } from '../registry.ts';
+import { waitRegister } from '../registry.ts';
 
 export class DxShow extends HTMLElement {
   private _cleanup: (() => void) | null = null;
@@ -14,16 +14,11 @@ export class DxShow extends HTMLElement {
   }
 
   private _connect(signalName: string): void {
-    const sig = resolve(signalName);
-    if (!sig) {
-      console.warn(`[dx-show] signal "${signalName}" not found in registry`);
-      return;
-    }
-
-    this.hidden = !sig();
-
-    this._cleanup = sig.subscribe((value) => {
-      this.hidden = !value;
+    waitRegister(signalName, (sig) => {
+      this.hidden = !sig();
+      this._cleanup = sig.subscribe((value) => {
+        this.hidden = !value;
+      });
     });
   }
 

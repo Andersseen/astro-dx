@@ -53,7 +53,7 @@ test.describe('Attributes — dx-for', () => {
     await page.locator('#btn-add-item').click();
     await page.waitForTimeout(100);
 
-    const items = page.locator('[dx-for="listItems"] ~ *');
+    const items = page.locator('ul[and-layout="vertical gap:xs"] > li');
     await expect(items).toHaveCount(2);
   });
 });
