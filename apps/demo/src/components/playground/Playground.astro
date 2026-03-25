@@ -84,10 +84,10 @@ const { id, files, height = 360 } = Astro.props;
   import { on } from '@astro-dx/events';
 
 
-  import coreCode from '../../../../../packages/core/dist/index.js?raw';
-  import domCode from '../../../../../packages/dom/dist/index.js?raw';
-  import eventsCode from '../../../../../packages/events/dist/index.js?raw';
-  import attributesCode from '../../../../../packages/attributes/dist/index.js?raw';
+  import coreCode from '@core/dist/index.js?raw';
+  import domCode from '@dom/dist/index.js?raw';
+  import eventsCode from '@events/dist/index.js?raw';
+  import attributesCode from '@attributes/dist/index.js?raw';
 
 
   const virtualUrls = {

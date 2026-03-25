@@ -25,7 +25,7 @@ const cleanupInput = onInput('#search', (val) => query.set(val));
 
 // Click
 const cleanupClick = onClick('#submit-btn', (e) => {
-  console.log('clicked at', e.clientX, e.clientY);
+
 });
 
 // Global key listener
@@ -42,7 +42,7 @@ const cleanupForm = onSubmit('#my-form', (e) => {
 // ResizeObserver
 const cleanupResize = onResize('#container', (entry) => {
   const { width, height } = entry.contentRect;
-  console.log(width, height);
+
 });
 
 // Cleanup all on before-swap

@@ -48,7 +48,6 @@ import { signal, effect } from '@astro-dx/core';
 
 const count = signal(0);
 const stop = effect(() => {
-  console.log('count changed:', count());
 });
 
 // stop() to clean up

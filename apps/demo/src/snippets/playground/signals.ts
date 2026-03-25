@@ -1,4 +1,4 @@
-import type { PlaygroundFiles } from '../../lib/playground/types.ts';
+import type { PlaygroundFiles } from "../../lib/playground/types.ts";
 
 export const signalsPlayground: PlaygroundFiles = {
   js: `\
@@ -15,7 +15,7 @@ const count = signal(0)
 const double = computed(() => count() * 2)
 const triple = computed(() => count() * 3)
 const sum    = computed(() => {
-  console.log('[astro-dx] Evaluating sum...')
+  
   return double() + triple()
 })
 
@@ -24,10 +24,9 @@ const sum    = computed(() => {
 const multiplier = linkedSignal(() => double())
 
 // 4. Side Effects (Auto-tracked)
-effect(() => {
+effect(() => {    
   const current = count()
   const val = sum()
-  console.log(\`Count: \${current}, Sum: \${val}, Mult: \${multiplier()}\`)
 })
 
 // Bindings using @astro-dx/dom & @astro-dx/events
