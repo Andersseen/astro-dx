@@ -10,7 +10,7 @@
     "dev": "pnpm run build:packages && pnpm --filter astro-dx-demo dev",
     "build": "pnpm build:packages && pnpm --filter astro-dx-demo build",
     "build:packages": "pnpm --filter './packages/*' build",
-    "build:demo": "pnpm --filter astro-dx-demo build",
+    "build:demo": "pnpm --filter astro-dx-demo... build",
     "test": "pnpm --filter './packages/*' --if-present test",
     "test:e2e": "pnpm --filter astro-dx-demo test:e2e",
     "test:e2e:ui": "pnpm --filter astro-dx-demo test:e2e:ui",
