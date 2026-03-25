@@ -17,11 +17,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        '@astro-dx/core': resolve(__dirname, '../../packages/core/src/index.ts'),
-        '@astro-dx/events': resolve(__dirname, '../../packages/events/src/index.ts'),
-        '@astro-dx/attributes': resolve(__dirname, '../../packages/attributes/src/index.ts'),
-        '@astro-dx/elements': resolve(__dirname, '../../packages/elements/src/index.ts'),
-        '@astro-dx/dom': resolve(__dirname, '../../packages/dom/src/index.ts'),
         '@core': resolve(__dirname, '../../packages/core'),
         '@dom': resolve(__dirname, '../../packages/dom'),
         '@events': resolve(__dirname, '../../packages/events'),
