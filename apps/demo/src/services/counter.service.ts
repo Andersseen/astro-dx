@@ -17,5 +17,3 @@ export class CounterServiceClass {
     this._count.set(0);
   }
 }
-
-export const CounterService = new CounterServiceClass();

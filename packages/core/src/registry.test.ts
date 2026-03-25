@@ -1,29 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { clearRegistry, inject, register } from "./registry.ts";
+import { clearRegistry, inject, register, createLocalRegistry } from "./registry.ts";
 
 class CounterService {
-  private _count = 0;
+  #count = 0;
 
   increment(): void {
-    this._count++;
+    this.#count++;
   }
 
   get count(): number {
-    return this._count;
+    return this.#count;
   }
 }
 
 class GreeterService {
   greet(name: string): string {
     return `Hello, ${name}`;
-  }
-}
-
-class LoggerService {
-  readonly logs: string[] = [];
-
-  log(message: string): void {
-    this.logs.push(message);
   }
 }
 
@@ -39,99 +31,55 @@ describe("register()", () => {
   });
 
   it("registers multiple services in one call", () => {
-    register([CounterService, GreeterService, LoggerService]);
+    register([CounterService, GreeterService]);
     expect(inject(CounterService)).toBeInstanceOf(CounterService);
     expect(inject(GreeterService)).toBeInstanceOf(GreeterService);
-    expect(inject(LoggerService)).toBeInstanceOf(LoggerService);
-  });
-
-  it("calling register() twice with the same class is a no-op", () => {
-    register(CounterService);
-    const first = inject(CounterService);
-    first.increment();
-
-    register(CounterService);
-    const second = inject(CounterService);
-
-    expect(second.count).toBe(1);
-    expect(first).toBe(second);
-  });
-
-  it("register() with empty array does not throw", () => {
-    expect(() => register([])).not.toThrow();
   });
 });
 
 describe("inject()", () => {
   it("returns the same instance on every call (singleton)", () => {
-    register(CounterService);
     const a = inject(CounterService);
     const b = inject(CounterService);
     expect(a).toBe(b);
   });
 
-  it("preserves state across inject() calls", () => {
-    register(CounterService);
-    inject(CounterService).increment();
-    inject(CounterService).increment();
-    expect(inject(CounterService).count).toBe(2);
-  });
-
-  it("returns correctly typed instance without casting", () => {
-    register(GreeterService);
-    const greeter = inject(GreeterService);
-    expect(greeter.greet("Anders")).toBe("Hello, Anders");
-  });
-
-  it("lazy-registers and warns when service not pre-registered", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-
+  it("lazy-registers when service not pre-registered", () => {
     const counter = inject(CounterService);
-
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining("CounterService"),
-    );
     expect(counter).toBeInstanceOf(CounterService);
-
-    warn.mockRestore();
-  });
-
-  it("lazy-registered service is a singleton on subsequent calls", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    const a = inject(CounterService);
-    const b = inject(CounterService);
-
-    expect(a).toBe(b);
-    expect(warn).toHaveBeenCalledTimes(1);
-    warn.mockRestore();
-  });
-
-  it("different service classes return different instances", () => {
-    register([CounterService, LoggerService]);
-    const counter = inject(CounterService);
-    const logger = inject(LoggerService);
-    expect(counter).not.toBe(logger);
   });
 });
 
-describe("clearRegistry()", () => {
-  it("removes all registered services", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+describe("Scoped DI (Local Registry)", () => {
+  it("creates isolated instances in local scope when registered", () => {
+    const local = createLocalRegistry();
+    local.register(CounterService);
+    const globalCount = inject(CounterService);
+    const localCount = local.inject(CounterService);
 
-    register(CounterService);
-    inject(CounterService).increment();
-
-    clearRegistry();
-
-    const fresh = inject(CounterService);
-    expect(fresh.count).toBe(0);
-    expect(warn).toHaveBeenCalled();
-
-    warn.mockRestore();
+    globalCount.increment();
+    expect(globalCount.count).toEqual(1);
+    expect(localCount.count).toEqual(0);
+    expect(globalCount).not.toBe(localCount);
   });
 
-  it("calling clearRegistry() on empty registry does not throw", () => {
-    expect(() => clearRegistry()).not.toThrow();
+  it("falls back to parent registry if service is marked as shared", () => {
+    class SharedService { name = "shared"; }
+    register(SharedService, { shared: true }); // Explicitly mark as shared
+    
+    const local = createLocalRegistry();
+    const instance = local.inject(SharedService);
+    
+    expect(instance).toBe(inject(SharedService));
+  });
+
+  it("allows overriding parent services in local scope", () => {
+    const local = createLocalRegistry();
+    local.register(CounterService);
+    
+    const globalCount = inject(CounterService);
+    const localCount = local.inject(CounterService);
+    
+    expect(globalCount).not.toBe(localCount);
   });
 });

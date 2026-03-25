@@ -1,40 +1,119 @@
-import { signal, type Signal } from "./signal.ts";
-import { effect } from "./effect.ts";
+import {
+  trackDependency,
+  removeObserver,
+  untracked, // Importamos untracked
+  type ReactiveNode,
+} from "./tracking.ts";
+import { computed } from "./computed.ts";
 
-interface LinkedSignalOptions<S, T> {
+export interface LinkedSignal<T> {
+  (): T;
+  peek(): T;
+  set(value: T): void;
+  update(fn: (prev: T) => T): void;
+  subscribe(fn: (value: T) => void): () => void;
+  version: number;
+  observers: Set<ReactiveNode>;
+}
+
+export interface LinkedSignalOptions<S, T> {
   source: () => S;
-  computation: (source: S, prev?: T) => T;
+  computation: (sourceValue: S, previousValue?: T) => T;
   equal?: (a: T, b: T) => boolean;
 }
 
-/**
- * A LinkedSignal is a writable signal that resets or recomputes its internal state
- * whenever its source dependency changes.
- */
 export function linkedSignal<S, T>(
   options: LinkedSignalOptions<S, T> | (() => T),
-): Signal<T> {
-  let sourceFn: () => any;
-  let computation: (s: any, prev?: T) => T;
-  let equal: ((a: T, b: T) => boolean) | undefined;
+): LinkedSignal<T> {
+  let sourceFn: () => S;
+  let computation: (s: S, prev?: T) => T;
+  let equal: (a: T, b: T) => boolean = Object.is;
 
   if (typeof options === "function") {
-    sourceFn = options;
-    computation = (s) => s;
+    sourceFn = options as any;
+    computation = (s: any) => s;
   } else {
     sourceFn = options.source;
     computation = options.computation;
-    equal = options.equal;
+    if (options.equal) equal = options.equal;
   }
 
-  // Initial value
-  const s = signal<T>(computation(sourceFn()), equal);
+  const sourceComp = computed(sourceFn);
 
-  // When source changes, update the signal
-  effect(() => {
-    const val = sourceFn();
-    s.set(computation(val, s.peek()));
-  });
+  let state: T;
+  let lastSourceVersion = -1;
+  let version = 0;
 
-  return s;
+  const observers = new Set<ReactiveNode>();
+
+  const node: ReactiveNode = {
+    version: 0,
+    observers,
+    dependencies: new Set(),
+    notify: () => {
+      version++;
+      node.version = version;
+      for (const observer of [...observers]) observer.notify();
+    },
+  };
+
+  const sync = () => {
+    const currentSource = sourceComp();
+    const sv = (sourceComp as any).version;
+
+    if (sv !== lastSourceVersion) {
+      state = computation(currentSource, state);
+      lastSourceVersion = sv;
+      version++;
+      node.version = version;
+    }
+  };
+
+  const read = (): T => {
+    sync();
+    trackDependency(node);
+    return state;
+  };
+
+  read.peek = () => {
+    sync();
+    return state;
+  };
+
+  read.set = (v: T) => {
+    if (!equal(state, v)) {
+      state = v;
+      version++;
+      node.version = version;
+      for (const observer of [...observers]) observer.notify();
+    }
+  };
+
+  read.update = (fn: (prev: T) => T) => read.set(fn(read.peek()));
+
+  read.subscribe = (fn: (value: T) => void) => {
+    let lastValue: T;
+    const observer: ReactiveNode = {
+      version: -1,
+      observers: new Set(),
+      dependencies: new Set(),
+      notify: () => {
+        const newValue = read();
+        if (!equal(lastValue, newValue)) {
+          lastValue = newValue;
+          untracked(() => fn(newValue)); // Seguro
+        }
+      },
+    };
+    observers.add(observer);
+    lastValue = read();
+    untracked(() => fn(lastValue)); // Seguro
+
+    return () => removeObserver(node, observer);
+  };
+
+  Object.defineProperty(read, "version", { get: () => version });
+  Object.defineProperty(read, "observers", { value: observers });
+
+  return read as unknown as LinkedSignal<T>;
 }

@@ -1,16 +1,16 @@
-import { trackDependency, setActiveObserver, type ReactiveNode } from "./tracking.ts";
+import {
+  trackDependency,
+  setActiveObserver,
+  removeObserver,
+  untracked, // Importamos untracked
+  type ReactiveNode,
+} from "./tracking.ts";
 
-/**
- * A Computed signal derives its value from other signals.
- * It is lazy: it only recomputes when read and its dependencies have changed.
- */
 export interface Computed<T> {
   (): T;
   peek(): T;
   subscribe(fn: (value: T) => void): () => void;
-  /** @internal */
   version: number;
-  /** @internal */
   observers: Set<ReactiveNode>;
 }
 
@@ -18,36 +18,61 @@ export function computed<T>(fn: () => T): Computed<T> {
   let value: T;
   let dirty = true;
   let version = 0;
+
+  const dependencyVersions = new Map<ReactiveNode, number>();
   const observers = new Set<ReactiveNode>();
-  const dependencies = new Set<{ observers: Set<ReactiveNode> }>();
+  const dependencies = new Set<ReactiveNode>();
 
   const node: ReactiveNode = {
     version: 0,
+    observers,
     dependencies,
     notify: () => {
       if (!dirty) {
         dirty = true;
         version++;
-        // Push notification to observers
+        node.version = version;
         for (const observer of [...observers]) {
           observer.notify();
         }
       }
     },
+    onBecomeUnobserved: () => {
+      for (const dep of dependencies) {
+        removeObserver(dep, node);
+      }
+      dependencies.clear();
+      dependencyVersions.clear();
+      dirty = true;
+    },
+  };
+
+  const shouldRecompute = () => {
+    if (dirty) {
+      for (const [dep, lastVersion] of dependencyVersions) {
+        if (dep.version !== lastVersion) return true;
+      }
+      if (dependencyVersions.size > 0) {
+        dirty = false;
+        return false;
+      }
+    }
+    return dirty;
   };
 
   const recompute = () => {
-    // Dynamic Dependency Tracking: cleanup old links
-    for (const dep of dependencies) {
-      dep.observers.delete(node);
-    }
+    for (const dep of dependencies) removeObserver(dep, node);
     dependencies.clear();
+    dependencyVersions.clear();
 
     const prevObserver = setActiveObserver(node);
     try {
       const newValue = fn();
       if (!Object.is(value, newValue)) {
         value = newValue;
+      }
+      for (const dep of dependencies) {
+        dependencyVersions.set(dep, dep.version);
       }
       dirty = false;
     } finally {
@@ -56,47 +81,37 @@ export function computed<T>(fn: () => T): Computed<T> {
   };
 
   const read = (): T => {
-    // Memory Safety: If this is the first time we are being tracked,
-    // we establish our own dependency links. 
-    // If we lose all observers, we could potentially clear dependencies,
-    // but the simplest way is to clear them if we are NOT being observed
-    // and a recompute happens.
-    
-    trackDependency({ observers }); // Register this computed as a dependency of the active observer
-    
-    if (dirty) {
-      recompute();
-    }
+    trackDependency(node);
+    if (shouldRecompute()) recompute();
     return value;
   };
 
   read.peek = () => {
-    if (dirty) recompute();
+    if (shouldRecompute()) recompute();
     return value;
   };
 
   read.subscribe = (fn: (value: T) => void) => {
+    let lastValue: T;
     const observer: ReactiveNode = {
       version: -1,
+      observers: new Set(),
       dependencies: new Set(),
-      notify: () => fn(read()),
+      notify: () => {
+        const newValue = read();
+        if (!Object.is(lastValue, newValue)) {
+          lastValue = newValue;
+          untracked(() => fn(newValue)); // Seguro
+        }
+      },
     };
     observers.add(observer);
-    fn(read());
-    return () => {
-      observers.delete(observer);
-      // Memory Safety: If no one is watching us, stop watching our dependencies
-      if (observers.size === 0) {
-        for (const dep of dependencies) {
-          dep.observers.delete(node);
-        }
-        dependencies.clear();
-        dirty = true; // Mark as dirty so it re-subscribes on next read
-      }
-    };
+    lastValue = read();
+    untracked(() => fn(lastValue)); // Seguro
+
+    return () => removeObserver(node, observer);
   };
 
-  // Internal access for versioning
   Object.defineProperty(read, "version", { get: () => version });
   Object.defineProperty(read, "observers", { value: observers });
 

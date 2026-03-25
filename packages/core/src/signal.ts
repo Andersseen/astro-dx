@@ -1,37 +1,34 @@
-import { trackDependency, type ReactiveNode } from "./tracking.ts";
+import {
+  trackDependency,
+  removeObserver,
+  untracked, // Importamos untracked
+  type ReactiveNode,
+} from "./tracking.ts";
 
-/**
- * A Signal is a primitive reactive cell that holds a value.
- * It notifies its observers whenever the value changes.
- */
-export interface Signal<T> {
-  /** Reads the value and registers a dependency. */
+export interface Signal<T> extends ReactiveNode {
   (): T;
-  /** Reads the value without registering a dependency. */
   peek(): T;
-  /** Sets a new value. If the value changed, notifies observers. */
   set(value: T): void;
-  /** Updates the value based on the previous state. */
   update(fn: (prev: T) => T): void;
-  /** Manually subscribes to changes. */
   subscribe(fn: (value: T) => void): () => void;
-  /** @internal Version counter for change detection. */
-  version: number;
-  /** @internal Set of observers currently watching this signal. */
-  observers: Set<ReactiveNode>;
 }
 
-export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is): Signal<T> {
+export function signal<T>(
+  initial: T,
+  equal: (a: T, b: T) => boolean = Object.is,
+): Signal<T> {
   let value = initial;
   const observers = new Set<ReactiveNode>();
 
-  const node: Signal<T> = (() => {
+  const node = (() => {
     trackDependency(node);
     return value;
   }) as Signal<T>;
 
   node.version = 0;
   node.observers = observers;
+  node.dependencies = new Set();
+  node.notify = () => {};
 
   node.peek = () => value;
 
@@ -39,7 +36,6 @@ export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is
     if (!equal(value, newValue)) {
       value = newValue;
       node.version++;
-      // Notify all observers (Push phase)
       for (const observer of [...observers]) {
         observer.notify();
       }
@@ -49,14 +45,27 @@ export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is
   node.update = (fn: (prev: T) => T) => node.set(fn(value));
 
   node.subscribe = (fn: (value: T) => void) => {
+    let lastValue = value;
+
     const observer: ReactiveNode = {
       version: -1,
+      observers: new Set(),
       dependencies: new Set(),
-      notify: () => fn(value),
+      notify: () => {
+        const newValue = node.peek();
+        if (!equal(lastValue, newValue)) {
+          lastValue = newValue;
+          // Ejecución segura sin trackear dependencias accidentales
+          untracked(() => fn(newValue));
+        }
+      },
     };
+
     observers.add(observer);
-    fn(value);
-    return () => observers.delete(observer);
+    // Ejecución segura inicial
+    untracked(() => fn(value));
+
+    return () => removeObserver(node, observer);
   };
 
   return node;
