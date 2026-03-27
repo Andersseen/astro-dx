@@ -1,4 +1,4 @@
-import { ElementRef } from './element-ref.ts';
+import { ElementRef } from "./element-ref.ts";
 
 interface TrackedRef {
   ref: WeakRef<ElementRef<Element>>;
@@ -7,9 +7,7 @@ interface TrackedRef {
 
 const _registry: TrackedRef[] = [];
 
-// FinalizationRegistry para limpiar automáticamente referencias destruidas
 const cleanupRegistry = new FinalizationRegistry<string>((_selector) => {
-  // Cuando un ElementRef es garbage collected, limpiamos el registry
   cleanupDestroyedRefs();
 });
 
@@ -19,7 +17,6 @@ function cleanupDestroyedRefs(): void {
     const ref = tracked.ref.deref();
     const element = tracked.element.deref();
 
-    // Limpiar si el ref fue destruido o el elemento ya no está en el DOM
     if (!ref || !element || !document.contains(element)) {
       _registry.splice(i, 1);
     }
@@ -29,13 +26,15 @@ function cleanupDestroyedRefs(): void {
 export class ElementNotFoundError extends Error {
   constructor(selector: string) {
     super(
-      `[astro-dx] Element with selector "${selector}" not found in the DOM. Ensure the element exists before calling getElement() or use getElementOrNull() for optional elements.`
+      `[astro-dx] Element with selector "${selector}" not found in the DOM. Ensure the element exists before calling getElement() or use getElementOrNull() for optional elements.`,
     );
-    this.name = 'ElementNotFoundError';
+    this.name = "ElementNotFoundError";
   }
 }
 
-export function getElementOrNull<T extends Element>(selector: string): ElementRef<T> | null {
+export function getElementOrNull<T extends Element>(
+  selector: string,
+): ElementRef<T> | null {
   const el = document.querySelector<T>(selector);
   if (!el) {
     return null;
@@ -48,7 +47,6 @@ export function getElementOrNull<T extends Element>(selector: string): ElementRe
   };
   _registry.push(trackedRef);
 
-  // Registrar para limpieza automática cuando el ref sea GC'd
   cleanupRegistry.register(ref, selector);
 
   return ref;
@@ -62,7 +60,9 @@ export function getElement<T extends Element>(selector: string): ElementRef<T> {
   return ref;
 }
 
-export function getElements<T extends Element>(selector: string): ElementRef<T>[] {
+export function getElements<T extends Element>(
+  selector: string,
+): ElementRef<T>[] {
   const els = Array.from(document.querySelectorAll<T>(selector));
   const refs = els.map((el) => {
     const ref = new ElementRef<T>(el);
@@ -78,7 +78,6 @@ export function getElements<T extends Element>(selector: string): ElementRef<T>[
 }
 
 export function destroyAll(): void {
-  // Limpiar solo los refs que aún existen
   for (const tracked of _registry) {
     const ref = tracked.ref.deref();
     if (ref) {
@@ -88,5 +87,7 @@ export function destroyAll(): void {
   _registry.length = 0;
 }
 
-// Exportar para testing y debugging avanzado
-export { _registry as __registry, cleanupDestroyedRefs as __cleanupDestroyedRefs };
+export {
+  _registry as __registry,
+  cleanupDestroyedRefs as __cleanupDestroyedRefs,
+};
