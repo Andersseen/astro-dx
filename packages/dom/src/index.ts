@@ -1,4 +1,10 @@
-export { getElement, getElements, destroyAll } from './get-element.ts';
+export {
+  getElement,
+  getElements,
+  destroyAll,
+  getElementOrNull,
+  ElementNotFoundError,
+} from './get-element.ts';
 export { ElementRef } from './element-ref.ts';
 export { text, attr, cls } from './bindings.ts';
 

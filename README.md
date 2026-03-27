@@ -1,6 +1,6 @@
 # astro-dx
 
-Angular-inspired signals, services and DOM bindings for Astro client-side scripting. Built on nanostores.
+Angular-inspired signals, services and DOM bindings for Astro client-side scripting. Zero-dependency reactive system.
 
 > **Community library** — not affiliated with or endorsed by the Astro core team.
 
@@ -13,17 +13,25 @@ Astro is great for content-focused sites. But when you need client-side interact
 astro-dx brings the patterns Angular 20+ developers know — signals, computed values, singleton services, declarative DOM bindings — to Astro client scripts. No compiler, no framework, zero JS added to the server-rendered markup.
 
 ```typescript
-// Before
-const $count = atom(0)
-document.querySelector('#count').textContent = String($count.get())
-document.querySelector('#btn').addEventListener('click', () => {
-  $count.set($count.get() + 1)
-})
+// Before - verbose and manual
+let count = 0
+const countEl = document.querySelector('#count')
+const btn = document.querySelector('#btn')
 
-// After
+function updateCount(newVal) {
+  count = newVal
+  if (countEl) countEl.textContent = String(count)
+}
+
+btn?.addEventListener('click', () => updateCount(count + 1))
+
+// After - with astro-dx
 const count = signal(0)
-text('#count', count)
-onClick('#btn', () => count.update(v => v + 1))
+const counterEl = getElement('#count')
+counterEl.text(count)
+
+const btn = getElement('#btn')
+btn.on('click', () => count.update(v => v + 1))
 ```
 
 ---

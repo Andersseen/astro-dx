@@ -1,6 +1,7 @@
 export { signal } from './signal.ts';
 export { computed } from './computed.ts';
-export { effect } from './effect.ts';
+export { effect, EffectError } from './effect.ts';
+export type { EffectOptions } from './effect.ts';
 export { linkedSignal } from './linkedSignal.ts';
 export {
   register,

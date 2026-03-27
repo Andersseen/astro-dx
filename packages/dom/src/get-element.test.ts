@@ -1,6 +1,12 @@
 import { signal } from '@astro-dx/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { destroyAll, getElement, getElements } from './get-element.ts';
+import {
+  ElementNotFoundError,
+  destroyAll,
+  getElement,
+  getElementOrNull,
+  getElements,
+} from './get-element.ts';
 
 describe('getElement', () => {
   beforeEach(() => {
@@ -135,5 +141,24 @@ describe('getElements', () => {
     items[1]?.el.dispatchEvent(new MouseEvent('click'));
 
     expect(clicked).toEqual(['1', '2']);
+  });
+
+  it('throws ElementNotFoundError when element not found', () => {
+    expect(() => getElement('#nonexistent')).toThrow(ElementNotFoundError);
+    expect(() => getElement('#nonexistent')).toThrow(
+      '[astro-dx] Element with selector "#nonexistent" not found'
+    );
+  });
+
+  it('getElementOrNull returns null when element not found', () => {
+    const result = getElementOrNull('#nonexistent');
+    expect(result).toBeNull();
+  });
+
+  it('getElementOrNull returns ElementRef when element exists', () => {
+    document.body.innerHTML = '<button id="btn">Click</button>';
+    const result = getElementOrNull<HTMLButtonElement>('#btn');
+    expect(result).not.toBeNull();
+    expect(result?.el).toBeInstanceOf(HTMLButtonElement);
   });
 });
