@@ -1,12 +1,6 @@
 import { signal } from '@astro-dx/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ElementNotFoundError,
-  destroyAll,
-  getElement,
-  getElementOrNull,
-  getElements,
-} from './get-element.ts';
+import { destroyAll, getElement, getElements } from './get-element.ts';
 
 describe('getElement', () => {
   beforeEach(() => {
@@ -17,7 +11,14 @@ describe('getElement', () => {
   it('returns an ElementRef for a matching element', () => {
     document.body.innerHTML = '<button id="btn">Click</button>';
     const btn = getElement<HTMLButtonElement>('#btn');
-    expect(btn.el).toBeInstanceOf(HTMLButtonElement);
+    expect(btn).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(btn!.el).toBeInstanceOf(HTMLButtonElement);
+  });
+
+  it('returns null when element not found', () => {
+    const result = getElement('#nonexistent');
+    expect(result).toBeNull();
   });
 
   it('text() updates textContent reactively', () => {
@@ -25,11 +26,15 @@ describe('getElement', () => {
     const count = signal(0);
     const span = getElement<HTMLSpanElement>('#count');
 
-    span.text(count);
-    expect(span.el.textContent).toBe('0');
+    expect(span).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    span!.text(count);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(span!.el.textContent).toBe('0');
 
     count.set(5);
-    expect(span.el.textContent).toBe('5');
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(span!.el.textContent).toBe('5');
   });
 
   it('attr() sets and removes attribute reactively', () => {
@@ -37,14 +42,19 @@ describe('getElement', () => {
     const isLoading = signal(false);
     const btn = getElement<HTMLButtonElement>('#btn');
 
-    btn.attr('disabled', isLoading);
-    expect(btn.el.hasAttribute('disabled')).toBe(false);
+    expect(btn).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.attr('disabled', isLoading);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(btn!.el.hasAttribute('disabled')).toBe(false);
 
     isLoading.set(true);
-    expect(btn.el.hasAttribute('disabled')).toBe(true);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(btn!.el.hasAttribute('disabled')).toBe(true);
 
     isLoading.set(false);
-    expect(btn.el.hasAttribute('disabled')).toBe(false);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(btn!.el.hasAttribute('disabled')).toBe(false);
   });
 
   it('cls() toggles class reactively', () => {
@@ -52,11 +62,15 @@ describe('getElement', () => {
     const isActive = signal(false);
     const card = getElement<HTMLDivElement>('#card');
 
-    card.cls('active', isActive);
-    expect(card.el.classList.contains('active')).toBe(false);
+    expect(card).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    card!.cls('active', isActive);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(card!.el.classList.contains('active')).toBe(false);
 
     isActive.set(true);
-    expect(card.el.classList.contains('active')).toBe(true);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    expect(card!.el.classList.contains('active')).toBe(true);
   });
 
   it('on() attaches event listener', () => {
@@ -64,8 +78,11 @@ describe('getElement', () => {
     const spy = vi.fn();
     const btn = getElement<HTMLButtonElement>('#btn');
 
-    btn.on('click', spy);
-    btn.el.click();
+    expect(btn).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.on('click', spy);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.el.click();
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -75,9 +92,12 @@ describe('getElement', () => {
     const spy = vi.fn();
     const btn = getElement<HTMLButtonElement>('#btn');
 
-    btn.cls('loading', isLoading).attr('disabled', isLoading).on('click', spy);
+    expect(btn).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.cls('loading', isLoading).attr('disabled', isLoading).on('click', spy);
 
-    btn.el.click();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.el.click();
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -86,20 +106,31 @@ describe('getElement', () => {
     const spy = vi.fn();
     const btn = getElement<HTMLButtonElement>('#btn');
 
-    btn.on('click', spy);
-    btn.destroy();
-    btn.el.click();
+    expect(btn).not.toBeNull();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.on('click', spy);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.destroy();
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btn!.el.click();
     expect(spy).toHaveBeenCalledTimes(0);
   });
 
   it('destroyAll() cleans all registered refs', () => {
-    document.body.innerHTML =
-      '\n      <button id="a">A</button>\n      <button id="b">B</button>\n    ';
+    document.body.innerHTML = '<button id="a">A</button><button id="b">B</button>';
     const spyA = vi.fn();
     const spyB = vi.fn();
 
-    getElement('#a').on('click', spyA);
-    getElement('#b').on('click', spyB);
+    const btnA = getElement('#a');
+    const btnB = getElement('#b');
+
+    expect(btnA).not.toBeNull();
+    expect(btnB).not.toBeNull();
+
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btnA!.on('click', spyA);
+    // biome-ignore lint/style/noNonNullAssertion: verified not null above
+    btnB!.on('click', spyB);
 
     destroyAll();
 
@@ -119,7 +150,7 @@ describe('getElements', () => {
 
   it('returns refs for all matching elements', () => {
     document.body.innerHTML =
-      '\n      <li class="item">A</li>\n      <li class="item">B</li>\n      <li class="item">C</li>\n    ';
+      '<li class="item">A</li><li class="item">B</li><li class="item">C</li>';
     const items = getElements<HTMLLIElement>('.item');
     expect(items).toHaveLength(3);
     for (const item of items) {
@@ -127,9 +158,15 @@ describe('getElements', () => {
     }
   });
 
+  it('returns empty array when no elements match', () => {
+    const items = getElements('.nonexistent');
+    expect(items).toEqual([]);
+    expect(items).toHaveLength(0);
+  });
+
   it('on() works per element', () => {
     document.body.innerHTML =
-      '\n      <li class="item" data-id="1">A</li>\n      <li class="item" data-id="2">B</li>\n    ';
+      '<li class="item" data-id="1">A</li><li class="item" data-id="2">B</li>';
     const clicked: string[] = [];
     const items = getElements<HTMLLIElement>('.item');
 
@@ -141,24 +178,5 @@ describe('getElements', () => {
     items[1]?.el.dispatchEvent(new MouseEvent('click'));
 
     expect(clicked).toEqual(['1', '2']);
-  });
-
-  it('throws ElementNotFoundError when element not found', () => {
-    expect(() => getElement('#nonexistent')).toThrow(ElementNotFoundError);
-    expect(() => getElement('#nonexistent')).toThrow(
-      '[astro-dx] Element with selector "#nonexistent" not found'
-    );
-  });
-
-  it('getElementOrNull returns null when element not found', () => {
-    const result = getElementOrNull('#nonexistent');
-    expect(result).toBeNull();
-  });
-
-  it('getElementOrNull returns ElementRef when element exists', () => {
-    document.body.innerHTML = '<button id="btn">Click</button>';
-    const result = getElementOrNull<HTMLButtonElement>('#btn');
-    expect(result).not.toBeNull();
-    expect(result?.el).toBeInstanceOf(HTMLButtonElement);
   });
 });

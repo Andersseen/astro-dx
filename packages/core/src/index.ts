@@ -14,6 +14,20 @@ export {
 } from './registry.ts';
 export { onPageLoad, onBeforeSwap } from './lifecycle.ts';
 export { untracked } from './tracking.ts';
+export {
+  enableDebug,
+  disableDebug,
+  isDebugEnabled,
+  startPerf,
+  endPerf,
+} from './debug.ts';
+export {
+  AstroDxError,
+  createElementNotFoundError,
+  createServiceNotFoundError,
+  createInfiniteLoopError,
+  createMissingDependencyError,
+} from './errors.ts';
 export type { Signal } from './signal.ts';
 export type { Computed } from './computed.ts';
 export type { LinkedSignal } from './linkedSignal.ts';

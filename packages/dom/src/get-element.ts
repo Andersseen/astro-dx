@@ -1,4 +1,4 @@
-import { ElementRef } from "./element-ref.ts";
+import { ElementRef } from './element-ref.ts';
 
 interface TrackedRef {
   ref: WeakRef<ElementRef<Element>>;
@@ -23,58 +23,28 @@ function cleanupDestroyedRefs(): void {
   }
 }
 
-export class ElementNotFoundError extends Error {
-  constructor(selector: string) {
-    super(
-      `[astro-dx] Element with selector "${selector}" not found in the DOM. Ensure the element exists before calling getElement() or use getElementOrNull() for optional elements.`,
-    );
-    this.name = "ElementNotFoundError";
-  }
-}
-
-export function getElementOrNull<T extends Element>(
-  selector: string,
-): ElementRef<T> | null {
-  const el = document.querySelector<T>(selector);
-  if (!el) {
-    return null;
-  }
-
+function trackElement<T extends Element>(el: T, selector: string): ElementRef<T> {
   const ref = new ElementRef<T>(el);
   const trackedRef: TrackedRef = {
     ref: new WeakRef(ref as ElementRef<Element>),
     element: new WeakRef(el),
   };
   _registry.push(trackedRef);
-
   cleanupRegistry.register(ref, selector);
-
   return ref;
 }
 
-export function getElement<T extends Element>(selector: string): ElementRef<T> {
-  const ref = getElementOrNull<T>(selector);
-  if (!ref) {
-    throw new ElementNotFoundError(selector);
+export function getElement<T extends Element>(selector: string): ElementRef<T> | null {
+  const el = document.querySelector<T>(selector);
+  if (!el) {
+    return null;
   }
-  return ref;
+  return trackElement(el, selector);
 }
 
-export function getElements<T extends Element>(
-  selector: string,
-): ElementRef<T>[] {
+export function getElements<T extends Element>(selector: string): ElementRef<T>[] {
   const els = Array.from(document.querySelectorAll<T>(selector));
-  const refs = els.map((el) => {
-    const ref = new ElementRef<T>(el);
-    const trackedRef: TrackedRef = {
-      ref: new WeakRef(ref as ElementRef<Element>),
-      element: new WeakRef(el),
-    };
-    _registry.push(trackedRef);
-    cleanupRegistry.register(ref, selector);
-    return ref;
-  });
-  return refs;
+  return els.map((el) => trackElement(el, selector));
 }
 
 export function destroyAll(): void {
@@ -87,7 +57,5 @@ export function destroyAll(): void {
   _registry.length = 0;
 }
 
-export {
-  _registry as __registry,
-  cleanupDestroyedRefs as __cleanupDestroyedRefs,
-};
+// Exportar para testing y debugging avanzado
+export { _registry as __registry, cleanupDestroyedRefs as __cleanupDestroyedRefs };

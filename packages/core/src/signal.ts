@@ -1,4 +1,7 @@
+import { logSignal, warn } from './debug.ts';
 import { type ReactiveNode, removeObserver, trackDependency, untracked } from './tracking.ts';
+
+let signalCounter = 0;
 
 export interface Signal<T> extends ReactiveNode {
   (): T;
@@ -6,11 +9,17 @@ export interface Signal<T> extends ReactiveNode {
   set(value: T): void;
   update(fn: (prev: T) => T): void;
   subscribe(fn: (value: T) => void): () => void;
+  _debugName?: string;
 }
 
-export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is): Signal<T> {
+export function signal<T>(
+  initial: T,
+  equal: (a: T, b: T) => boolean = Object.is,
+  debugName?: string
+): Signal<T> {
   let value = initial;
   const observers = new Set<ReactiveNode>();
+  const name = debugName || `signal-${++signalCounter}`;
 
   const node = (() => {
     trackDependency(node);
@@ -21,16 +30,22 @@ export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is
   node.observers = observers;
   node.dependencies = new Set();
   node.notify = () => {};
-
+  node._debugName = name;
   node.peek = () => value;
 
   node.set = (newValue: T) => {
     if (!equal(value, newValue)) {
+      const oldValue = value;
       value = newValue;
       node.version++;
+
+      logSignal(name, oldValue, newValue);
+
       for (const observer of [...observers]) {
         observer.notify();
       }
+    } else {
+      warn(`Signal "${name}" updated with the same value`, { value });
     }
   };
 
@@ -47,14 +62,12 @@ export function signal<T>(initial: T, equal: (a: T, b: T) => boolean = Object.is
         const newValue = node.peek();
         if (!equal(lastValue, newValue)) {
           lastValue = newValue;
-
           untracked(() => fn(newValue));
         }
       },
     };
 
     observers.add(observer);
-
     untracked(() => fn(value));
 
     return () => removeObserver(node, observer);

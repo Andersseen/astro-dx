@@ -1,8 +1,5 @@
-import {
-  type ReactiveNode,
-  removeObserver,
-  setActiveObserver,
-} from "./tracking.ts";
+import { endPerf, logEffect, startPerf, warn } from './debug.ts';
+import { type ReactiveNode, removeObserver, setActiveObserver } from './tracking.ts';
 
 const MAX_ITERATIONS = 100;
 
@@ -15,17 +12,14 @@ export class EffectError extends Error {
   constructor(
     message: string,
     public readonly effectName: string | undefined,
-    public readonly originalError: Error,
+    public readonly originalError: Error
   ) {
     super(message);
-    this.name = "EffectError";
+    this.name = 'EffectError';
   }
 }
 
-export function effect(
-  fn: () => void,
-  options: EffectOptions = {},
-): () => void {
+export function effect(fn: () => void, options: EffectOptions = {}): () => void {
   const { name, onError } = options;
   const dependencies = new Set<ReactiveNode>();
 
@@ -63,9 +57,9 @@ export function effect(
       executionState.isDisposed = true;
       cleanupDeps();
       const infiniteLoopError = new EffectError(
-        `[astro-dx] Infinite loop detected in effect${name ? ` "${name}"` : ""}. The effect has been disposed to prevent browser freeze. Check for circular dependencies or unbounded updates.`,
+        `[astro-dx] Infinite loop detected in effect${name ? ` "${name}"` : ''}. The effect has been disposed to prevent browser freeze. Check for circular dependencies or unbounded updates.`,
         name,
-        new Error("Max iterations exceeded"),
+        new Error('Max iterations exceeded')
       );
 
       throw infiniteLoopError;
@@ -73,22 +67,22 @@ export function effect(
 
     cleanupDeps();
 
+    const perfLabel = name || 'effect';
+    startPerf(perfLabel);
+
     const prevObserver = setActiveObserver(node);
     try {
       fn();
       executionState.lastError = null;
     } catch (error) {
-      if (
-        error instanceof EffectError &&
-        error.message.includes("Infinite loop detected")
-      ) {
+      if (error instanceof EffectError && error.message.includes('Infinite loop detected')) {
         throw error;
       }
 
       const effectError = new EffectError(
-        `[astro-dx] Error in effect${name ? ` "${name}"` : ""}: ${error instanceof Error ? error.message : String(error)}`,
+        `[astro-dx] Error in effect${name ? ` "${name}"` : ''}: ${error instanceof Error ? error.message : String(error)}`,
         name,
-        error instanceof Error ? error : new Error(String(error)),
+        error instanceof Error ? error : new Error(String(error))
       );
 
       executionState.lastError = effectError;
@@ -98,15 +92,22 @@ export function effect(
       } else {
         console.error(effectError.message);
         if (error instanceof Error && error.stack) {
-          console.error("Stack trace:", error.stack);
+          console.error('Stack trace:', error.stack);
         }
       }
     } finally {
       setActiveObserver(prevObserver);
+      const duration = endPerf(perfLabel);
+      logEffect(name, dependencies.size, duration ?? undefined);
     }
   };
 
   run();
+
+  // Warn if effect has no dependencies
+  if (dependencies.size === 0) {
+    warn(`Effect${name ? ` "${name}"` : ''} has no reactive dependencies and will never re-run`);
+  }
 
   return () => {
     if (executionState.isDisposed) return;
