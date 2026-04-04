@@ -1,6 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
+
 <BaseLayout title="Debug Mode">
   <div class="docs-container">
     <header class="page-header">
@@ -28,7 +30,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <p>Debug mode helps you understand what's happening with signals, effects, and services in your application. It's automatically disabled in production builds.</p>
 
           <h3>Method 1: In Code</h3>
-          <pre><code>{`import { enableDebug } from '@astro-dx/core';
+          
+          <CodeBlock 
+            language="typescript"
+            filename="app.ts"
+            code={`import { enableDebug } from '@astro-dx/core';
 
 // Enable all debug features
 enableDebug();
@@ -39,20 +45,39 @@ enableDebug({
   logEffects: true,
   logServices: false,
   showWarnings: true
-});`}</code></pre>
+});`}
+          />
 
           <h3>Method 2: Via localStorage (Persistent)</h3>
           <p>Open your browser's DevTools console and run:</p>
-          <pre><code>localStorage.setItem('astro-dx-debug', 'true');
-location.reload();</code></pre>
+          
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`localStorage.setItem('astro-dx-debug', 'true');
+location.reload();`}
+          />
 
           <h3>Disabling Debug Mode</h3>
-          <pre><code>{`import { disableDebug } from '@astro-dx/core';
+          
+          <CodeBlock 
+            language="typescript"
+            filename="app.ts"
+            code={`import { disableDebug } from '@astro-dx/core';
 
-disableDebug();`}</code></pre>
+disableDebug();`}
+          />
+          
           <p>Or clear localStorage:</p>
-          <pre><code>localStorage.removeItem('astro-dx-debug');
-location.reload();`}</code></pre>
+          
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`localStorage.removeItem('astro-dx-debug');
+location.reload();`}
+          />
         </section>
 
         <section id="signal-logging" class="doc-section">
@@ -60,9 +85,14 @@ location.reload();`}</code></pre>
           
           <p>When signal logging is enabled, you'll see every signal update in the console:</p>
 
-          <pre><code class="console-output">{`[astro-dx:signal] count: 0 → 1
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:signal] count: 0 → 1
 [astro-dx:signal] count: 1 → 2
-[astro-dx:signal] user: {name: "John"} → {name: "Jane"}`}</code></pre>
+[astro-dx:signal] user: {name: "John"} → {name: "Jane"}`}
+          />
 
           <div class="tip-box">
             <strong>💡 Tip:</strong> Use this to track down unnecessary re-renders or unexpected state changes.
@@ -74,14 +104,23 @@ location.reload();`}</code></pre>
           
           <p>Effect logging shows when effects execute and how many dependencies they track:</p>
 
-          <pre><code class="console-output">{`[astro-dx:effect] "counter" executed with 2 dependencies (0.12ms)
-[astro-dx:effect] executed with 1 dependencies (0.05ms)`}</code></pre>
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:effect] "counter" executed with 2 dependencies (0.12ms)
+[astro-dx:effect] executed with 1 dependencies (0.05ms)`}
+          />
 
           <p>To name your effects for better debugging:</p>
 
-          <pre><code>{`effect(() => {
+          <CodeBlock 
+            language="typescript"
+            filename="example.ts"
+            code={`effect(() => {
   console.log('Count is:', count());
-}, { name: 'counter' });`}</code></pre>
+}, { name: 'counter' });`}
+          />
         </section>
 
         <section id="performance" class="doc-section">
@@ -89,13 +128,17 @@ location.reload();`}</code></pre>
           
           <p>You can track the performance of specific operations:</p>
 
-          <pre><code>{`import { startPerf, endPerf } from '@astro-dx/core';
+          <CodeBlock 
+            language="typescript"
+            filename="example.ts"
+            code={`import { startPerf, endPerf } from '@astro-dx/core';
 
 // In your code
 startPerf('heavy-computation');
 // ... do some work
 const duration = endPerf('heavy-computation');
-console.log(\`Operation took \${duration}ms\`);`}</code></pre>
+console.log(\`Operation took \${duration}ms\`);`}
+          />
 
           <div class="tip-box warning">
             <strong>⚠️ Warning:</strong> Performance tracking is only available when debug mode is enabled. In production, these functions are no-ops.
@@ -107,9 +150,14 @@ console.log(\`Operation took \${duration}ms\`);`}</code></pre>
           
           <p>Debug mode can warn you about common issues:</p>
 
-          <pre><code class="console-output">{`[astro-dx:warn] Effect has no reactive dependencies
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:warn] Effect has no reactive dependencies
 [astro-dx:warn] Signal "count" updated with the same value
-[astro-dx:warn] Service "CartService" registered multiple times`}</code></pre>
+[astro-dx:warn] Service "CartService" registered multiple times`}
+          />
 
           <table class="warnings-table">
             <thead>
@@ -144,17 +192,22 @@ console.log(\`Operation took \${duration}ms\`);`}</code></pre>
           
           <p>You can also toggle debug mode directly from the browser console:</p>
 
-          <pre><code>{`// Check current state
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`// Check current state
 window.__ASTRO_DX_DEBUG__  // true or false
 
 // Toggle debug mode
 window.enableAstroDxDebug()
-window.disableAstroDxDebug()`}</code></pre>
+window.disableAstroDxDebug()`}
+          />
 
           <div class="tip-box">
             <strong>💡 Pro Tip:</strong> Create a bookmarklet to quickly toggle debug mode:
             <br />
-            <code>javascript:localStorage.setItem('astro-dx-debug', localStorage.getItem('astro-dx-debug') === 'true' ? 'false' : 'true');location.reload();</code>
+            <code class="bookmarklet">javascript:localStorage.setItem('astro-dx-debug', localStorage.getItem('astro-dx-debug') === 'true' ? 'false' : 'true');location.reload();</code>
           </div>
         </section>
       </main>
@@ -255,25 +308,6 @@ window.disableAstroDxDebug()`}</code></pre>
       margin-bottom: 1rem;
     }
 
-    .doc-section pre {
-      background: #0f172a;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      overflow-x: auto;
-      margin: 1rem 0;
-    }
-
-    .doc-section code {
-      font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      color: #e2e8f0;
-    }
-
-    .console-output {
-      color: #4ade80 !important;
-      background: #022c22 !important;
-    }
-
     .tip-box {
       background: rgba(96, 165, 250, 0.1);
       border-left: 4px solid #60a5fa;
@@ -286,6 +320,16 @@ window.disableAstroDxDebug()`}</code></pre>
     .tip-box.warning {
       background: rgba(245, 158, 11, 0.1);
       border-left-color: #f59e0b;
+    }
+
+    .tip-box .bookmarklet {
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      word-break: break-all;
     }
 
     .warnings-table {

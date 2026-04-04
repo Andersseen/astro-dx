@@ -4,6 +4,13 @@ export class DxIf extends HTMLElement {
   private _cleanup: (() => void) | null = null;
   private _tpl: HTMLTemplateElement | null = null;
   private _isMounted = false;
+  private _shadow: ShadowRoot;
+
+  constructor() {
+    super();
+    this._shadow = this.attachShadow({ mode: 'open' });
+    this._shadow.innerHTML = '<slot></slot>';
+  }
 
   connectedCallback(): void {
     const signalName = this.getAttribute('signal');
@@ -20,20 +27,24 @@ export class DxIf extends HTMLElement {
   }
 
   private _connect(signalName: string): void {
-    waitRegister(signalName, (sig) => {
-      const initialValue = Boolean(sig());
-      if (initialValue) {
-        this._mount();
-      }
-
-      this._cleanup = sig.subscribe((value) => {
-        if (value && !this._isMounted) {
+    try {
+      waitRegister(signalName, (sig) => {
+        const initialValue = Boolean(sig());
+        if (initialValue) {
           this._mount();
-        } else if (!value && this._isMounted) {
-          this._unmount();
         }
+
+        this._cleanup = sig.subscribe((value) => {
+          if (value && !this._isMounted) {
+            this._mount();
+          } else if (!value && this._isMounted) {
+            this._unmount();
+          }
+        });
       });
-    });
+    } catch (err) {
+      console.error('[dx-if] Failed to connect signal:', err);
+    }
   }
 
   private _mount(): void {

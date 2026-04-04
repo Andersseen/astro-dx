@@ -31,3 +31,12 @@ export {
 export type { Signal } from './signal.ts';
 export type { Computed } from './computed.ts';
 export type { LinkedSignal } from './linkedSignal.ts';
+export {
+  createSignalKey,
+  registerSignal,
+  resolveSignal,
+  waitForSignal,
+  unregisterSignal,
+  clearSignalRegistry,
+} from './signalKey.ts';
+export type { SignalKey, ReadableSignal } from './signalKey.ts';

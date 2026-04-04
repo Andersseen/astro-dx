@@ -1,12 +1,108 @@
 ---
+import AlpinePlayground from '../components/playground/AlpinePlayground.astro';
+import Playground from '../components/playground/Playground.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+  alpineConditionalsPlayground,
+  alpineCounterPlayground,
+} from '../snippets/playground/alpine-counter.ts';
+import { attributesPlayground } from '../snippets/playground/attributes.ts';
+
+const counterAstroDx = `\
+import { signal } from '@astro-dx/core';
+import { onClick } from '@astro-dx/events';
+
+const count = signal(0);
+
+onClick('#increment', () => count.update(v => v + 1));
+onClick('#reset', () => count.set(0));
+
+count.subscribe(v => {
+  const el = document.querySelector('#counter-display');
+  if (el) el.textContent = String(v);
+});`;
+
+const counterAstroDxHtml = `\
+<div style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem">
+  <button id="increment" style="font-size:1rem;padding:.5rem 1.5rem">
+    Increment
+  </button>
+
+  <div id="counter-display" style="font-size:2.5rem;font-weight:700;color:#60a5fa">
+    0
+  </div>
+
+  <button id="reset" style="font-size:.75rem;opacity:.6">
+    Reset
+  </button>
+</div>`;
+
+const counterAlpineHtml = `\
+<div
+  x-data="{ count: 0 }"
+  style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem"
+>
+  <button
+    @click="count++"
+    style="font-size:1rem;padding:.5rem 1.5rem"
+  >
+    Increment
+  </button>
+
+  <div style="font-size:2.5rem;font-weight:700;color:#fbbf24" x-text="count">
+    0
+  </div>
+
+  <button
+    @click="count = 0"
+    style="font-size:.75rem;opacity:.6"
+  >
+    Reset
+  </button>
+</div>`;
+
+const conditionalsAstroDx = attributesPlayground;
+
+const conditionalsAlpineHtml = `\
+<div
+  x-data="{ showBox: true, mounted: true }"
+  style="display:flex;flex-direction:column;gap:1.25rem;padding:1rem"
+>
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <button @click="showBox = !showBox" style="font-size:.8rem">
+      Toggle x-show
+    </button>
+    <div
+      x-show="showBox"
+      style="padding:.25rem .75rem;background:#fb923c20;border-radius:4px;
+             border:1px solid #fb923c40;font-size:.8rem;color:#fb923c"
+    >
+      I stay in DOM (display:none)
+    </div>
+  </div>
+
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <button @click="mounted = !mounted" style="font-size:.8rem">
+      Toggle x-if
+    </button>
+    <template x-if="mounted">
+      <div
+        style="padding:.25rem .75rem;background:#16a34a20;border-radius:4px;
+               border:1px solid #16a34a40;font-size:.8rem;color:#4ade80"
+      >
+        I am removed from DOM
+      </div>
+    </template>
+  </div>
+</div>`;
 ---
+
 <BaseLayout title="Comparison with Alpine.js">
   <div class="comparison-container">
     <header class="page-header">
       <h1 class="page-title">astro-dx vs Alpine.js</h1>
       <p class="page-description">
-        A detailed comparison to help you choose the right tool for your Astro project.
+        A detailed comparison with interactive playgrounds to help you choose the right tool.
       </p>
     </header>
 
@@ -63,84 +159,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </section>
 
     <section class="comparison-section">
-      <h2 class="section-title">Code Comparison</h2>
-      
-      <div class="example-grid">
-        <div class="example-card">
-          <h3>Counter Example</h3>
-          <div class="code-tabs">
-            <div class="tab active">astro-dx</div>
-            <div class="tab">Alpine.js</div>
-          </div>
-          <div class="code-block">
-            <pre class="astro-dx-code active"><code>{`// TypeScript - Full type safety
-import { signal, getElement } from '@astro-dx/core';
-
-const count = signal(0);
-
-const btn = getElement('#counter-btn');
-btn?.on('click', () => count.update(v => v + 1));
-
-const display = getElement('#counter-display');
-display?.text(count);`}</code></pre>
-            <pre class="alpine-code"><code>{`<!-- HTML with Alpine attributes -->
-<div x-data="{ count: 0 }">
-  <button @click="count++">Increment</button>
-  <span x-text="count"></span>
-</div>
-
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>`}</code></pre>
-          </div>
+      <h2 class="section-title">Counter Example — Try it yourself</h2>
+      <div class="playground-comparison">
+        <div class="playground-side">
+          <div class="side-label astro-dx-label">astro-dx</div>
+          <Playground id="counter-dx" files={{ js: counterAstroDx, html: counterAstroDxHtml }} height={320} />
         </div>
-
-        <div class="example-card">
-          <h3>Conditional Rendering</h3>
-          <div class="code-tabs">
-            <div class="tab active">astro-dx</div>
-            <div class="tab">Alpine.js</div>
-          </div>
-          <div class="code-block">
-            <pre class="astro-dx-code active"><code>{`const isVisible = signal(true);
-
-const el = getElement('#conditional');
-el?.attr('hidden', computed(() => !isVisible()));`}</code></pre>
-            <pre class="alpine-code"><code>{`<div x-data="{ isVisible: true }">
-  <div x-show="isVisible">
-    Content
-  </div>
-</div>`}</code></pre>
-          </div>
+        <div class="playground-side">
+          <div class="side-label alpine-label">Alpine.js</div>
+          <AlpinePlayground id="counter-alpine" files={alpineCounterPlayground} height={320} />
         </div>
+      </div>
+    </section>
 
-        <div class="example-card">
-          <h3>List Rendering</h3>
-          <div class="code-tabs">
-            <div class="tab active">astro-dx</div>
-            <div class="tab">Alpine.js</div>
-          </div>
-          <div class="code-block">
-            <pre class="astro-dx-code active"><code>{`const items = signal(['A', 'B', 'C']);
-
-// Using dx-for directive
-<ul>
-  <li dx-for="items" dx-text="."></li>
-</ul>
-
-// Or manual approach
-const list = getElement('#list');
-items.subscribe(currentItems => {
-  list.el.innerHTML = currentItems
-    .map(item => \`<li>\${item}</li>\`)
-    .join('');
-});`}</code></pre>
-            <pre class="alpine-code"><code>{`<div x-data="{ items: ['A', 'B', 'C'] }">
-  <ul>
-    <template x-for="item in items" :key="item">
-      <li x-text="item"></li>
-    </template>
-  </ul>
-</div>`}</code></pre>
-          </div>
+    <section class="comparison-section">
+      <h2 class="section-title">Conditionals — Try it yourself</h2>
+      <div class="playground-comparison">
+        <div class="playground-side">
+          <div class="side-label astro-dx-label">astro-dx</div>
+          <Playground id="conditionals-dx" files={conditionalsAstroDx} height={400} />
+        </div>
+        <div class="playground-side">
+          <div class="side-label alpine-label">Alpine.js</div>
+          <AlpinePlayground id="conditionals-alpine" files={{ js: '', html: conditionalsAlpineHtml }} height={400} />
         </div>
       </div>
     </section>
@@ -244,30 +285,9 @@ items.subscribe(currentItems => {
     </section>
   </div>
 
-  <script>
-    // Simple tab switching for code examples
-    document.querySelectorAll('.code-tabs').forEach(tabs => {
-      const tabButtons = tabs.querySelectorAll('.tab');
-      const codeBlocks = tabs.parentElement?.querySelectorAll('pre');
-      
-      tabButtons.forEach((btn, index) => {
-        btn.addEventListener('click', () => {
-          // Update tabs
-          tabButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          
-          // Update code blocks
-          codeBlocks?.forEach((block, i) => {
-            block.classList.toggle('active', i === index);
-          });
-        });
-      });
-    });
-  </script>
-
   <style>
     .comparison-container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 2rem;
     }
@@ -342,70 +362,43 @@ items.subscribe(currentItems => {
       font-weight: 500;
     }
 
-    .example-grid {
+    .playground-comparison {
       display: grid;
-      gap: 2rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
     }
 
-    .example-card {
-      background: rgba(30, 41, 59, 0.5);
-      border-radius: 0.75rem;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      overflow: hidden;
+    @media (max-width: 1100px) {
+      .playground-comparison {
+        grid-template-columns: 1fr;
+      }
     }
 
-    .example-card h3 {
-      padding: 1rem 1.5rem;
-      margin: 0;
-      background: rgba(15, 23, 42, 0.5);
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-
-    .code-tabs {
+    .playground-side {
       display: flex;
-      background: rgba(15, 23, 42, 0.8);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .tab {
-      padding: 0.75rem 1.5rem;
-      cursor: pointer;
-      color: #94a3b8;
+    .side-label {
       font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s;
-      border-bottom: 2px solid transparent;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
     }
 
-    .tab:hover {
-      color: #e2e8f0;
-    }
-
-    .tab.active {
-      color: #60a5fa;
-      border-bottom-color: #60a5fa;
+    .astro-dx-label {
       background: rgba(96, 165, 250, 0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.2);
     }
 
-    .code-block pre {
-      margin: 0;
-      padding: 1.5rem;
-      overflow-x: auto;
-      background: #0f172a;
-      display: none;
-    }
-
-    .code-block pre.active {
-      display: block;
-    }
-
-    .code-block code {
-      font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      line-height: 1.7;
-      color: #e2e8f0;
+    .alpine-label {
+      background: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.2);
     }
 
     .use-cases {

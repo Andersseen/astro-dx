@@ -12,7 +12,6 @@ const { id, files, height = 360 } = Astro.props;
   <div class="playground-header playground-mobile-only">
     <div class="playground-tabs">
       <button class="playground-tab active" data-tab="preview" data-for={id}>Preview</button>
-      <button class="playground-tab" data-tab="js" data-for={id}>TS</button>
       <button class="playground-tab" data-tab="html" data-for={id}>HTML</button>
     </div>
     <button class="playground-run" data-run={id} title="Run code">
@@ -25,18 +24,14 @@ const { id, files, height = 360 } = Astro.props;
     <div class="playground-code-pane">
       <div class="playground-code-header">
         <div class="playground-code-tabs">
-          <button class="playground-code-tab active" data-codetab="js" data-for={id}>TS</button>
-          <button class="playground-code-tab" data-codetab="html" data-for={id}>HTML</button>
+          <button class="playground-code-tab active" data-codetab="html" data-for={id}>HTML</button>
         </div>
         <button class="playground-run-desktop" data-run-desktop={id} title="Run code">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21"/></svg>
           Run
         </button>
       </div>
-      <div class="playground-code-panel active" data-codepanel="js" data-owner={id}>
-        <div class="playground-editor" id={`editor-js-${id}`}></div>
-      </div>
-      <div class="playground-code-panel" data-codepanel="html" data-owner={id}>
+      <div class="playground-code-panel active" data-codepanel="html" data-owner={id}>
         <div class="playground-editor" id={`editor-html-${id}`}></div>
       </div>
     </div>
@@ -61,68 +56,46 @@ const { id, files, height = 360 } = Astro.props;
         title={`${id} mobile preview`}
       ></iframe>
     </div>
-    <div class="playground-panel" data-panel="js" data-owner={id}>
-      <div class="playground-editor" id={`editor-js-mobile-${id}`}></div>
-    </div>
     <div class="playground-panel" data-panel="html" data-owner={id}>
       <div class="playground-editor" id={`editor-html-mobile-${id}`}></div>
     </div>
   </div>
 
-  <script type="application/json" id={`data-js-${id}`} set:html={JSON.stringify(files.js)} />
   <script type="application/json" id={`data-html-${id}`} set:html={JSON.stringify(files.html)} />
 </div>
 
 <script>
   import { EditorView, basicSetup } from 'codemirror';
-  import { javascript } from '@codemirror/lang-javascript';
   import { html } from '@codemirror/lang-html';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { EditorState } from '@codemirror/state';
-  import { buildSrcdoc } from '../../snippets/playground/template';
+  import { buildAlpineSrcdoc } from '../../snippets/playground/template';
   import { getElement, getElements } from '@astro-dx/dom';
   import { on } from '@astro-dx/events';
-
-
-  import coreCode from '@core/dist/index.js?raw';
-  import domCode from '@dom/dist/index.js?raw';
-  import eventsCode from '@events/dist/index.js?raw';
-  import attributesCode from '@attributes/dist/index.js?raw';
-
-
-  const virtualUrls = {
-    core: URL.createObjectURL(new Blob([coreCode], { type: 'application/javascript' })),
-    dom: URL.createObjectURL(new Blob([domCode], { type: 'application/javascript' })),
-    events: URL.createObjectURL(new Blob([eventsCode], { type: 'application/javascript' })),
-    attributes: URL.createObjectURL(new Blob([attributesCode], { type: 'application/javascript' }))
-  };
 
   function initPlayground(container: HTMLElement) {
     const id = container.id.replace('playground-', '');
     const height = Number(container.dataset.height) || 360;
 
-    const jsDataRef = getElement<HTMLElement>(`#data-js-${id}`);
     const htmlDataRef = getElement<HTMLElement>(`#data-html-${id}`);
 
-    if (!jsDataRef || !htmlDataRef || !jsDataRef.el?.textContent || !htmlDataRef.el?.textContent) {
-      console.error(`[Playground] Missing data elements for "${id}"`);
+    if (!htmlDataRef?.el?.textContent) {
+      console.error(`[AlpinePlayground] Missing data for "${id}"`);
       return;
     }
 
-    let jsCode: string;
     let htmlCode: string;
 
     try {
-      jsCode = JSON.parse(jsDataRef.el.textContent);
       htmlCode = JSON.parse(htmlDataRef.el.textContent);
     } catch (err) {
-      console.error(`[Playground] Failed to parse data for "${id}":`, err);
+      console.error(`[AlpinePlayground] Failed to parse data for "${id}":`, err);
       return;
     }
 
     const editors = new Map<string, EditorView>();
 
-    function getOrCreateEditor(elId: string, type: 'js' | 'html', code: string): EditorView {
+    function getOrCreateEditor(elId: string, code: string): EditorView {
       if (editors.has(elId)) return editors.get(elId)!;
 
       const editorRef = getElement<HTMLElement>(`#${elId}`);
@@ -138,7 +111,7 @@ const { id, files, height = 360 } = Astro.props;
               '&': { height: `${height}px`, fontSize: '13px' },
               '.cm-scroller': { overflow: 'auto' },
             }),
-            type === 'js' ? javascript({ typescript: true }) : html(),
+            html(),
           ],
         }),
         parent: editorRef.el,
@@ -148,22 +121,15 @@ const { id, files, height = 360 } = Astro.props;
       return view;
     }
 
-    function getCurrentCode(): { js: string; html: string } {
-      const jsEditorDesktop = editors.get(`editor-js-${id}`);
-      const jsEditorMobile = editors.get(`editor-js-mobile-${id}`);
+    function getCurrentCode(): string {
       const htmlEditorDesktop = editors.get(`editor-html-${id}`);
       const htmlEditorMobile = editors.get(`editor-html-mobile-${id}`);
-
-      return {
-        js: jsEditorDesktop?.state.doc.toString() ?? jsEditorMobile?.state.doc.toString() ?? jsCode,
-        html: htmlEditorDesktop?.state.doc.toString() ?? htmlEditorMobile?.state.doc.toString() ?? htmlCode,
-      };
+      return htmlEditorDesktop?.state.doc.toString() ?? htmlEditorMobile?.state.doc.toString() ?? htmlCode;
     }
 
     function runCode() {
       const code = getCurrentCode();
-   
-      const srcdoc = buildSrcdoc(code.js, code.html, virtualUrls);
+      const srcdoc = buildAlpineSrcdoc(code);
 
       const desktopIframeRef = getElement<HTMLIFrameElement>(`#iframe-${id}`);
       const mobileIframeRef = getElement<HTMLIFrameElement>(`#iframe-mobile-${id}`);
@@ -183,7 +149,7 @@ const { id, files, height = 360 } = Astro.props;
         tab.classList.add('active');
         const targetPanelRef = getElement(`.playground-code-panel[data-codepanel="${target}"][data-owner="${id}"]`);
         if (targetPanelRef?.el) targetPanelRef.el.classList.add('active');
-        getOrCreateEditor(`editor-${target}-${id}`, target as 'js' | 'html', target === 'js' ? jsCode : htmlCode);
+        getOrCreateEditor(`editor-${target}-${id}`, htmlCode);
       });
     });
 
@@ -202,16 +168,13 @@ const { id, files, height = 360 } = Astro.props;
         tab.classList.add('active');
         const targetPanelRef = getElement(`.playground-panel[data-panel="${target}"][data-owner="${id}"]`);
         if (targetPanelRef?.el) targetPanelRef.el.classList.add('active');
-        if (target === 'js' || target === 'html') {
-          getOrCreateEditor(`editor-${target}-mobile-${id}`, target, target === 'js' ? jsCode : htmlCode);
-        }
       });
     });
 
     const mobileRunBtnRef = getElement(`[data-run="${id}"]`);
     if (mobileRunBtnRef?.el) on(mobileRunBtnRef.el, 'click', runCode);
 
-    getOrCreateEditor(`editor-js-${id}`, 'js', jsCode);
+    getOrCreateEditor(`editor-html-${id}`, htmlCode);
     runCode();
   }
 

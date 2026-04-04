@@ -3,15 +3,41 @@ import { type ReactiveNode, removeObserver, trackDependency, untracked } from '.
 
 let signalCounter = 0;
 
+/**
+ * A reactive signal that holds a value and notifies observers when it changes.
+ * @typeParam T - The type of value held by the signal
+ */
 export interface Signal<T> extends ReactiveNode {
+  /** Read the current value (tracks dependencies when called in reactive context) */
   (): T;
+  /** Read the current value without tracking dependencies */
   peek(): T;
+  /** Set a new value and notify all observers */
   set(value: T): void;
+  /** Update the value using a function that receives the previous value */
   update(fn: (prev: T) => T): void;
+  /** Subscribe to value changes. Returns an unsubscribe function */
   subscribe(fn: (value: T) => void): () => void;
+  /** Debug name for development tools */
   _debugName?: string;
 }
 
+/**
+ * Creates a reactive signal that holds a value and notifies observers when it changes.
+ *
+ * @example
+ * ```ts
+ * const count = signal(0);
+ * console.log(count()); // 0
+ * count.set(5);
+ * count.update(n => n + 1); // 6
+ * ```
+ *
+ * @param initial - The initial value of the signal
+ * @param equal - Custom equality function to determine if the value has changed (defaults to Object.is)
+ * @param debugName - Optional name for debugging purposes
+ * @returns A Signal instance that can be read, updated, and subscribed to
+ */
 export function signal<T>(
   initial: T,
   equal: (a: T, b: T) => boolean = Object.is,

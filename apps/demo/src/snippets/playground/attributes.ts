@@ -1,8 +1,7 @@
 import type { PlaygroundFiles } from '../../lib/playground/types.ts';
 
 export const attributesPlayground: PlaygroundFiles = {
-  js: `\
-
+  js: `
 import { signal, computed } from '@astro-dx/core';
 import { onClick} from '@astro-dx/events';
 
@@ -54,15 +53,9 @@ items.subscribe(list => {
     </li>
   \`).join('')
 })
-
-
-
-
-
 `,
 
-  html: `\
-<div style="display:flex;flex-direction:column;gap:1.25rem">
+  html: `<div style="display:flex;flex-direction:column;gap:1.25rem">
 
   <div style="display:flex;gap:.5rem;align-items:center">
     <button id="toggle-show" style="font-size:.8rem">Toggle dx-show</button>

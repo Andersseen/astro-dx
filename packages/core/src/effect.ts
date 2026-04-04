@@ -3,11 +3,19 @@ import { type ReactiveNode, removeObserver, setActiveObserver } from './tracking
 
 const MAX_ITERATIONS = 100;
 
+/**
+ * Options for configuring effect behavior
+ */
 export interface EffectOptions {
+  /** Name for debugging and profiling */
   name?: string;
+  /** Custom error handler. If not provided, errors are logged to console */
   onError?: (error: Error) => void;
 }
 
+/**
+ * Error thrown when an effect encounters a problem during execution
+ */
 export class EffectError extends Error {
   constructor(
     message: string,
@@ -19,6 +27,23 @@ export class EffectError extends Error {
   }
 }
 
+/**
+ * Creates a reactive effect that runs when its dependencies change.
+ * Effects are used for side effects like DOM updates, logging, etc.
+ *
+ * @example
+ * ```ts
+ * const count = signal(0);
+ * const dispose = effect(() => {
+ *   console.log('Count changed:', count());
+ * });
+ * // Later: dispose();
+ * ```
+ *
+ * @param fn - Function to run when dependencies change
+ * @param options - Configuration options for the effect
+ * @returns A dispose function to clean up the effect
+ */
 export function effect(fn: () => void, options: EffectOptions = {}): () => void {
   const { name, onError } = options;
   const dependencies = new Set<ReactiveNode>();
