@@ -1,7 +1,6 @@
 ---
-import AlpinePlayground from '../components/playground/AlpinePlayground.astro';
-import Playground from '../components/playground/Playground.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CodePanel from '../components/CodePanel.astro';
 import {
   alpineConditionalsPlayground,
   alpineCounterPlayground,
@@ -22,79 +21,11 @@ count.subscribe(v => {
   if (el) el.textContent = String(v);
 });`;
 
-const counterAstroDxHtml = `\
-<div style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem">
-  <button id="increment" style="font-size:1rem;padding:.5rem 1.5rem">
-    Increment
-  </button>
-
-  <div id="counter-display" style="font-size:2.5rem;font-weight:700;color:#60a5fa">
-    0
-  </div>
-
-  <button id="reset" style="font-size:.75rem;opacity:.6">
-    Reset
-  </button>
-</div>`;
-
-const counterAlpineHtml = `\
-<div
-  x-data="{ count: 0 }"
-  style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem"
->
-  <button
-    @click="count++"
-    style="font-size:1rem;padding:.5rem 1.5rem"
-  >
-    Increment
-  </button>
-
-  <div style="font-size:2.5rem;font-weight:700;color:#fbbf24" x-text="count">
-    0
-  </div>
-
-  <button
-    @click="count = 0"
-    style="font-size:.75rem;opacity:.6"
-  >
-    Reset
-  </button>
-</div>`;
+const counterAlpineHtml = alpineCounterPlayground.html;
 
 const conditionalsAstroDx = attributesPlayground;
 
-const conditionalsAlpineHtml = `\
-<div
-  x-data="{ showBox: true, mounted: true }"
-  style="display:flex;flex-direction:column;gap:1.25rem;padding:1rem"
->
-  <div style="display:flex;gap:.5rem;align-items:center">
-    <button @click="showBox = !showBox" style="font-size:.8rem">
-      Toggle x-show
-    </button>
-    <div
-      x-show="showBox"
-      style="padding:.25rem .75rem;background:#fb923c20;border-radius:4px;
-             border:1px solid #fb923c40;font-size:.8rem;color:#fb923c"
-    >
-      I stay in DOM (display:none)
-    </div>
-  </div>
-
-  <div style="display:flex;gap:.5rem;align-items:center">
-    <button @click="mounted = !mounted" style="font-size:.8rem">
-      Toggle x-if
-    </button>
-    <template x-if="mounted">
-      <div
-        style="padding:.25rem .75rem;background:#16a34a20;border-radius:4px;
-               border:1px solid #16a34a40;font-size:.8rem;color:#4ade80"
-      >
-        I am removed from DOM
-      </div>
-    </template>
-  </div>
-</div>`;
+const conditionalsAlpineHtml = alpineConditionalsPlayground.html;
 ---
 
 <BaseLayout title="Comparison with Alpine.js">
@@ -102,7 +33,7 @@ const conditionalsAlpineHtml = `\
     <header class="page-header">
       <h1 class="page-title">astro-dx vs Alpine.js</h1>
       <p class="page-description">
-        A detailed comparison with interactive playgrounds to help you choose the right tool.
+        A detailed comparison to help you choose the right tool for your Astro project.
       </p>
     </header>
 
@@ -159,29 +90,29 @@ const conditionalsAlpineHtml = `\
     </section>
 
     <section class="comparison-section">
-      <h2 class="section-title">Counter Example — Try it yourself</h2>
-      <div class="playground-comparison">
-        <div class="playground-side">
-          <div class="side-label astro-dx-label">astro-dx</div>
-          <Playground id="counter-dx" files={{ js: counterAstroDx, html: counterAstroDxHtml }} height={320} />
+      <h2 class="section-title">Counter Example</h2>
+      <div class="code-comparison">
+        <div class="code-side">
+          <div class="side-label astro-dx-label">astro-dx — TypeScript</div>
+          <CodePanel id="counter-dx" code={counterAstroDx} language="typescript" height={320} />
         </div>
-        <div class="playground-side">
-          <div class="side-label alpine-label">Alpine.js</div>
-          <AlpinePlayground id="counter-alpine" files={alpineCounterPlayground} height={320} />
+        <div class="code-side">
+          <div class="side-label alpine-label">Alpine.js — HTML</div>
+          <CodePanel id="counter-alpine" code={counterAlpineHtml} language="html" height={320} />
         </div>
       </div>
     </section>
 
     <section class="comparison-section">
-      <h2 class="section-title">Conditionals — Try it yourself</h2>
-      <div class="playground-comparison">
-        <div class="playground-side">
-          <div class="side-label astro-dx-label">astro-dx</div>
-          <Playground id="conditionals-dx" files={conditionalsAstroDx} height={400} />
+      <h2 class="section-title">Conditionals Example</h2>
+      <div class="code-comparison">
+        <div class="code-side">
+          <div class="side-label astro-dx-label">astro-dx — TypeScript</div>
+          <CodePanel id="conditionals-dx" code={conditionalsAstroDx.js} language="typescript" height={400} />
         </div>
-        <div class="playground-side">
-          <div class="side-label alpine-label">Alpine.js</div>
-          <AlpinePlayground id="conditionals-alpine" files={{ js: '', html: conditionalsAlpineHtml }} height={400} />
+        <div class="code-side">
+          <div class="side-label alpine-label">Alpine.js — HTML</div>
+          <CodePanel id="conditionals-alpine" code={conditionalsAlpineHtml} language="html" height={400} />
         </div>
       </div>
     </section>
@@ -362,19 +293,19 @@ const conditionalsAlpineHtml = `\
       font-weight: 500;
     }
 
-    .playground-comparison {
+    .code-comparison {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
     }
 
-    @media (max-width: 1100px) {
-      .playground-comparison {
+    @media (max-width: 900px) {
+      .code-comparison {
         grid-template-columns: 1fr;
       }
     }
 
-    .playground-side {
+    .code-side {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
