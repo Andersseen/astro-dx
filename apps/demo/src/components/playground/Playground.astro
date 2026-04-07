@@ -44,7 +44,7 @@ const { id, files, height = 360 } = Astro.props;
       <iframe
         id={`iframe-${id}`}
         class="playground-iframe"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         style={`height:${height}px`}
         title={`${id} preview`}
       ></iframe>
@@ -56,7 +56,7 @@ const { id, files, height = 360 } = Astro.props;
       <iframe
         id={`iframe-mobile-${id}`}
         class="playground-iframe"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         style={`height:${height}px`}
         title={`${id} mobile preview`}
       ></iframe>
@@ -90,11 +90,17 @@ const { id, files, height = 360 } = Astro.props;
   import attributesCode from '@attributes/dist/index.js?raw';
 
 
+  // Use data URLs instead of blob URLs for cross-origin iframe compatibility
+  function toDataUrl(code: string): string {
+    const base64 = btoa(unescape(encodeURIComponent(code)));
+    return `data:text/javascript;base64,${base64}`;
+  }
+
   const virtualUrls = {
-    core: URL.createObjectURL(new Blob([coreCode], { type: 'application/javascript' })),
-    dom: URL.createObjectURL(new Blob([domCode], { type: 'application/javascript' })),
-    events: URL.createObjectURL(new Blob([eventsCode], { type: 'application/javascript' })),
-    attributes: URL.createObjectURL(new Blob([attributesCode], { type: 'application/javascript' }))
+    core: toDataUrl(coreCode),
+    dom: toDataUrl(domCode),
+    events: toDataUrl(eventsCode),
+    attributes: toDataUrl(attributesCode)
   };
 
   function initPlayground(container: HTMLElement) {

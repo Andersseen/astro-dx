@@ -11,7 +11,7 @@ export function buildSrcdoc(
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline';">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body { margin: 0; padding: 1rem; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; line-height: 1.5; color: #e4e4e7; background: hsl(240 6% 10%); }

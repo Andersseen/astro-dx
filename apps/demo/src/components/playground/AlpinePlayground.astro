@@ -39,7 +39,7 @@ const { id, files, height = 360 } = Astro.props;
       <iframe
         id={`iframe-${id}`}
         class="playground-iframe"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         style={`height:${height}px`}
         title={`${id} preview`}
       ></iframe>
@@ -51,7 +51,7 @@ const { id, files, height = 360 } = Astro.props;
       <iframe
         id={`iframe-mobile-${id}`}
         class="playground-iframe"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         style={`height:${height}px`}
         title={`${id} mobile preview`}
       ></iframe>
