@@ -29,6 +29,7 @@
       "types": "./dist/dom.d.ts"
     }
   },
+  "sideEffects": ["./dist/elements.js"],
   "files": ["dist"],
   "scripts": {
     "build": "tsup"

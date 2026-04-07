@@ -138,4 +138,58 @@ describe('effect()', () => {
       });
     }).toThrow('[astro-dx] Infinite loop detected in effect');
   });
+
+  it('handles errors with onError callback', () => {
+    const count = signal(0);
+    const onError = vi.fn();
+
+    effect(
+      () => {
+        if (count() > 0) {
+          throw new Error('Test error');
+        }
+      },
+      { onError }
+    );
+
+    expect(onError).not.toHaveBeenCalled();
+
+    count.set(1);
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(onError.mock.calls[0][0].message).toContain('Test error');
+  });
+
+  it('logs errors to console when no onError provided', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const count = signal(0);
+
+    effect(() => {
+      if (count() > 0) {
+        throw new Error('Console error test');
+      }
+    });
+
+    count.set(1);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Console error test'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('supports named effects', () => {
+    const count = signal(0);
+    const onError = vi.fn();
+
+    effect(
+      () => {
+        if (count() > 0) {
+          throw new Error('Named effect error');
+        }
+      },
+      { name: 'MyEffect', onError }
+    );
+
+    count.set(1);
+    expect(onError.mock.calls[0][0].message).toContain('MyEffect');
+  });
 });

@@ -1,0 +1,95 @@
+---
+interface Props {
+  id: string;
+  code: string;
+  language?: 'typescript' | 'html';
+  label?: string;
+  height?: number;
+}
+
+const { id, code, language = 'typescript', label, height = 360 } = Astro.props;
+---
+
+<div class="code-panel" id={`code-panel-${id}`} data-height={height} data-lang={language}>
+  {label && <div class="code-panel-label">{label}</div>}
+  <div class="code-panel-editor" id={`editor-${id}`}></div>
+  <script type="application/json" id={`data-${id}`} set:html={JSON.stringify(code)} />
+</div>
+
+<script>
+  import { EditorView, basicSetup } from 'codemirror';
+  import { javascript } from '@codemirror/lang-javascript';
+  import { html } from '@codemirror/lang-html';
+  import { oneDark } from '@codemirror/theme-one-dark';
+  import { EditorState } from '@codemirror/state';
+  import { getElement, getElements } from '@astro-dx/dom';
+
+  function initCodePanel(container: HTMLElement) {
+    const id = container.id.replace('code-panel-', '');
+    const height = Number(container.dataset.height) || 360;
+    const lang = container.dataset.lang || 'typescript';
+
+    const dataRef = getElement<HTMLElement>(`#data-${id}`);
+    if (!dataRef?.el?.textContent) return;
+
+    let code: string;
+    try {
+      code = JSON.parse(dataRef.el.textContent);
+    } catch {
+      return;
+    }
+
+    const editorRef = getElement<HTMLElement>(`#editor-${id}`);
+    if (!editorRef?.el) return;
+
+    new EditorView({
+      state: EditorState.create({
+        doc: code,
+        extensions: [
+          basicSetup,
+          oneDark,
+          EditorView.theme({
+            '&': { height: `${height}px`, fontSize: '13px' },
+            '.cm-scroller': { overflow: 'auto' },
+          }),
+          lang === 'typescript' ? javascript({ typescript: true }) : html(),
+        ],
+      }),
+      parent: editorRef.el,
+    });
+  }
+
+  getElements<HTMLElement>('.code-panel').forEach(ref => initCodePanel(ref.el));
+</script>
+
+<style>
+  .code-panel {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: hsl(240 6% 10%);
+  }
+
+  .code-panel-label {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(240 6% 8%);
+    color: hsl(var(--muted-foreground));
+  }
+
+  .code-panel-editor {
+    overflow: auto;
+  }
+
+  .code-panel-editor :global(.cm-editor) {
+    border-radius: 0;
+  }
+
+  .code-panel-editor :global(.cm-gutters) {
+    border-right: 1px solid hsl(var(--border));
+  }
+</style>

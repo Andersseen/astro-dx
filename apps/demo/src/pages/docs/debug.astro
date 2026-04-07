@@ -1,0 +1,369 @@
+---
+import CodeBlock from '../../components/CodeBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Debug Mode">
+  <div class="docs-container">
+    <header class="page-header">
+      <h1 class="page-title">Debug Mode</h1>
+      <p class="page-description">
+        Enable debug mode to get insights into your application's reactivity during development.
+      </p>
+    </header>
+
+    <div class="docs-content">
+      <nav class="docs-nav">
+        <ul>
+          <li><a href="#enable-debug">Enabling Debug Mode</a></li>
+          <li><a href="#signal-logging">Signal Logging</a></li>
+          <li><a href="#effect-logging">Effect Logging</a></li>
+          <li><a href="#performance">Performance Tracking</a></li>
+          <li><a href="#warnings">Warnings</a></li>
+        </ul>
+      </nav>
+
+      <main class="docs-main">
+        <section id="enable-debug" class="doc-section">
+          <h2>Enabling Debug Mode</h2>
+          
+          <p>Debug mode helps you understand what's happening with signals, effects, and services in your application. It's automatically disabled in production builds.</p>
+
+          <h3>Method 1: In Code</h3>
+          
+          <CodeBlock 
+            language="typescript"
+            filename="app.ts"
+            code={`import { enableDebug } from '@astro-dx/core';
+
+// Enable all debug features
+enableDebug();
+
+// Or enable specific features
+enableDebug({
+  logSignals: true,
+  logEffects: true,
+  logServices: false,
+  showWarnings: true
+});`}
+          />
+
+          <h3>Method 2: Via localStorage (Persistent)</h3>
+          <p>Open your browser's DevTools console and run:</p>
+          
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`localStorage.setItem('astro-dx-debug', 'true');
+location.reload();`}
+          />
+
+          <h3>Disabling Debug Mode</h3>
+          
+          <CodeBlock 
+            language="typescript"
+            filename="app.ts"
+            code={`import { disableDebug } from '@astro-dx/core';
+
+disableDebug();`}
+          />
+          
+          <p>Or clear localStorage:</p>
+          
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`localStorage.removeItem('astro-dx-debug');
+location.reload();`}
+          />
+        </section>
+
+        <section id="signal-logging" class="doc-section">
+          <h2>Signal Logging</h2>
+          
+          <p>When signal logging is enabled, you'll see every signal update in the console:</p>
+
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:signal] count: 0 → 1
+[astro-dx:signal] count: 1 → 2
+[astro-dx:signal] user: {name: "John"} → {name: "Jane"}`}
+          />
+
+          <div class="tip-box">
+            <strong>💡 Tip:</strong> Use this to track down unnecessary re-renders or unexpected state changes.
+          </div>
+        </section>
+
+        <section id="effect-logging" class="doc-section">
+          <h2>Effect Logging</h2>
+          
+          <p>Effect logging shows when effects execute and how many dependencies they track:</p>
+
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:effect] "counter" executed with 2 dependencies (0.12ms)
+[astro-dx:effect] executed with 1 dependencies (0.05ms)`}
+          />
+
+          <p>To name your effects for better debugging:</p>
+
+          <CodeBlock 
+            language="typescript"
+            filename="example.ts"
+            code={`effect(() => {
+  console.log('Count is:', count());
+}, { name: 'counter' });`}
+          />
+        </section>
+
+        <section id="performance" class="doc-section">
+          <h2>Performance Tracking</h2>
+          
+          <p>You can track the performance of specific operations:</p>
+
+          <CodeBlock 
+            language="typescript"
+            filename="example.ts"
+            code={`import { startPerf, endPerf } from '@astro-dx/core';
+
+// In your code
+startPerf('heavy-computation');
+// ... do some work
+const duration = endPerf('heavy-computation');
+console.log(\`Operation took \${duration}ms\`);`}
+          />
+
+          <div class="tip-box warning">
+            <strong>⚠️ Warning:</strong> Performance tracking is only available when debug mode is enabled. In production, these functions are no-ops.
+          </div>
+        </section>
+
+        <section id="warnings" class="doc-section">
+          <h2>Warnings</h2>
+          
+          <p>Debug mode can warn you about common issues:</p>
+
+          <CodeBlock 
+            language="bash"
+            filename="Console Output"
+            showLineNumbers={false}
+            code={`[astro-dx:warn] Effect has no reactive dependencies
+[astro-dx:warn] Signal "count" updated with the same value
+[astro-dx:warn] Service "CartService" registered multiple times`}
+          />
+
+          <table class="warnings-table">
+            <thead>
+              <tr>
+                <th>Warning</th>
+                <th>Meaning</th>
+                <th>Solution</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>"Effect has no reactive dependencies"</td>
+                <td>The effect will never re-run</td>
+                <td>Make sure the effect reads at least one signal</td>
+              </tr>
+              <tr>
+                <td>"Signal updated with the same value"</td>
+                <td>Unnecessary update that won't trigger effects</td>
+                <td>Use update() only when the value actually changes</td>
+              </tr>
+              <tr>
+                <td>"Service registered multiple times"</td>
+                <td>Possible memory leak or duplicate initialization</td>
+                <td>Register services only once, usually in layout</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="doc-section">
+          <h2>Browser DevTools Integration</h2>
+          
+          <p>You can also toggle debug mode directly from the browser console:</p>
+
+          <CodeBlock 
+            language="bash"
+            filename="Browser Console"
+            showLineNumbers={false}
+            code={`// Check current state
+window.__ASTRO_DX_DEBUG__  // true or false
+
+// Toggle debug mode
+window.enableAstroDxDebug()
+window.disableAstroDxDebug()`}
+          />
+
+          <div class="tip-box">
+            <strong>💡 Pro Tip:</strong> Create a bookmarklet to quickly toggle debug mode:
+            <br />
+            <code class="bookmarklet">javascript:localStorage.setItem('astro-dx-debug', localStorage.getItem('astro-dx-debug') === 'true' ? 'false' : 'true');location.reload();</code>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <style>
+    .docs-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    .page-description {
+      font-size: 1.125rem;
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .docs-content {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 3rem;
+    }
+
+    .docs-nav {
+      position: sticky;
+      top: 6rem;
+      height: fit-content;
+    }
+
+    .docs-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .docs-nav li {
+      margin-bottom: 0.5rem;
+    }
+
+    .docs-nav a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .docs-nav a:hover {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .docs-main {
+      min-width: 0;
+    }
+
+    .doc-section {
+      margin-bottom: 3rem;
+    }
+
+    .doc-section h2 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+    }
+
+    .doc-section h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+      color: #e2e8f0;
+    }
+
+    .doc-section p {
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .tip-box {
+      background: rgba(96, 165, 250, 0.1);
+      border-left: 4px solid #60a5fa;
+      padding: 1rem 1.5rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 1.5rem 0;
+      color: #e2e8f0;
+    }
+
+    .tip-box.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-left-color: #f59e0b;
+    }
+
+    .tip-box .bookmarklet {
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+
+    .warnings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+
+    .warnings-table th,
+    .warnings-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .warnings-table th {
+      background: rgba(15, 23, 42, 0.5);
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .warnings-table td {
+      color: #cbd5e1;
+    }
+
+    @media (max-width: 768px) {
+      .docs-content {
+        grid-template-columns: 1fr;
+      }
+
+      .docs-nav {
+        position: static;
+        order: -1;
+      }
+    }
+  </style>
+</BaseLayout>

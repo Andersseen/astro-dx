@@ -2,6 +2,7 @@
 import CodeBlock from '../../components/CodeBlock.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
+
 <BaseLayout title="@astro-dx/core">
   <section and-layout="vertical gap:xl" class="max-w-3xl mx-auto px-6 py-24">
 
@@ -15,43 +16,53 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">signal()</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal } from '@astro-dx/core';
+      <CodeBlock 
+        language="typescript" 
+        filename="example.ts"
+        code={`import { signal } from '@astro-dx/core';
 
 const count = signal(0);
 
-count();           
-count.set(5);      
-count.update(v => v + 1);  
-count.subscribe(v => console.log(v)); 
-      `} />
+console.log(count());        // 0
+count.set(5);                // set to 5
+count.update(v => v + 1);    // increment
+count.subscribe(v => console.log(v)); // listen for changes`} 
+      />
     </div>
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">computed()</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal, computed } from '@astro-dx/core';
+      <CodeBlock 
+        language="typescript" 
+        filename="example.ts"
+        code={`import { signal, computed } from '@astro-dx/core';
 
 const count = signal(0);
 const double = computed(() => count() * 2);
 
-double();  
+console.log(double());  // 0
 count.set(3);
-double();  
-      `} />
+console.log(double());  // 6`} 
+      />
     </div>
 
     <div and-layout="vertical gap:sm">
       <h2 and-text="h5 weight:bold">effect()</h2>
-      <CodeBlock lang="typescript" code={`
-import { signal, effect } from '@astro-dx/core';
+      <CodeBlock 
+        language="typescript" 
+        filename="example.ts"
+        code={`import { signal, effect } from '@astro-dx/core';
 
 const count = signal(0);
+
 const stop = effect(() => {
+  console.log('Count is:', count());
 });
 
-
-      `} />
+// Later, cleanup
+count.set(1);  // Logs: "Count is: 1"
+stop();        // Stop listening`} 
+      />
     </div>
 
     <div and-layout="vertical gap:sm">
@@ -59,21 +70,64 @@ const stop = effect(() => {
       <p and-text="p-sm" class="opacity-70">
         Lifecycle hooks for Astro ViewTransitions. Fall back gracefully without ViewTransitions.
       </p>
-      <CodeBlock lang="typescript" code={`
-import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
+      <CodeBlock 
+        language="typescript" 
+        filename="example.ts"
+        code={`import { onPageLoad, onBeforeSwap } from '@astro-dx/core';
 import { getElement, destroyAll } from '@astro-dx/dom';
 
 onPageLoad(() => {
-  
+  // Initialize after page load
   const btn = getElement('#btn');
-  btn.on('click', () => {  });
+  btn?.on('click', () => { 
+    console.log('clicked');
+  });
 });
 
 onBeforeSwap(() => {
-  
-  destroyAll(); 
-});
-      `} />
+  // Cleanup before navigation
+  destroyAll();
+});`} 
+      />
+    </div>
+
+    <div and-layout="vertical gap:sm">
+      <h2 and-text="h5 weight:bold">Services</h2>
+      <p and-text="p-sm" class="opacity-70">
+        Share state across Astro islands with dependency injection.
+      </p>
+      <CodeBlock 
+        language="typescript" 
+        filename="cart.service.ts"
+        code={`import { signal, computed } from '@astro-dx/core';
+
+export class CartService {
+  #items = signal<string[]>([]);
+
+  readonly total = computed(() => this.#items().length);
+
+  add(item: string) {
+    this.#items.update(prev => [...prev, item]);
+  }
+
+  clear() {
+    this.#items.set([]);
+  }
+}`} 
+      />
+
+      <CodeBlock 
+        language="typescript" 
+        filename="island-a.astro"
+        code={`import { register, inject } from '@astro-dx/core';
+import { CartService } from './cart.service';
+
+// Register once
+register([CartService]);
+
+const cart = inject(CartService);
+cart.add('Product A');`} 
+      />
     </div>
 
   </section>

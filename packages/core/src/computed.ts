@@ -6,14 +6,40 @@ import {
   untracked,
 } from './tracking.ts';
 
+/**
+ * A computed value that automatically recalculates when its dependencies change.
+ * Computed values are lazy - they only recompute when read and only if dependencies have changed.
+ * @typeParam T - The type of the computed value
+ */
 export interface Computed<T> {
+  /** Read the computed value (tracks dependencies when called in reactive context) */
   (): T;
+  /** Read the computed value without tracking dependencies */
   peek(): T;
+  /** Subscribe to changes in the computed value */
   subscribe(fn: (value: T) => void): () => void;
+  /** Internal version counter for change detection */
   version: number;
+  /** Set of observers that depend on this computed value */
   observers: Set<ReactiveNode>;
 }
 
+/**
+ * Creates a computed value that automatically recalculates when its reactive dependencies change.
+ * Computed values are lazy - they only recompute when read and only if dependencies have changed.
+ *
+ * @example
+ * ```ts
+ * const count = signal(0);
+ * const double = computed(() => count() * 2);
+ * console.log(double()); // 0
+ * count.set(5);
+ * console.log(double()); // 10 (recomputed)
+ * ```
+ *
+ * @param fn - A function that computes the value based on reactive dependencies
+ * @returns A Computed instance that can be read and subscribed to
+ */
 export function computed<T>(fn: () => T): Computed<T> {
   let value: T;
   let dirty = true;

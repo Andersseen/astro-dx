@@ -1,0 +1,496 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CodePanel from '../components/CodePanel.astro';
+import {
+  alpineConditionalsPlayground,
+  alpineCounterPlayground,
+} from '../snippets/playground/alpine-counter.ts';
+import { attributesPlayground } from '../snippets/playground/attributes.ts';
+
+const counterAstroDx = `\
+import { signal } from '@astro-dx/core';
+import { onClick } from '@astro-dx/events';
+
+const count = signal(0);
+
+onClick('#increment', () => count.update(v => v + 1));
+onClick('#reset', () => count.set(0));
+
+count.subscribe(v => {
+  const el = document.querySelector('#counter-display');
+  if (el) el.textContent = String(v);
+});`;
+
+const counterAlpineHtml = alpineCounterPlayground.html;
+
+const conditionalsAstroDx = attributesPlayground;
+
+const conditionalsAlpineHtml = alpineConditionalsPlayground.html;
+---
+
+<BaseLayout title="Comparison with Alpine.js">
+  <div class="comparison-container">
+    <header class="page-header">
+      <h1 class="page-title">astro-dx vs Alpine.js</h1>
+      <p class="page-description">
+        A detailed comparison to help you choose the right tool for your Astro project.
+      </p>
+    </header>
+
+    <section class="comparison-section">
+      <h2 class="section-title">Quick Comparison</h2>
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>astro-dx</th>
+              <th>Alpine.js</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Bundle Size</strong></td>
+              <td class="highlight">~3KB (core only)</td>
+              <td>~15KB</td>
+            </tr>
+            <tr>
+              <td><strong>Framework</strong></td>
+              <td class="highlight">Zero framework</td>
+              <td>Embedded DSL</td>
+            </tr>
+            <tr>
+              <td><strong>Syntax</strong></td>
+              <td class="highlight">TypeScript / JavaScript</td>
+              <td>HTML attributes (x-data, x-show, etc.)</td>
+            </tr>
+            <tr>
+              <td><strong>Type Safety</strong></td>
+              <td class="highlight">Full TypeScript support</td>
+              <td>Limited</td>
+            </tr>
+            <tr>
+              <td><strong>Learning Curve</strong></td>
+              <td>Familiar (Angular/React patterns)</td>
+              <td class="highlight">Very easy</td>
+            </tr>
+            <tr>
+              <td><strong>State Sharing</strong></td>
+              <td class="highlight">Services across islands</td>
+              <td>Single x-data scope</td>
+            </tr>
+            <tr>
+              <td><strong>Server Rendering</strong></td>
+              <td class="highlight">100% SSR compatible</td>
+              <td>Hydration required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <h2 class="section-title">Counter Example</h2>
+      <div class="code-comparison">
+        <div class="code-side">
+          <div class="side-label astro-dx-label">astro-dx — TypeScript</div>
+          <CodePanel id="counter-dx" code={counterAstroDx} language="typescript" height={320} />
+        </div>
+        <div class="code-side">
+          <div class="side-label alpine-label">Alpine.js — HTML</div>
+          <CodePanel id="counter-alpine" code={counterAlpineHtml} language="html" height={320} />
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <h2 class="section-title">Conditionals Example</h2>
+      <div class="code-comparison">
+        <div class="code-side">
+          <div class="side-label astro-dx-label">astro-dx — TypeScript</div>
+          <CodePanel id="conditionals-dx" code={conditionalsAstroDx.js} language="typescript" height={400} />
+        </div>
+        <div class="code-side">
+          <div class="side-label alpine-label">Alpine.js — HTML</div>
+          <CodePanel id="conditionals-alpine" code={conditionalsAlpineHtml} language="html" height={400} />
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <h2 class="section-title">When to Use Each</h2>
+      <div class="use-cases">
+        <div class="use-case astro-dx">
+          <h3>Use astro-dx when:</h3>
+          <ul>
+            <li>You need <strong>type safety</strong> and TypeScript support</li>
+            <li>You're building <strong>complex state management</strong> across multiple islands</li>
+            <li>You want <strong>fine-grained control</strong> over reactivity</li>
+            <li>You prefer <strong>explicit code</strong> over magic attributes</li>
+            <li>You need <strong>services/singletons</strong> for shared state</li>
+            <li>Bundle size is critical (<strong>5x smaller</strong> than Alpine)</li>
+          </ul>
+        </div>
+
+        <div class="use-case alpine">
+          <h3>Use Alpine.js when:</h3>
+          <ul>
+            <li>You need <strong>rapid prototyping</strong></li>
+            <li>You prefer <strong>HTML-centric</strong> development</li>
+            <li>Your team is more <strong>designer-focused</strong></li>
+            <li>You need <strong>transitions/animations</strong> out of the box</li>
+            <li>You want the <strong>easiest learning curve</strong></li>
+            <li>You're building <strong>simple, isolated components</strong></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <h2 class="section-title">Performance Comparison</h2>
+      <div class="performance-stats">
+        <div class="stat-card">
+          <div class="stat-value">~3KB</div>
+          <div class="stat-label">astro-dx (core)</div>
+          <div class="stat-sublabel">gzipped</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">~15KB</div>
+          <div class="stat-label">Alpine.js</div>
+          <div class="stat-sublabel">gzipped</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Zero</div>
+          <div class="stat-label">astro-dx SSR</div>
+          <div class="stat-sublabel">JS sent to client</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Full</div>
+          <div class="stat-label">Alpine.js hydration</div>
+          <div class="stat-sublabel">Required on load</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <h2 class="section-title">Key Differences</h2>
+      <div class="differences-list">
+        <div class="difference-item">
+          <h4>1. Philosophy</h4>
+          <p><strong>astro-dx</strong> is designed for developers who want explicit control and type safety. It's closer to Angular's signals or React's useState but for Astro.</p>
+          <p><strong>Alpine.js</strong> follows the "HTML-first" philosophy, similar to Vue or AngularJS (1.x), where behavior is declared in HTML attributes.</p>
+        </div>
+
+        <div class="difference-item">
+          <h4>2. Bundle Size</h4>
+          <p><strong>astro-dx</strong> is modular - import only what you need. The core is ~3KB, and you can add features (events, dom bindings) as needed.</p>
+          <p><strong>Alpine.js</strong> is ~15KB for the full framework. You can't tree-shake unused features.</p>
+        </div>
+
+        <div class="difference-item">
+          <h4>3. State Management</h4>
+          <p><strong>astro-dx</strong> has built-in services with dependency injection, allowing you to share state across multiple Astro islands without prop drilling.</p>
+          <p><strong>Alpine.js</strong> uses x-data scopes. Sharing state between components requires global stores or custom events.</p>
+        </div>
+
+        <div class="difference-item">
+          <h4>4. Type Safety</h4>
+          <p><strong>astro-dx</strong> is written in TypeScript with full type inference. Your editor will catch errors before runtime.</p>
+          <p><strong>Alpine.js</strong> is JavaScript-based. While you can use TypeScript, it's not designed for it and type checking is limited.</p>
+        </div>
+
+        <div class="difference-item">
+          <h4>5. Server Rendering</h4>
+          <p><strong>astro-dx</strong> adds zero JavaScript to your server-rendered HTML. Everything runs client-side only where needed.</p>
+          <p><strong>Alpine.js</strong> requires hydration. The HTML contains Alpine directives that need to be parsed and initialized.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section cta-section">
+      <h2 class="section-title">Ready to try astro-dx?</h2>
+      <div class="cta-buttons">
+        <a href="/docs/installation" class="cta-button primary">Get Started</a>
+        <a href="/demo" class="cta-button secondary">View Demos</a>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .comparison-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    .page-description {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .comparison-section {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 1.875rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #f1f5f9;
+    }
+
+    .comparison-table-wrapper {
+      overflow-x: auto;
+      border-radius: 0.75rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .comparison-table th {
+      background: rgba(15, 23, 42, 0.5);
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .comparison-table td {
+      color: #cbd5e1;
+    }
+
+    .comparison-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .comparison-table .highlight {
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    .code-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .code-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .code-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .side-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+    }
+
+    .astro-dx-label {
+      background: rgba(96, 165, 250, 0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.2);
+    }
+
+    .alpine-label {
+      background: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+    }
+
+    .use-cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .use-case {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      padding: 2rem;
+    }
+
+    .use-case.astro-dx {
+      border-left: 4px solid #60a5fa;
+    }
+
+    .use-case.alpine {
+      border-left: 4px solid #4ade80;
+    }
+
+    .use-case h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+    }
+
+    .use-case ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .use-case li {
+      padding: 0.5rem 0;
+      color: #cbd5e1;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .use-case li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .performance-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .stat-sublabel {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-top: 0.25rem;
+    }
+
+    .differences-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .difference-item {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      padding: 2rem;
+    }
+
+    .difference-item h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+    }
+
+    .difference-item p {
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .difference-item p:last-child {
+      margin-bottom: 0;
+    }
+
+    .cta-section {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(192, 132, 252, 0.1) 100%);
+      border-radius: 1rem;
+      margin-top: 4rem;
+    }
+
+    .cta-section .section-title {
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.875rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .cta-button.primary {
+      background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+      color: white;
+    }
+
+    .cta-button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(96, 165, 250, 0.3);
+    }
+
+    .cta-button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cta-button.secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</BaseLayout>

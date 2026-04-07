@@ -28,22 +28,30 @@ export class DxFor extends HTMLElement {
   }
 
   private _connect(signalName: string): void {
-    waitRegister(signalName, (sig) => {
-      this._cleanup = (sig as unknown as SubscribableItems).subscribe((items) =>
-        this._render(items ?? [])
-      );
-    });
+    try {
+      waitRegister(signalName, (sig) => {
+        this._cleanup = (sig as unknown as SubscribableItems).subscribe((items) =>
+          this._render(items ?? [])
+        );
+      });
+    } catch (err) {
+      console.error('[dx-for] Failed to connect signal:', err);
+    }
   }
 
   private _render(items: Item[]): void {
     if (!this._tpl) return;
 
-    if (this._keyField) {
-      this._renderKeyed(items);
-      return;
-    }
+    try {
+      if (this._keyField) {
+        this._renderKeyed(items);
+        return;
+      }
 
-    this._renderSimple(items);
+      this._renderSimple(items);
+    } catch (err) {
+      console.error('[dx-for] Error rendering items:', err);
+    }
   }
 
   private _renderSimple(items: Item[]): void {
@@ -106,10 +114,14 @@ export class DxFor extends HTMLElement {
   }
 
   private _bindItem(el: Element, item: Item): void {
-    applyBinding(el, item);
+    try {
+      applyBinding(el, item);
 
-    for (const child of Array.from(el.querySelectorAll('[dx-text],[dx-attr],[dx-class]'))) {
-      applyBinding(child, item);
+      for (const child of Array.from(el.querySelectorAll('[dx-text],[dx-attr],[dx-class]'))) {
+        applyBinding(child, item);
+      }
+    } catch (err) {
+      console.error('[dx-for] Error binding item:', err);
     }
   }
 

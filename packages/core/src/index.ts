@@ -1,6 +1,7 @@
 export { signal } from './signal.ts';
 export { computed } from './computed.ts';
-export { effect } from './effect.ts';
+export { effect, EffectError } from './effect.ts';
+export type { EffectOptions } from './effect.ts';
 export { linkedSignal } from './linkedSignal.ts';
 export {
   register,
@@ -13,6 +14,29 @@ export {
 } from './registry.ts';
 export { onPageLoad, onBeforeSwap } from './lifecycle.ts';
 export { untracked } from './tracking.ts';
+export {
+  enableDebug,
+  disableDebug,
+  isDebugEnabled,
+  startPerf,
+  endPerf,
+} from './debug.ts';
+export {
+  AstroDxError,
+  createElementNotFoundError,
+  createServiceNotFoundError,
+  createInfiniteLoopError,
+  createMissingDependencyError,
+} from './errors.ts';
 export type { Signal } from './signal.ts';
 export type { Computed } from './computed.ts';
 export type { LinkedSignal } from './linkedSignal.ts';
+export {
+  createSignalKey,
+  registerSignal,
+  resolveSignal,
+  waitForSignal,
+  unregisterSignal,
+  clearSignalRegistry,
+} from './signalKey.ts';
+export type { SignalKey, ReadableSignal } from './signalKey.ts';
